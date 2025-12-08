@@ -1,7 +1,6 @@
+@import url("./assets/fonts/index.css");
 @import "tailwindcss";
 @import "tw-animate-css";
-
-@import url("./assets/fonts/index.css");
 
 @custom-variant dark (&:is(.dark *));
 
@@ -52,7 +51,88 @@ APP STYLING CONFIGURATIONS
 }
 
 :root {
-  --radius: 0.625rem;
+  --background: 210 20% 98%;
+  --foreground: 222 47% 11%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+
+  --primary: 142 76% 36%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222 47% 11%;
+
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 47%;
+
+  --accent: 38 92% 50%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  --ring: 142 76% 36%;
+
+  --radius: 0.75rem;
+
+  /* Custom semantic colors */
+  --success: 142 76% 36%;
+  --success-foreground: 0 0% 100%;
+
+  --warning: 38 92% 50%;
+  --warning-foreground: 0 0% 100%;
+
+  --info: 199 89% 48%;
+  --info-foreground: 0 0% 100%;
+
+  --rider: 199 89% 48%;
+  --rider-foreground: 0 0% 100%;
+
+  --driver: 142 76% 36%;
+  --driver-foreground: 0 0% 100%;
+
+  --online: 142 76% 36%;
+  --offline: 215 16% 47%;
+  --busy: 38 92% 50%;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(
+    135deg,
+    hsl(142, 76%, 36%) 0%,
+    hsl(142, 76%, 28%) 100%
+  );
+  --gradient-hero: linear-gradient(
+    135deg,
+    hsl(222, 47%, 11%) 0%,
+    hsl(222, 47%, 20%) 100%
+  );
+  --gradient-rider: linear-gradient(
+    135deg,
+    hsl(199, 89%, 48%) 0%,
+    hsl(199, 89%, 38%) 100%
+  );
+  --gradient-driver: linear-gradient(
+    135deg,
+    hsl(142, 76%, 36%) 0%,
+    hsl(142, 76%, 28%) 100%
+  );
+
+  --sidebar-background: 0 0% 100%;
+  --sidebar-foreground: 222 47% 11%;
+  --sidebar-primary: 142 76% 36%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 210 40% 96%;
+  --sidebar-accent-foreground: 222 47% 11%;
+  --sidebar-border: 214 32% 91%;
+  --sidebar-ring: 142 76% 36%;
+
+  /* --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -83,11 +163,62 @@ APP STYLING CONFIGURATIONS
   --sidebar-accent: oklch(0.97 0 0);
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-ring: oklch(0.708 0 0); */
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --background: 222 47% 8%;
+  --foreground: 210 40% 98%;
+
+  --card: 222 47% 11%;
+  --card-foreground: 210 40% 98%;
+
+  --popover: 222 47% 11%;
+  --popover-foreground: 210 40% 98%;
+
+  --primary: 142 76% 42%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 217 33% 17%;
+  --secondary-foreground: 210 40% 98%;
+
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 20% 65%;
+
+  --accent: 38 92% 50%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 0 63% 31%;
+  --destructive-foreground: 210 40% 98%;
+
+  --border: 217 33% 17%;
+  --input: 217 33% 17%;
+  --ring: 142 76% 42%;
+
+  --success: 142 76% 42%;
+  --success-foreground: 0 0% 100%;
+
+  --warning: 38 92% 50%;
+  --warning-foreground: 0 0% 100%;
+
+  --info: 199 89% 48%;
+  --info-foreground: 0 0% 100%;
+
+  --rider: 199 89% 48%;
+  --rider-foreground: 0 0% 100%;
+
+  --driver: 142 76% 42%;
+  --driver-foreground: 0 0% 100%;
+
+  --sidebar-background: 222 47% 11%;
+  --sidebar-foreground: 210 40% 98%;
+  --sidebar-primary: 142 76% 42%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 217 33% 17%;
+  --sidebar-accent-foreground: 210 40% 98%;
+  --sidebar-border: 217 33% 17%;
+  --sidebar-ring: 142 76% 42%;
+  /* --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
@@ -117,7 +248,7 @@ APP STYLING CONFIGURATIONS
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-ring: oklch(0.556 0 0); */
 }
 
 @layer base {
@@ -126,5 +257,31 @@ APP STYLING CONFIGURATIONS
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .gradient-hero {
+    background: var(--gradient-hero);
+  }
+
+  .gradient-rider {
+    background: var(--gradient-rider);
+  }
+
+  .gradient-driver {
+    background: var(--gradient-driver);
+  }
+
+  .glass {
+    @apply bg-card/80 backdrop-blur-xl border border-border/50;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
   }
 }
