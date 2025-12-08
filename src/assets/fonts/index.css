@@ -1,0 +1,13 @@
+@font-face {
+  font-family: "Inter";
+  src: url("./Inter-VariableFont_opsz\,wght.ttf") format("truetype");
+  display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Grotesk";
+  src: url("./SpaceGrotesk-VariableFont_wght.ttf") format("truetype");
+  display: swap;
+  font-style: normal;
+}
