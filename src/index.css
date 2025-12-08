@@ -13,14 +13,81 @@ APP STYLING CONFIGURATIONS
   --font-inter: "Inter", sans-serif;
   --font-grotesk: "Grotesk", sans-serif;
 
+  /* COLORS */
+  --color-brand-black: #000000;
+  --color-brand-white: #ffffff;
+
+  --color-brand-green: #1db954;
+  --color-brand-green-dark: #138a3d;
+
+  --color-brand-gray-900: #0f172a;
+  --color-brand-gray-800: #1e293b;
+  --color-brand-gray-600: #475569;
+  --color-brand-gray-400: #94a3b8;
+  --color-brand-gray-200: #e2e8f0;
+
+  --error: #dc2626;
+  --warning: #f59e0b;
+  --info: #2563eb;
+  --success: #16a34a;
+
+  /* RIDER COLORS */
+  --color-rider-bg: #ffffff;
+  --color-rider-surface: #f8fafc;
+  --color-rider-border: #e2e8f0;
+
+  --color-rider-text-primary: #020617;
+  --color-rider-text-secondary: #475569;
+
+  --color-rider-primary: #1db954;
+  --color-rider-primary-hover: #15803d;
+
+  --color-rider-secondary: #2563eb;
+  --color-rider-map-overlay: rgba(0, 0, 0, 0.6);
+  /* RIDER COLORS */
+
+  /* DRIVER COLORS */
+  --color-driver-bg: #020617;
+  --color-driver-surface: #0f172a;
+  --color-driver-border: #1e293b;
+
+  --color-driver-text-primary: #f8fafc;
+  --color-driver-text-secondary: #cbd5e1;
+
+  --color-driver-primary: #facc15;
+  --color-driver-primary-hover: #eab308;
+
+  --color-driver-online: #22c55e;
+  --color-driver-busy: #facc15;
+  --color-driver-offline: #64748b;
+  --color-driver-danger: #ef4444;
+
+  /* DRIVER COLORS */
+
+  /* --admin-bg: #020617; // main background
+  --admin-surface: #020617; // cards, tables
+  --admin-border: #1e293b;
+
+  --admin-text-primary: #f8fafc;
+  --admin-text-secondary: #cbd5e1;
+
+  --admin-primary: #2563eb; // actions, links
+  --admin-primary-hover: #1d4ed8; */
+
+  /* --admin-success: #22C55E;
+--admin-warning: #F59E0B;
+--admin-danger: #EF4444; */
+
+  /* COLORS */
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
@@ -32,7 +99,7 @@ APP STYLING CONFIGURATIONS
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
-  --color-border: var(--border);
+  --color-border: hsl(var(--border));
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-chart-1: var(--chart-1);
@@ -76,6 +143,7 @@ APP STYLING CONFIGURATIONS
   --destructive-foreground: 0 0% 100%;
 
   --border: 214 32% 91%;
+
   --input: 214 32% 91%;
   --ring: 142 76% 36%;
 
@@ -256,7 +324,7 @@ APP STYLING CONFIGURATIONS
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background font-grotesk text-primary;
   }
 }
 
