@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router";
 
 import OnboardingBanner from "@/components/dashboard/OnboardingBanner";
-import { RoleBadge } from "@/components/dashboard/RoleBadge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +15,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { driverNavItems, riderNavItems } from "@/constants";
 import { cn } from "@/lib/utils";
-import { Bell, Car, LogOut, Menu, Settings, User, X } from "lucide-react";
+import { Bell, LogOut, Menu, Settings, User, X } from "lucide-react";
 
 const DashboardLayout = () => {
   const navigate = useNavigate();
