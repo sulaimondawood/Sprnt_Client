@@ -1,26 +1,16 @@
 // User roles and status types
-export type UserRole = "RIDER" | "DRIVER" | "ADMIN";
-export type UserStatus = "ACTIVE" | "SUSPENDED" | "DEACTIVATED";
-export type DriverStatus = "ONLINE" | "OFFLINE" | "BUSY" | "BANNED";
-export type VehicleStatus = "ACTIVE" | "INACTIVE" | "PENDING_APPROVAL";
-export type VehicleType = "Sedan" | "SUV" | "Bike" | "Tricycle" | "Luxury";
-export type DocumentType = "INSURANCE" | "ROAD_WORTHINESS" | "REGISTRATION";
-export type DocumentStatus = "PENDING" | "APPROVED" | "REJECTED";
-export type TripStatus =
-  | "REQUESTED"
-  | "ACCEPTED"
-  | "ARRIVING"
-  | "STARTED"
-  | "COMPLETED"
-  | "CANCELLED";
-export type PaymentStatus = "PENDING" | "PAID" | "FAILED";
-export type TransactionType = "CREDIT" | "DEBIT";
-export type TransactionReason =
-  | "TRIP_PAYMENT"
-  | "BONUS"
-  | "WITHDRAWAL"
-  | "TOP_UP";
-export type TicketStatus = "OPEN" | "IN_PROGRESS" | "RESOLVED";
+export type UserRole = 'RIDER' | 'DRIVER' | 'ADMIN';
+export type UserStatus = 'ACTIVE' | 'SUSPENDED' | 'DEACTIVATED';
+export type DriverStatus = 'ONLINE' | 'OFFLINE' | 'BUSY' | 'BANNED';
+export type VehicleStatus = 'ACTIVE' | 'INACTIVE' | 'PENDING_APPROVAL';
+export type VehicleType = 'Sedan' | 'SUV' | 'Bike' | 'Tricycle' | 'Luxury';
+export type DocumentType = 'INSURANCE' | 'ROAD_WORTHINESS' | 'REGISTRATION';
+export type DocumentStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+export type TripStatus = 'REQUESTED' | 'ACCEPTED' | 'ARRIVING' | 'STARTED' | 'COMPLETED' | 'CANCELLED';
+export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED';
+export type TransactionType = 'CREDIT' | 'DEBIT';
+export type TransactionReason = 'TRIP_PAYMENT' | 'BONUS' | 'WITHDRAWAL' | 'TOP_UP';
+export type TicketStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED';
 
 // User Account
 export interface UserAccount {

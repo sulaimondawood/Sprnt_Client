@@ -1,14 +1,59 @@
-import { RouterProvider } from "react-router";
-import { router } from "./routes";
-import { Toaster } from "./components/ui/sonner";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import LandingPage from "./pages/LandingPage";
+import AuthPage from "./pages/AuthPage";
+import DashboardLayout from "./pages/DashboardLayout";
+import DashboardHome from "./pages/dashboard/DashboardHome";
+import BookRidePage from "./pages/dashboard/BookRidePage";
+import TripHistoryPage from "./pages/dashboard/TripHistoryPage";
+import WalletPage from "./pages/dashboard/WalletPage";
+import SupportPage from "./pages/dashboard/SupportPage";
+import SettingsPage from "./pages/dashboard/SettingsPage";
+import VehiclePage from "./pages/dashboard/VehiclePage";
+import DocumentsPage from "./pages/dashboard/DocumentsPage";
+import RatingsPage from "./pages/dashboard/RatingsPage";
+import CurrentTripPage from "./pages/dashboard/CurrentTripPage";
+import ProfilePage from "./pages/dashboard/ProfilePage";
+import OnboardingPage from "./pages/OnboardingPage";
+import NotFound from "./pages/NotFound";
 
-function App() {
-  return (
-    <>
-      <Toaster />
-      <RouterProvider router={router} />
-    </>
-  );
-}
+const queryClient = new QueryClient();
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/auth" element={<AuthPage />} />
+            <Route path="/onboarding" element={<OnboardingPage />} />
+            <Route path="/dashboard" element={<DashboardLayout />}>
+              <Route index element={<DashboardHome />} />
+              <Route path="book" element={<BookRidePage />} />
+              <Route path="trips" element={<TripHistoryPage />} />
+              <Route path="wallet" element={<WalletPage />} />
+              <Route path="earnings" element={<WalletPage />} />
+              <Route path="support" element={<SupportPage />} />
+              <Route path="settings" element={<SettingsPage />} />
+              <Route path="vehicle" element={<VehiclePage />} />
+              <Route path="documents" element={<DocumentsPage />} />
+              <Route path="ratings" element={<RatingsPage />} />
+              <Route path="current-trip" element={<CurrentTripPage />} />
+              <Route path="profile" element={<ProfilePage />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
+  </QueryClientProvider>
+);
 
 export default App;
