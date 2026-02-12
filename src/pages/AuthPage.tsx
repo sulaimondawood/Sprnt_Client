@@ -1,28 +1,30 @@
-import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useAuth } from '@/contexts/AuthContext';
-import { Car, User, Eye, EyeOff, Mail, Lock, Phone } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/contexts/AuthContext";
+import { Car, User, Eye, EyeOff, Mail, Lock, Phone } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const AuthPage = () => {
   const [searchParams] = useSearchParams();
-  const defaultRole = searchParams.get('role') as 'rider' | 'driver' || 'rider';
-  const isSignup = searchParams.get('signup') === 'true';
-  
+  const defaultRole =
+    (searchParams.get("role") as "rider" | "driver") || "rider";
+  const isSignup = searchParams.get("signup") === "true";
+
   const [isLogin, setIsLogin] = useState(!isSignup);
-  const [role, setRole] = useState<'rider' | 'driver'>(defaultRole);
+  const [role, setRole] = useState<"rider" | "driver">(defaultRole);
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const { login, simulateIncompleteProfile, setSimulateIncompleteProfile } = useAuth();
+
+  const { login, simulateIncompleteProfile, setSimulateIncompleteProfile } =
+    useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -31,17 +33,17 @@ const AuthPage = () => {
     setIsSubmitting(true);
 
     try {
-      await login(email, password, role === 'rider' ? 'RIDER' : 'DRIVER');
+      await login(email, password, role === "rider" ? "RIDER" : "DRIVER");
       toast({
-        title: isLogin ? 'Welcome back!' : 'Account created!',
-        description: `Successfully ${isLogin ? 'signed in' : 'signed up'} as a ${role}.`,
+        title: isLogin ? "Welcome back!" : "Account created!",
+        description: `Successfully ${isLogin ? "signed in" : "signed up"} as a ${role}.`,
       });
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Something went wrong. Please try again.',
-        variant: 'destructive',
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
@@ -58,26 +60,36 @@ const AuthPage = () => {
               <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center">
                 <Car className="h-7 w-7 text-primary-foreground" />
               </div>
-              <span className="text-2xl font-bold">RideFlow</span>
+              <span className="text-2xl font-bold">Sprnt</span>
             </div>
             <h1 className="text-3xl font-bold mb-2">
-              {isLogin ? 'Welcome back' : 'Create account'}
+              {isLogin ? "Welcome back" : "Create account"}
             </h1>
             <p className="text-muted-foreground">
-              {isLogin 
-                ? 'Sign in to access your dashboard' 
-                : 'Sign up to start your journey'}
+              {isLogin
+                ? "Sign in to access your dashboard"
+                : "Sign up to start your journey"}
             </p>
           </div>
 
           {/* Role Selection */}
-          <Tabs value={role} onValueChange={(v) => setRole(v as 'rider' | 'driver')} className="w-full">
+          <Tabs
+            value={role}
+            onValueChange={(v) => setRole(v as "rider" | "driver")}
+            className="w-full"
+          >
             <TabsList className="grid w-full grid-cols-2 h-14">
-              <TabsTrigger value="rider" className="gap-2 data-[state=active]:gradient-rider data-[state=active]:text-rider-foreground">
+              <TabsTrigger
+                value="rider"
+                className="gap-2 data-[state=active]:gradient-rider data-[state=active]:text-rider-foreground"
+              >
                 <User className="h-5 w-5" />
                 Rider
               </TabsTrigger>
-              <TabsTrigger value="driver" className="gap-2 data-[state=active]:gradient-driver data-[state=active]:text-driver-foreground">
+              <TabsTrigger
+                value="driver"
+                className="gap-2 data-[state=active]:gradient-driver data-[state=active]:text-driver-foreground"
+              >
                 <Car className="h-5 w-5" />
                 Driver
               </TabsTrigger>
@@ -126,7 +138,7 @@ const AuthPage = () => {
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
                     id="password"
-                    type={showPassword ? 'text' : 'password'}
+                    type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -138,7 +150,11 @@ const AuthPage = () => {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -149,7 +165,10 @@ const AuthPage = () => {
                     <input type="checkbox" className="rounded border-border" />
                     <span className="text-muted-foreground">Remember me</span>
                   </label>
-                  <button type="button" className="text-primary hover:underline">
+                  <button
+                    type="button"
+                    className="text-primary hover:underline"
+                  >
                     Forgot password?
                   </button>
                 </div>
@@ -158,22 +177,30 @@ const AuthPage = () => {
               {/* Dev option: simulate incomplete profile */}
               {!isLogin && (
                 <label className="flex items-center gap-2 cursor-pointer text-sm">
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     checked={simulateIncompleteProfile}
-                    onChange={(e) => setSimulateIncompleteProfile(e.target.checked)}
-                    className="rounded border-border" 
+                    onChange={(e) =>
+                      setSimulateIncompleteProfile(e.target.checked)
+                    }
+                    className="rounded border-border"
                   />
-                  <span className="text-muted-foreground">(Dev) Simulate incomplete profile</span>
+                  <span className="text-muted-foreground">
+                    (Dev) Simulate incomplete profile
+                  </span>
                 </label>
               )}
 
-              <Button 
-                type="submit" 
-                className={`w-full h-12 text-lg ${role === 'rider' ? 'gradient-rider' : 'gradient-driver'}`}
+              <Button
+                type="submit"
+                className={`w-full h-12 text-lg ${role === "rider" ? "gradient-rider" : "gradient-driver"}`}
                 disabled={isSubmitting}
               >
-                {isSubmitting ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
+                {isSubmitting
+                  ? "Please wait..."
+                  : isLogin
+                    ? "Sign In"
+                    : "Create Account"}
               </Button>
             </form>
           </Card>
@@ -184,35 +211,37 @@ const AuthPage = () => {
               onClick={() => setIsLogin(!isLogin)}
               className="text-primary font-medium hover:underline"
             >
-              {isLogin ? 'Sign Up' : 'Sign In'}
+              {isLogin ? "Sign Up" : "Sign In"}
             </button>
           </p>
         </div>
       </div>
 
       {/* Right Side - Decorative */}
-      <div className={`hidden lg:flex flex-1 items-center justify-center p-12 ${role === 'rider' ? 'gradient-rider' : 'gradient-driver'}`}>
+      <div
+        className={`hidden lg:flex flex-1 items-center justify-center p-12 ${role === "rider" ? "gradient-rider" : "gradient-driver"}`}
+      >
         <div className="text-center text-white space-y-8 max-w-md">
           <div className="w-24 h-24 rounded-3xl bg-white/20 flex items-center justify-center mx-auto">
-            {role === 'rider' ? (
+            {role === "rider" ? (
               <User className="h-12 w-12" />
             ) : (
               <Car className="h-12 w-12" />
             )}
           </div>
           <h2 className="text-3xl font-bold">
-            {role === 'rider' 
-              ? 'Get there safely, every time' 
-              : 'Drive your way to success'}
+            {role === "rider"
+              ? "Get there safely, every time"
+              : "Drive your way to success"}
           </h2>
           <p className="text-lg opacity-90">
-            {role === 'rider'
-              ? 'Book rides instantly, track in real-time, and pay seamlessly. Your journey starts here.'
-              : 'Set your own schedule, maximize your earnings, and join our community of professional drivers.'}
+            {role === "rider"
+              ? "Book rides instantly, track in real-time, and pay seamlessly. Your journey starts here."
+              : "Set your own schedule, maximize your earnings, and join our community of professional drivers."}
           </p>
-          
+
           <div className="grid grid-cols-3 gap-4 pt-8">
-            {role === 'rider' ? (
+            {role === "rider" ? (
               <>
                 <div className="bg-white/10 rounded-xl p-4">
                   <p className="text-2xl font-bold">2min</p>
