@@ -24,13 +24,9 @@ api.interceptors.request.use(
   (confiq) => {
     if (typeof window !== "undefined") {
       const token = localStorage.getItem(TOKEN);
-      const tenant = localStorage.getItem("x-tenant");
+
       if (token) {
         confiq.headers.Authorization = `Bearer ${token}`;
-      }
-
-      if (tenant) {
-        confiq.headers["X-Tenant-ID"] = tenant;
       }
     }
     return confiq;

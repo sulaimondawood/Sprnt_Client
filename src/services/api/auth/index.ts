@@ -13,8 +13,12 @@ export type LoginPayload = {
 };
 
 export const AuthAPI = {
-  async register(payload: RegisterPayload) {
+  async registerRider(payload: RegisterPayload) {
     const res = await request.post("/auth/sign-up/rider", payload);
+    return res.data;
+  },
+  async registerDriver(payload: RegisterPayload) {
+    const res = await request.post("/auth/sign-up/driver", payload);
     return res.data;
   },
   async login(payload: LoginPayload) {

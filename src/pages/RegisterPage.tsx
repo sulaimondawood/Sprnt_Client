@@ -1,18 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAuth } from "@/contexts/AuthContext";
-import { Car, User, Eye, EyeOff, Mail, Lock, Phone } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Car, Eye, EyeOff, Lock, Mail, User } from "lucide-react";
+import { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
-import { useMutation } from "@tanstack/react-query";
-import { AuthAPI, RegisterPayload } from "@/services/api/auth";
-import { toast } from "sonner";
 import { SideBox } from "@/components/auth/SideBox";
+import { ROUTES } from "@/constants/routes";
+import { AuthAPI, RegisterPayload } from "@/services/api/auth";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 const RegisterPage = () => {
   const [searchParams] = useSearchParams();
@@ -27,11 +27,22 @@ const RegisterPage = () => {
 
   const navigate = useNavigate();
 
-  const { mutate: register, isPending } = useMutation({
-    mutationFn: (payload: RegisterPayload) => AuthAPI.register(payload),
+  const { mutate: registerRider, isPending } = useMutation({
+    mutationFn: (payload: RegisterPayload) => AuthAPI.registerRider(payload),
     onSuccess(data) {
       toast("Account created!");
-      navigate("/dashboard");
+      navigate(ROUTES.login);
+    },
+    onError(error: any) {
+      toast.error(error?.response?.data?.message);
+    },
+  });
+
+  const { mutate: registerDriver, isPending: isPendingDriver } = useMutation({
+    mutationFn: (payload: RegisterPayload) => AuthAPI.registerDriver(payload),
+    onSuccess(data) {
+      toast("Account created!");
+      navigate(ROUTES.login);
     },
     onError(error: any) {
       toast.error(error?.response?.data?.message);
@@ -40,11 +51,21 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    register({
-      email,
-      fullname,
-      password,
-    });
+    if (role === "rider") {
+      registerRider({
+        email,
+        fullname,
+        password,
+      });
+    } else if (role === "driver") {
+      registerDriver({
+        email,
+        fullname,
+        password,
+      });
+    } else {
+      return null;
+    }
   };
 
   return (
@@ -153,9 +174,11 @@ const RegisterPage = () => {
               <Button
                 type="submit"
                 className={`w-full h-12 text-lg ${role === "rider" ? "gradient-rider" : "gradient-driver"}`}
-                disabled={isPending}
+                disabled={role === "rider" ? isPending : isPendingDriver}
               >
-                {isPending ? "Please wait..." : "Create Account"}
+                {isPending || isPendingDriver
+                  ? "Please wait..."
+                  : "Create Account"}
               </Button>
             </form>
           </Card>

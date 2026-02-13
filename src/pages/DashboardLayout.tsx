@@ -1,12 +1,9 @@
-import { useState, useEffect, useMemo } from "react";
-import { Outlet, useNavigate, Link, useLocation } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
 import { RoleBadge } from "@/components/RoleBadge";
-import { RiderOnboarding } from "@/components/onboarding/RiderOnboarding";
 import { DriverOnboarding } from "@/components/onboarding/DriverOnboarding";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { RiderOnboarding } from "@/components/onboarding/RiderOnboarding";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,32 +13,34 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
-import {
-  Car,
-  LayoutDashboard,
-  MapPin,
-  History,
-  Wallet,
-  HelpCircle,
-  Settings,
-  LogOut,
-  Menu,
-  X,
-  User,
-  Bell,
-  FileText,
-  Star,
-} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { token } from "@/services/api/config";
+import {
+  Bell,
+  Car,
+  FileText,
+  HelpCircle,
+  History,
+  LayoutDashboard,
+  LogOut,
+  MapPin,
+  Menu,
+  Settings,
+  Star,
+  User,
+  Wallet,
+  X,
+} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 
-import { jwtDecode, JwtPayload } from "jwt-decode";
 import { ROUTES } from "@/constants/routes";
 import { logout } from "@/helpers";
+import { jwtDecode, JwtPayload } from "jwt-decode";
 
 export interface CustomJwtPayload extends JwtPayload {
   role?: string;
-  completedProfile?: boolean;
+  completedProfile?: string;
 }
 
 const DashboardLayout = () => {
@@ -65,10 +64,14 @@ const DashboardLayout = () => {
   useEffect(() => {
     if (!token) {
       navigate(ROUTES.login);
-    } else if (!profile?.completedProfile) {
-      setShowOnboarding(true);
     }
   }, [navigate, profile]);
+
+  useEffect(() => {
+    if (profile?.completedProfile === "false") {
+      setShowOnboarding(true);
+    }
+  }, [navigate, location, profile]);
 
   const riderNavItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
@@ -97,10 +100,6 @@ const DashboardLayout = () => {
     logout();
     navigate("/");
   };
-
-  if (!token) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-background">
