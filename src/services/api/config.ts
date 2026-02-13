@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
 
-const baseURL = import.meta.env.BASE_URL;
+const baseURL = import.meta.env.VITE_API_BASE_URL;
 
 export const TOKEN = "_token";
 
