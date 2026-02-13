@@ -105,7 +105,7 @@ const DashboardLayout = () => {
     <div className="min-h-screen bg-background">
       {/* Onboarding Modal */}
       <Dialog open={showOnboarding} onOpenChange={() => {}}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 [&>button]:hidden">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 [&>button]:hidden">
           {role === "RIDER" ? (
             <RiderOnboarding setShowOnboarding={setShowOnboarding} />
           ) : (
