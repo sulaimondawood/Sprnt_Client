@@ -10,9 +10,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Car, User, Eye, EyeOff, Mail, Lock, Phone } from "lucide-react";
 
 import { useMutation } from "@tanstack/react-query";
-import { AuthAPI, RegisterPayload } from "@/services/api/auth";
+import { AuthAPI, LoginPayload, RegisterPayload } from "@/services/api/auth";
 import { toast } from "sonner";
 import { SideBox } from "@/components/auth/SideBox";
+import { ROUTES } from "@/constants/routes";
 
 const LoginPage = () => {
   const [searchParams] = useSearchParams();
@@ -23,12 +24,11 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullname, setFullname] = useState("");
 
   const navigate = useNavigate();
 
-  const { mutate: register, isPending } = useMutation({
-    mutationFn: (payload: RegisterPayload) => AuthAPI.register(payload),
+  const { mutate: login, isPending } = useMutation({
+    mutationFn: (payload: LoginPayload) => AuthAPI.login(payload),
     onSuccess(data) {
       toast("Account created!");
       navigate("/dashboard");
@@ -40,9 +40,8 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    register({
+    login({
       email,
-      fullname,
       password,
     });
   };
@@ -156,7 +155,10 @@ const LoginPage = () => {
 
           <p className="text-center text-muted-foreground">
             Don't have an account?
-            <button className="text-primary font-medium hover:underline">
+            <button
+              onClick={() => navigate(ROUTES.register)}
+              className="text-primary font-medium hover:underline"
+            >
               Sign Up
             </button>
           </p>
