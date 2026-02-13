@@ -20,10 +20,10 @@ import {
 } from "lucide-react";
 
 interface RiderOnboardingProps {
-  onComplete: () => void;
+  setShowOnboarding: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export function RiderOnboarding({ onComplete }: RiderOnboardingProps) {
+export function RiderOnboarding({ setShowOnboarding }: RiderOnboardingProps) {
   const { updateRiderProfile } = useAuth();
   const [step, setStep] = useState(1);
   const totalSteps = 4;

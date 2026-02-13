@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Outlet, useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { RoleBadge } from "@/components/RoleBadge";
@@ -37,6 +37,7 @@ import { token } from "@/services/api/config";
 
 import { jwtDecode, JwtPayload } from "jwt-decode";
 import { ROUTES } from "@/constants/routes";
+import { logout } from "@/helpers";
 
 export interface CustomJwtPayload extends JwtPayload {
   role?: string;
@@ -44,15 +45,6 @@ export interface CustomJwtPayload extends JwtPayload {
 }
 
 const DashboardLayout = () => {
-  // const {
-  //   user,
-  //   riderProfile,
-  //   driverProfile,
-  //   logout,
-  //   isAuthenticated,
-  //   updateRiderProfile,
-  //   updateDriverProfile,
-  // } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -60,34 +52,23 @@ const DashboardLayout = () => {
   const [isOnline, setIsOnline] = useState(false);
   // const [isOnline, setIsOnline] = useState(driverProfile?.status === "ONLINE");
 
-  const decodedToken = jwtDecode<CustomJwtPayload>(token);
+  const profile = useMemo(() => {
+    try {
+      return token ? jwtDecode<CustomJwtPayload>(token) : null;
+    } catch {
+      return null;
+    }
+  }, []);
 
-  console.log(decodedToken);
-
-  const role = decodedToken?.role;
-  const profile = decodedToken;
+  const role = profile?.role;
 
   useEffect(() => {
     if (!token) {
       navigate(ROUTES.login);
-    }
-  }, [navigate]);
-
-  useEffect(() => {
-    // Show onboarding modal if profile is incomplete
-    if (!profile?.completedProfile) {
+    } else if (!profile?.completedProfile) {
       setShowOnboarding(true);
     }
-  }, [profile?.completedProfile]);
-
-  const handleOnboardingComplete = () => {
-    if (isDriver) {
-      updateDriverProfile({ isProfileComplete: true });
-    } else {
-      updateRiderProfile({ isProfileComplete: true });
-    }
-    setShowOnboarding(false);
-  };
+  }, [navigate, profile]);
 
   const riderNavItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
@@ -127,9 +108,9 @@ const DashboardLayout = () => {
       <Dialog open={showOnboarding} onOpenChange={() => {}}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 [&>button]:hidden">
           {role === "RIDER" ? (
-            <RiderOnboarding onComplete={handleOnboardingComplete} />
+            <RiderOnboarding setShowOnboarding={setShowOnboarding} />
           ) : (
-            <DriverOnboarding onComplete={handleOnboardingComplete} />
+            <DriverOnboarding setShowOnboarding={setShowOnboarding} />
           )}
         </DialogContent>
       </Dialog>

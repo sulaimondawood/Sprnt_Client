@@ -1,20 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAuth } from "@/contexts/AuthContext";
-import { Car, User, Eye, EyeOff, Mail, Lock, Phone } from "lucide-react";
+import { Car, Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
-import { useMutation } from "@tanstack/react-query";
-import { AuthAPI, LoginPayload, RegisterPayload } from "@/services/api/auth";
-import { toast } from "sonner";
 import { SideBox } from "@/components/auth/SideBox";
 import { ROUTES } from "@/constants/routes";
+import { AuthAPI, LoginPayload } from "@/services/api/auth";
 import { TOKEN } from "@/services/api/config";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 const LoginPage = () => {
   const [searchParams] = useSearchParams();
@@ -33,7 +31,6 @@ const LoginPage = () => {
     onSuccess(data) {
       toast(data?.message || "Redirecting to dashboard");
       const token = data?.data?.token;
-      console.log(token);
       localStorage.setItem(TOKEN, token);
       navigate(ROUTES.dashboard);
     },
@@ -52,7 +49,6 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen bg-background flex">
-      {/* Left Side - Form */}
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-md space-y-8">
           <div className="text-center">
@@ -67,30 +63,6 @@ const LoginPage = () => {
               Sign in to access your dashboard
             </p>
           </div>
-
-          {/* Role Selection */}
-          <Tabs
-            value={role}
-            onValueChange={(v) => setRole(v as "rider" | "driver")}
-            className="w-full"
-          >
-            <TabsList className="grid w-full grid-cols-2 h-14">
-              <TabsTrigger
-                value="rider"
-                className="gap-2 data-[state=active]:gradient-rider data-[state=active]:text-rider-foreground"
-              >
-                <User className="h-5 w-5" />
-                Rider
-              </TabsTrigger>
-              <TabsTrigger
-                value="driver"
-                className="gap-2 data-[state=active]:gradient-driver data-[state=active]:text-driver-foreground"
-              >
-                <Car className="h-5 w-5" />
-                Driver
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
 
           <Card className="p-6">
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -149,7 +121,7 @@ const LoginPage = () => {
 
               <Button
                 type="submit"
-                className={`w-full h-12 text-lg ${role === "rider" ? "gradient-rider" : "gradient-driver"}`}
+                className={`w-full h-12 text-lg`}
                 disabled={isPending}
               >
                 {isPending ? "Please wait..." : "Sign In"}
@@ -168,7 +140,6 @@ const LoginPage = () => {
           </p>
         </div>
       </div>
-
       <SideBox role={role} />
     </div>
   );
