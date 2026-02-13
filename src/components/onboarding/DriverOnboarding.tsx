@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { Card } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Select,
   SelectContent,
@@ -12,22 +11,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useAuth } from "@/contexts/AuthContext";
-import {
-  User,
-  FileText,
-  Car,
-  Upload,
-  CheckCircle2,
-  Camera,
-  ChevronRight,
-  ChevronLeft,
-  Sparkles,
-  Shield,
-  Calendar,
-} from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
+import { DriverAPI, DriverRegistrationType } from "@/services/api/driver";
 import { UploadAPI } from "@/services/api/upload";
+import { useMutation } from "@tanstack/react-query";
+import {
+  Calendar,
+  Camera,
+  Car,
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  LoaderCircle,
+  Shield,
+  Sparkles,
+  Upload,
+  User,
+} from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 interface DriverOnboardingProps {
@@ -37,7 +37,7 @@ interface DriverOnboardingProps {
 export function DriverOnboarding({ setShowOnboarding }: DriverOnboardingProps) {
   // const { updateDriverProfile } = useAuth();
   const [step, setStep] = useState(1);
-  const totalSteps = 5;
+  const totalSteps = 4;
   const progress = (step / totalSteps) * 100;
 
   const [formData, setFormData] = useState({
@@ -54,22 +54,28 @@ export function DriverOnboarding({ setShowOnboarding }: DriverOnboardingProps) {
     vehicleType: "",
     documents: [
       {
-        documentType: "insuranceDoc",
+        documentType: "INSURANCE_CERTIFICATE",
         documentUrl: "",
+        label: "Vehicle Insurance",
+        desc: "Valid insurance certificate",
       },
       {
-        documentType: "roadWorthinessDoc",
+        documentType: "ROAD_WORTHINESS",
         documentUrl: "",
+        label: "Road Worthiness",
+        desc: "Road worthiness certificate",
       },
       {
-        documentType: "registrationDoc",
+        documentType: "VEHICLE_LICENSE",
         documentUrl: "",
+        label: "Vehicle License",
+        desc: "Vehicle license document",
       },
     ],
   });
-  const [uploading, setUploading] = useState<string | null>(null);
+  const [uploadingKey, setUploadingKey] = useState<string | null>(null);
 
-  const { mutate: upload } = useMutation({
+  const { mutateAsync: upload } = useMutation({
     mutationFn: async (file: File) => {
       const res = await UploadAPI.getUploadSignature();
       const signatureData = res;
@@ -84,6 +90,15 @@ export function DriverOnboarding({ setShowOnboarding }: DriverOnboardingProps) {
       return await UploadAPI.uploadFile(formData);
     },
   });
+  const { mutate: completeOnboarding } = useMutation({
+    mutationFn: (payload: DriverRegistrationType) =>
+      DriverAPI.completeProfile(payload),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onSuccess(data: any) {
+      setShowOnboarding(false);
+      toast.success(data?.message || "Driver onboarding was successfull");
+    },
+  });
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -94,11 +109,17 @@ export function DriverOnboarding({ setShowOnboarding }: DriverOnboardingProps) {
     file: File | null,
     isDocumentArray: boolean = false,
     docType?: string,
+    label?: string,
+    desc?: string,
   ) => {
     if (!file) return;
+
+    const currentKey = isDocumentArray ? `${key}-${docType}` : key;
+
     try {
+      setUploadingKey(currentKey);
       const result = await upload(file);
-      const url = result.data?.secure_url;
+      const url = result?.secure_url;
 
       setFormData((prev) => {
         if (isDocumentArray && docType) {
@@ -109,7 +130,7 @@ export function DriverOnboarding({ setShowOnboarding }: DriverOnboardingProps) {
             ...prev,
             documents: [
               ...otherDocs,
-              { documentType: docType, documentUrl: url },
+              { documentType: docType, documentUrl: url, label, desc },
             ],
           };
         }
@@ -118,6 +139,8 @@ export function DriverOnboarding({ setShowOnboarding }: DriverOnboardingProps) {
       });
     } catch (error) {
       toast.error("Upload failed. Please try again.");
+    } finally {
+      setUploadingKey(null);
     }
   };
 
@@ -136,13 +159,22 @@ export function DriverOnboarding({ setShowOnboarding }: DriverOnboardingProps) {
   };
 
   const handleComplete = () => {
-    // updateDriverProfile({
-    //   fullName: formData.fullName,
-    //   licenseNumber: formData.licenseNumber,
-    //   nin: formData.nin,
-    //   isProfileComplete: true,
-    // });
-    // onComplete();
+    completeOnboarding({
+      licenseExpiry: formData.licenseExpiry,
+      licenseNumber: formData.licenseNumber,
+      nin: formData.nin,
+      profileImage: formData.profileImage,
+      vehicle: {
+        brand: formData.vehicleBrand,
+        capacity: Number(formData.vehicleCapacity),
+        color: formData.vehicleColor,
+        model: formData.vehicleModel,
+        plateNumber: formData.vehiclePlate,
+        type: formData.vehicleType,
+        year: formData.vehicleYear,
+        vehicleDocument: formData.documents,
+      },
+    });
   };
 
   const canProceed = () => {
@@ -171,21 +203,17 @@ export function DriverOnboarding({ setShowOnboarding }: DriverOnboardingProps) {
         );
       case 4:
         return formData.profileImage.length > 2;
-      case 5:
-        return true;
+
       default:
         return true;
     }
   };
-
-  console.log(formData);
 
   const steps = [
     { icon: Shield, label: "Verification" },
     { icon: Car, label: "Vehicle" },
     { icon: FileText, label: "Documents" },
     { icon: User, label: "Personal" },
-    { icon: CheckCircle2, label: "Complete" },
   ];
 
   const vehicleTypes = ["SUV", "Bike", "Tricycle", "Car"];
@@ -444,6 +472,7 @@ export function DriverOnboarding({ setShowOnboarding }: DriverOnboardingProps) {
                   <Input
                     id="vehicleCapacity"
                     placeholder="e.g.,5"
+                    type="number"
                     value={formData.vehicleCapacity}
                     onChange={(e) =>
                       handleInputChange("vehicleCapacity", e.target.value)
@@ -469,25 +498,9 @@ export function DriverOnboarding({ setShowOnboarding }: DriverOnboardingProps) {
             </div>
 
             <div className="grid gap-4">
-              {[
-                {
-                  key: "insuranceDoc",
-                  label: "Vehicle Insurance",
-                  desc: "Valid insurance certificate",
-                },
-                {
-                  key: "registrationDoc",
-                  label: "Vehicle Registration",
-                  desc: "Vehicle registration document",
-                },
-                {
-                  key: "roadWorthinessDoc",
-                  label: "Road Worthiness",
-                  desc: "Road worthiness certificate",
-                },
-              ].map((doc) => (
+              {formData.documents.map((doc) => (
                 <div
-                  key={doc.key}
+                  key={doc.documentType}
                   className="border-2 border-dashed border-border rounded-xl p-4 hover:border-driver/50 transition-colors"
                 >
                   <div className="flex items-center justify-between">
@@ -498,35 +511,46 @@ export function DriverOnboarding({ setShowOnboarding }: DriverOnboardingProps) {
                       </p>
                     </div>
 
-                    <Button variant="outline" size="sm" asChild>
-                      <label className="cursor-pointer">
-                        <Upload className="h-4 w-4 mr-2" />
-                        Upload
-                        <input
-                          type="file"
-                          className="hidden"
-                          accept="image/*,.pdf"
-                          onChange={(e) =>
-                            handleFileChange(
-                              "documents",
-                              e.target.files?.[0] || null,
-                              true,
-                              doc.key,
-                            )
-                          }
-                        />
-                      </label>
+                    <Button
+                      disabled={
+                        uploadingKey === `documents-${doc.documentType}`
+                      }
+                      variant="outline"
+                      size="sm"
+                      asChild
+                    >
+                      {uploadingKey === `documents-${doc.documentType}` ? (
+                        <p className="text-black">Uploading...</p>
+                      ) : (
+                        <label className="cursor-pointer">
+                          <Upload className="h-4 w-4 mr-2" />
+                          Upload
+                          <input
+                            type="file"
+                            className="hidden"
+                            accept="image/*,.pdf"
+                            onChange={(e) =>
+                              handleFileChange(
+                                "documents",
+                                e.target.files?.[0] || null,
+                                true,
+                                doc.documentType,
+                                doc.label,
+                                doc.desc,
+                              )
+                            }
+                          />
+                        </label>
+                      )}
                     </Button>
                   </div>
-                  {/* {formData[doc.key as keyof typeof formData] && (
-                      <p className="text-sm text-success mt-2">
-                        ✓{" "}
-                        {
-                          (formData[doc.key as keyof typeof formData] as File)
-                            ?.name
-                        }
-                      </p>
-                    )} */}
+                  {doc.documentUrl && (
+                    <img
+                      src={doc.documentUrl}
+                      alt={doc.documentType}
+                      className="h-48 object-cover w-full mt-5"
+                    />
+                  )}
                 </div>
               ))}
             </div>
@@ -549,94 +573,52 @@ export function DriverOnboarding({ setShowOnboarding }: DriverOnboardingProps) {
               <div>
                 <p className="font-semibold">Personal Information</p>
                 <p className="text-sm text-muted-foreground">
-                  Let's start with your basic details
+                  Let's start with your profile picture
                 </p>
               </div>
             </div>
 
             <div className="flex justify-center">
               <div className="relative">
-                <Avatar className="h-24 w-24">
-                  <AvatarImage src={formData.profileImage} />
-                  <AvatarFallback className="bg-driver text-driver-foreground text-2xl">
-                    {"D"}
-                    {/* {formData.fullName?.charAt(0) || "D"} */}
-                  </AvatarFallback>
-                </Avatar>
-                <Button
-                  size="icon"
-                  variant="secondary"
-                  className="absolute -bottom-2 -right-2 rounded-full h-8 w-8"
-                >
-                  <Camera className="h-4 w-4" />
-                </Button>
+                {uploadingKey === "profileImage" ? (
+                  <LoaderCircle className="size-5 animate-spin" />
+                ) : (
+                  <>
+                    <Avatar className="size-56">
+                      <AvatarImage src={formData?.profileImage || ""} />
+                      <AvatarFallback className="bg-driver text-driver-foreground text-2xl">
+                        {"D"}
+                        {/* {formData.fullName?.charAt(0) || "D"} */}
+                      </AvatarFallback>
+                    </Avatar>
+                    <Button
+                      size="icon"
+                      variant="secondary"
+                      className="absolute bottom-6 -right-2 rounded-full size-12"
+                    >
+                      <label className="cursor-pointer">
+                        <Camera className="size-10" />
+                        <input
+                          type="file"
+                          className="hidden"
+                          accept="image/*,.pdf"
+                          onChange={(e) =>
+                            handleFileChange(
+                              "profileImage",
+                              e.target.files?.[0] || null,
+                              false,
+                            )
+                          }
+                        />
+                      </label>
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
-
-            <div className="grid gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name *</Label>
-                {/* <Input
-                    id="fullName"
-                    placeholder="Enter your full legal name"
-                    value={formData.fullName}
-                    onChange={(e) =>
-                      handleInputChange("fullName", e.target.value)
-                    }
-                  /> */}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number *</Label>
-                {/* <Input
-                    id="phone"
-                    placeholder="+234 XXX XXX XXXX"
-                    value={formData.phone}
-                    onChange={(e) => handleInputChange("phone", e.target.value)}
-                  /> */}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Step 5: Complete */}
-        {step === 5 && (
-          <div className="space-y-6 animate-fade-in text-center">
-            <div className="w-20 h-20 bg-success/10 rounded-full flex items-center justify-center mx-auto">
-              <CheckCircle2 className="h-10 w-10 text-success" />
-            </div>
-
-            <div>
-              <h2 className="text-2xl font-bold mb-2">Welcome Aboard!</h2>
-              <p className="text-muted-foreground">
-                Your driver profile has been created. Start accepting rides and
-                earning money!
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 text-left p-4 bg-driver/5 rounded-xl">
-              <div>
-                <p className="text-sm text-muted-foreground">Name</p>
-                {/* <p className="font-medium">{formData.fullName}</p> */}
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">License</p>
-                <p className="font-medium">{formData.licenseNumber}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Vehicle</p>
-                <p className="font-medium">
-                  {formData.vehicleBrand} {formData.vehicleModel}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Status</p>
-                <p className="font-medium text-warning">Pending Verification</p>
-              </div>
-            </div>
-
             <div className="p-4 bg-info/10 border border-info/20 rounded-xl text-left">
               <p className="text-sm">
-                <strong>Next Steps:</strong> Our team will review your documents
+                <strong>Submit:</strong> Our team will review your documents
                 within 24-48 hours. You'll receive a notification once your
                 account is approved.
               </p>
@@ -662,7 +644,7 @@ export function DriverOnboarding({ setShowOnboarding }: DriverOnboardingProps) {
         >
           {step === totalSteps ? (
             <>
-              Start Driving
+              Submit & Start Driving
               <Sparkles className="h-4 w-4 ml-2" />
             </>
           ) : (
