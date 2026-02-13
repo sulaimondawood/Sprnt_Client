@@ -14,6 +14,7 @@ import { AuthAPI, LoginPayload, RegisterPayload } from "@/services/api/auth";
 import { toast } from "sonner";
 import { SideBox } from "@/components/auth/SideBox";
 import { ROUTES } from "@/constants/routes";
+import { TOKEN } from "@/services/api/config";
 
 const LoginPage = () => {
   const [searchParams] = useSearchParams();
@@ -30,8 +31,11 @@ const LoginPage = () => {
   const { mutate: login, isPending } = useMutation({
     mutationFn: (payload: LoginPayload) => AuthAPI.login(payload),
     onSuccess(data) {
-      toast("Account created!");
-      navigate("/dashboard");
+      toast(data?.message || "Redirecting to dashboard");
+      const token = data?.data?.token;
+      console.log(token);
+      localStorage.setItem(TOKEN, token);
+      navigate(ROUTES.dashboard);
     },
     onError(error: any) {
       toast.error(error?.response?.data?.message);

@@ -33,38 +33,52 @@ import {
   Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { token } from "@/services/api/config";
+
+import { jwtDecode, JwtPayload } from "jwt-decode";
+import { ROUTES } from "@/constants/routes";
+
+export interface CustomJwtPayload extends JwtPayload {
+  role?: string;
+  completedProfile?: boolean;
+}
 
 const DashboardLayout = () => {
-  const {
-    user,
-    riderProfile,
-    driverProfile,
-    logout,
-    isAuthenticated,
-    updateRiderProfile,
-    updateDriverProfile,
-  } = useAuth();
+  // const {
+  //   user,
+  //   riderProfile,
+  //   driverProfile,
+  //   logout,
+  //   isAuthenticated,
+  //   updateRiderProfile,
+  //   updateDriverProfile,
+  // } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [isOnline, setIsOnline] = useState(driverProfile?.status === "ONLINE");
+  const [isOnline, setIsOnline] = useState(false);
+  // const [isOnline, setIsOnline] = useState(driverProfile?.status === "ONLINE");
 
-  const isDriver = user?.role === "DRIVER";
-  const profile = isDriver ? driverProfile : riderProfile;
+  const decodedToken = jwtDecode<CustomJwtPayload>(token);
+
+  console.log(decodedToken);
+
+  const role = decodedToken?.role;
+  const profile = decodedToken;
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate("/auth");
+    if (!token) {
+      navigate(ROUTES.login);
     }
-  }, [isAuthenticated, navigate]);
+  }, [navigate]);
 
   useEffect(() => {
     // Show onboarding modal if profile is incomplete
-    if (profile && !profile.isProfileComplete) {
+    if (!profile?.completedProfile) {
       setShowOnboarding(true);
     }
-  }, [profile]);
+  }, [profile?.completedProfile]);
 
   const handleOnboardingComplete = () => {
     if (isDriver) {
@@ -96,14 +110,14 @@ const DashboardLayout = () => {
     { icon: Settings, label: "Settings", path: "/dashboard/settings" },
   ];
 
-  const navItems = isDriver ? driverNavItems : riderNavItems;
+  const navItems = role === "RIDER" ? riderNavItems : driverNavItems;
 
   const handleLogout = () => {
     logout();
     navigate("/");
   };
 
-  if (!isAuthenticated) {
+  if (!token) {
     return null;
   }
 
@@ -112,10 +126,10 @@ const DashboardLayout = () => {
       {/* Onboarding Modal */}
       <Dialog open={showOnboarding} onOpenChange={() => {}}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 [&>button]:hidden">
-          {isDriver ? (
-            <DriverOnboarding onComplete={handleOnboardingComplete} />
-          ) : (
+          {role === "RIDER" ? (
             <RiderOnboarding onComplete={handleOnboardingComplete} />
+          ) : (
+            <DriverOnboarding onComplete={handleOnboardingComplete} />
           )}
         </DialogContent>
       </Dialog>
@@ -139,7 +153,7 @@ const DashboardLayout = () => {
               <div
                 className={cn(
                   "w-10 h-10 rounded-xl flex items-center justify-center",
-                  isDriver ? "gradient-driver" : "gradient-rider",
+                  role !== "RIDER" ? "gradient-driver" : "gradient-rider",
                 )}
               >
                 <Car className="h-6 w-6 text-white" />
@@ -147,12 +161,12 @@ const DashboardLayout = () => {
               <span className="text-xl font-bold hidden sm:block">Sprnt</span>
             </Link>
 
-            <RoleBadge role={user?.role || "RIDER"} size="sm" />
+            <RoleBadge role={role || "RIDER"} size="sm" />
           </div>
 
           <div className="flex items-center gap-4">
             {/* Driver Online/Offline Toggle */}
-            {isDriver && (
+            {role === "DRIVER" && (
               <div className="hidden sm:flex items-center gap-3 px-4 py-2 bg-muted rounded-full">
                 <span
                   className={cn(
@@ -183,28 +197,28 @@ const DashboardLayout = () => {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="gap-2 px-2">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={profile?.profileImage} />
+                    <AvatarImage src={""} />
                     <AvatarFallback
                       className={
-                        isDriver
+                        role === "DRIVER"
                           ? "bg-driver text-driver-foreground"
                           : "bg-rider text-rider-foreground"
                       }
                     >
-                      {profile?.fullName?.charAt(0) || "U"}
+                      {profile?.sub?.charAt(0) || "U"}
                     </AvatarFallback>
                   </Avatar>
                   <span className="hidden md:block font-medium">
-                    {profile?.fullName || "User"}
+                    {profile?.sub || "User"}
                   </span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>
                   <div className="flex flex-col">
-                    <span>{profile?.fullName || "User"}</span>
+                    <span>{profile?.sub || "User"}</span>
                     <span className="text-sm font-normal text-muted-foreground">
-                      {user?.email}
+                      {profile.sub}
                     </span>
                   </div>
                 </DropdownMenuLabel>
@@ -253,7 +267,7 @@ const DashboardLayout = () => {
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-xl transition-all",
                   isActive
-                    ? isDriver
+                    ? role === "DRIVER"
                       ? "gradient-driver text-driver-foreground"
                       : "gradient-rider text-rider-foreground"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -267,7 +281,7 @@ const DashboardLayout = () => {
         </nav>
 
         {/* Driver status card at bottom */}
-        {isDriver && (
+        {role === "DRIVER" && (
           <div className="absolute bottom-4 left-4 right-4">
             <div
               className={cn(
