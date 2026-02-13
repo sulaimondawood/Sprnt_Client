@@ -12,14 +12,13 @@ import { Car, User, Eye, EyeOff, Mail, Lock, Phone } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { AuthAPI, RegisterPayload } from "@/services/api/auth";
 import { toast } from "sonner";
+import { SideBox } from "@/components/auth/SideBox";
 
-const AuthPage = () => {
+const RegisterPage = () => {
   const [searchParams] = useSearchParams();
   const defaultRole =
     (searchParams.get("role") as "rider" | "driver") || "rider";
-  const isSignup = searchParams.get("signup") === "true";
 
-  const [isLogin, setIsLogin] = useState(!isSignup);
   const [role, setRole] = useState<"rider" | "driver">(defaultRole);
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -60,13 +59,9 @@ const AuthPage = () => {
               </div>
               <span className="text-2xl font-bold">Sprnt</span>
             </div>
-            <h1 className="text-3xl font-bold mb-2">
-              {isLogin ? "Welcome back" : "Create account"}
-            </h1>
+            <h1 className="text-3xl font-bold mb-2">Create account</h1>
             <p className="text-muted-foreground">
-              {isLogin
-                ? "Sign in to access your dashboard"
-                : "Sign up to start your journey"}
+              Sign up to start your journey
             </p>
           </div>
 
@@ -112,23 +107,21 @@ const AuthPage = () => {
                 </div>
               </div>
 
-              {!isLogin && (
-                <div className="space-y-2">
-                  <Label htmlFor="fullname">Fullname</Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input
-                      id="fullname"
-                      type="text"
-                      placeholder="Dawood Adekunle"
-                      value={fullname}
-                      onChange={(e) => setFullname(e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
+              <div className="space-y-2">
+                <Label htmlFor="fullname">Fullname</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    id="fullname"
+                    type="text"
+                    placeholder="Dawood Adekunle"
+                    value={fullname}
+                    onChange={(e) => setFullname(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
                 </div>
-              )}
+              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
@@ -157,107 +150,31 @@ const AuthPage = () => {
                 </div>
               </div>
 
-              {isLogin && (
-                <div className="flex items-center justify-between text-sm">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" className="rounded border-border" />
-                    <span className="text-muted-foreground">Remember me</span>
-                  </label>
-                  <button
-                    type="button"
-                    className="text-primary hover:underline"
-                  >
-                    Forgot password?
-                  </button>
-                </div>
-              )}
-
               <Button
                 type="submit"
                 className={`w-full h-12 text-lg ${role === "rider" ? "gradient-rider" : "gradient-driver"}`}
                 disabled={isPending}
               >
-                {isPending
-                  ? "Please wait..."
-                  : isLogin
-                    ? "Sign In"
-                    : "Create Account"}
+                {isPending ? "Please wait..." : "Create Account"}
               </Button>
             </form>
           </Card>
 
           <p className="text-center text-muted-foreground">
-            {isLogin ? "Don't have an account? " : "Already have an account? "}
+            Already have an account?
             <button
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={() => navigate("/auth/login")}
               className="text-primary font-medium hover:underline"
             >
-              {isLogin ? "Sign Up" : "Sign In"}
+              Sign In
             </button>
           </p>
         </div>
       </div>
 
-      {/* Right Side - Decorative */}
-      <div
-        className={`hidden lg:flex flex-1 items-center justify-center p-12 ${role === "rider" ? "gradient-rider" : "gradient-driver"}`}
-      >
-        <div className="text-center text-white space-y-8 max-w-md">
-          <div className="w-24 h-24 rounded-3xl bg-white/20 flex items-center justify-center mx-auto">
-            {role === "rider" ? (
-              <User className="h-12 w-12" />
-            ) : (
-              <Car className="h-12 w-12" />
-            )}
-          </div>
-          <h2 className="text-3xl font-bold">
-            {role === "rider"
-              ? "Get there safely, every time"
-              : "Drive your way to success"}
-          </h2>
-          <p className="text-lg opacity-90">
-            {role === "rider"
-              ? "Book rides instantly, track in real-time, and pay seamlessly. Your journey starts here."
-              : "Set your own schedule, maximize your earnings, and join our community of professional drivers."}
-          </p>
-
-          <div className="grid grid-cols-3 gap-4 pt-8">
-            {role === "rider" ? (
-              <>
-                <div className="bg-white/10 rounded-xl p-4">
-                  <p className="text-2xl font-bold">2min</p>
-                  <p className="text-sm opacity-80">Avg. pickup</p>
-                </div>
-                <div className="bg-white/10 rounded-xl p-4">
-                  <p className="text-2xl font-bold">4.9★</p>
-                  <p className="text-sm opacity-80">Avg. rating</p>
-                </div>
-                <div className="bg-white/10 rounded-xl p-4">
-                  <p className="text-2xl font-bold">24/7</p>
-                  <p className="text-sm opacity-80">Support</p>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="bg-white/10 rounded-xl p-4">
-                  <p className="text-2xl font-bold">₦50K+</p>
-                  <p className="text-sm opacity-80">Weekly avg.</p>
-                </div>
-                <div className="bg-white/10 rounded-xl p-4">
-                  <p className="text-2xl font-bold">Flex</p>
-                  <p className="text-sm opacity-80">Schedule</p>
-                </div>
-                <div className="bg-white/10 rounded-xl p-4">
-                  <p className="text-2xl font-bold">Free</p>
-                  <p className="text-sm opacity-80">Insurance</p>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
+      <SideBox role={role} />
     </div>
   );
 };
 
-export default AuthPage;
+export default RegisterPage;
