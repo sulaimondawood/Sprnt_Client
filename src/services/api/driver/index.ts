@@ -30,4 +30,9 @@ export const DriverAPI = {
     const res = await api.post("/driver/onboard", payload);
     return res.data;
   },
+
+  async recentRides() {
+    const res = await api.get("/driver/rides/recent");
+    return res.data.data;
+  },
 };
