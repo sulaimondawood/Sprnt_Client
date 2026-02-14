@@ -1,4 +1,5 @@
 import { EmptyState } from "@/components/dashboard/EmptyState";
+import { QuickActionsSkeleton } from "@/components/dashboard/home/QuickActionsSkeleton";
 import { RecentTripsSkeleton } from "@/components/dashboard/home/RecentTripsSkeleton";
 import { RoleBadge } from "@/components/RoleBadge";
 import { StatCard } from "@/components/StatCard";
@@ -16,6 +17,7 @@ import {
 } from "@/data/mockData";
 import { profile } from "@/helpers";
 import { DriverAPI } from "@/services/api/driver";
+import { UserAPI } from "@/services/api/user";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import {
@@ -32,7 +34,7 @@ import {
 import { Link } from "react-router-dom";
 
 const DashboardHome = () => {
-  const { user, riderProfile, driverProfile } = useAuth();
+  const { user } = useAuth();
   const isDriver = user?.role === "DRIVER";
   // const profile = isDriver ? driverProfile : riderProfile;
   const stats = isDriver ? mockDriverStats : mockRiderStats;
@@ -47,7 +49,6 @@ const DashboardHome = () => {
     }).format(amount);
   };
 
-  const recentTrips = trips.slice(0, 3);
   const activeTrip = isDriver
     ? trips.find((t) => t.status === "STARTED")
     : null;
@@ -56,9 +57,18 @@ const DashboardHome = () => {
     data: recentRides,
     isLoading: isLoadingRecentRides,
     isSuccess: isSuccessLoadingRecentRides,
-  } = useQuery({
+  } = useQuery<Ride[]>({
     queryKey: ["rides", "recent"],
     queryFn: DriverAPI.recentRides,
+  });
+
+  const {
+    data: userProfile,
+    isLoading: isLoadingUserProfileData,
+    isSuccess: isSuccessLoadingUserProfileData,
+  } = useQuery({
+    queryKey: ["user", "profile"],
+    queryFn: UserAPI.profile,
   });
 
   const profileData = profile();
@@ -204,16 +214,16 @@ const DashboardHome = () => {
             </div>
 
             <div className="space-y-4">
-              {recentTrips.map((trip) => (
+              {recentRides.map((trip) => (
                 <div
                   key={trip.id}
                   className="flex items-center gap-4 p-4 bg-muted/50 rounded-xl hover:bg-muted transition-colors"
                 >
                   <div
                     className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                      trip.status === "COMPLETED"
+                      trip.rideStatus === "COMPLETED"
                         ? "bg-success/10 text-success"
-                        : trip.status === "CANCELLED"
+                        : trip.rideStatus === "CANCELLED"
                           ? "bg-destructive/10 text-destructive"
                           : "bg-info/10 text-info"
                     }`}
@@ -224,16 +234,16 @@ const DashboardHome = () => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <p className="font-medium truncate">
-                        {isDriver
+                        {role === "DRIVER"
                           ? trip.riderName
                           : trip.dropoffLocation.address}
                       </p>
-                      <StatusBadge status={trip.status} type="trip" />
+                      <StatusBadge status={trip.rideStatus} type="trip" />
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {trip.requestedAt &&
+                      {trip.createdAt &&
                         format(
-                          new Date(trip.requestedAt),
+                          new Date(trip.createdAt),
                           "MMM d, yyyy • h:mm a",
                         )}
                     </p>
@@ -241,12 +251,10 @@ const DashboardHome = () => {
 
                   <div className="text-right">
                     <p className="font-semibold">
-                      {trip.finalFare
-                        ? formatCurrency(trip.finalFare)
-                        : formatCurrency(trip.estimatedFare)}
+                      {formatCurrency(trip.estimatedFare)}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {(trip.distanceMeters / 1000).toFixed(1)} km
+                      {trip.estimatedDistance} km
                     </p>
                   </div>
                 </div>
@@ -267,100 +275,120 @@ const DashboardHome = () => {
         {/* Quick Actions / Summary */}
         <Card className="p-6">
           <h2 className="text-xl font-semibold mb-6">
-            {isDriver ? "Quick Stats" : "Quick Actions"}
+            {role === "DRIVER" ? "Quick Stats" : "Quick Actions"}
           </h2>
 
           {role === "DRIVER" ? (
-            <div className="space-y-4">
-              <div className="p-4 bg-muted rounded-xl">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-muted-foreground">Total Trips</span>
-                  <span className="font-bold text-2xl">{stats.totalTrips}</span>
-                </div>
-                <div className="h-2 bg-background rounded-full overflow-hidden">
-                  <div
-                    className="h-full gradient-driver rounded-full"
-                    style={{
-                      width: `${Math.min((stats.totalTrips / 2000) * 100, 100)}%`,
-                    }}
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Next milestone: 2,000 trips
-                </p>
-              </div>
+            <>
+              {isLoadingUserProfileData && <QuickActionsSkeleton />}
+              {isSuccessLoadingUserProfileData && (
+                <div className="space-y-4">
+                  <div className="p-4 bg-muted rounded-xl">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-muted-foreground">
+                        Total Completed Trips
+                      </span>
+                      <span className="font-bold text-2xl">
+                        {userProfile?.driver?.totalCompletedTrips ?? 0}
+                      </span>
+                    </div>
+                    <div className="h-2 bg-background rounded-full overflow-hidden">
+                      <div
+                        className="h-full gradient-driver rounded-full"
+                        style={{
+                          width: `${(userProfile?.driver?.totalCompletedTrips / 5000) * 100}%`,
+                        }}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Next milestone: 5,000 trips
+                    </p>
+                  </div>
 
-              <div className="p-4 bg-muted rounded-xl">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-muted-foreground">Total Earnings</span>
-                  <span className="font-bold">
-                    {formatCurrency(stats.totalEarnings)}
-                  </span>
-                </div>
-              </div>
+                  <div className="p-4 bg-muted rounded-xl">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-muted-foreground">
+                        Total Earnings
+                      </span>
+                      <span className="font-bold">{formatCurrency(0)}</span>
+                    </div>
+                  </div>
 
-              <div className="p-4 bg-muted rounded-xl">
-                <div className="flex items-center gap-2 mb-2">
-                  <Star className="h-5 w-5 text-warning fill-warning" />
-                  <span className="text-muted-foreground">Driver Rating</span>
+                  <div className="p-4 bg-muted rounded-xl">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Star className="h-5 w-5 text-warning fill-warning" />
+                      <span className="text-muted-foreground">
+                        Driver Rating
+                      </span>
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-bold text-3xl">
+                        {userProfile?.driver?.rating}
+                      </span>
+                      <span className="text-muted-foreground">/ 5.0</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-baseline gap-2">
-                  <span className="font-bold text-3xl">{stats.rating}</span>
-                  <span className="text-muted-foreground">/ 5.0</span>
-                </div>
-              </div>
-            </div>
+              )}
+            </>
           ) : (
-            <div className="space-y-3">
-              <Link to="/dashboard/book" className="block">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start gap-3 h-14"
-                >
-                  <div className="w-10 h-10 rounded-lg gradient-rider flex items-center justify-center">
-                    <MapPin className="h-5 w-5 text-rider-foreground" />
-                  </div>
-                  <div className="text-left">
-                    <p className="font-medium">Book a Ride</p>
-                    <p className="text-sm text-muted-foreground">
-                      Get a ride now
-                    </p>
-                  </div>
-                </Button>
-              </Link>
+            <>
+              {isLoadingUserProfileData && <QuickActionsSkeleton />}
+              {isSuccessLoadingUserProfileData && (
+                <div className="space-y-3">
+                  <Link to="/dashboard/book" className="block">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start gap-3 h-14"
+                    >
+                      <div className="w-10 h-10 rounded-lg gradient-rider flex items-center justify-center">
+                        <MapPin className="h-5 w-5 text-rider-foreground" />
+                      </div>
+                      <div className="text-left">
+                        <p className="font-medium">Book a Ride</p>
+                        <p className="text-sm text-muted-foreground">
+                          Get a ride now
+                        </p>
+                      </div>
+                    </Button>
+                  </Link>
 
-              <Link to="/dashboard/wallet" className="block">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start gap-3 h-14"
-                >
-                  <div className="w-10 h-10 rounded-lg bg-warning/10 flex items-center justify-center">
-                    <Wallet className="h-5 w-5 text-warning" />
-                  </div>
-                  <div className="text-left">
-                    <p className="font-medium">Top Up Wallet</p>
-                    <p className="text-sm text-muted-foreground">Add funds</p>
-                  </div>
-                </Button>
-              </Link>
+                  <Link to="/dashboard/wallet" className="block">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start gap-3 h-14"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-warning/10 flex items-center justify-center">
+                        <Wallet className="h-5 w-5 text-warning" />
+                      </div>
+                      <div className="text-left">
+                        <p className="font-medium">Top Up Wallet</p>
+                        <p className="text-sm text-muted-foreground">
+                          Add funds
+                        </p>
+                      </div>
+                    </Button>
+                  </Link>
 
-              <Link to="/dashboard/trips" className="block">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start gap-3 h-14"
-                >
-                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
-                    <Clock className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                  <div className="text-left">
-                    <p className="font-medium">Trip History</p>
-                    <p className="text-sm text-muted-foreground">
-                      View past rides
-                    </p>
-                  </div>
-                </Button>
-              </Link>
-            </div>
+                  <Link to="/dashboard/trips" className="block">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start gap-3 h-14"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+                        <Clock className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                      <div className="text-left">
+                        <p className="font-medium">Trip History</p>
+                        <p className="text-sm text-muted-foreground">
+                          View past rides
+                        </p>
+                      </div>
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </>
           )}
         </Card>
       </div>
