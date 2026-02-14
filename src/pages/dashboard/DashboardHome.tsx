@@ -14,6 +14,7 @@ import {
   mockRiderTrips,
   mockRiderWallet,
 } from "@/data/mockData";
+import { profile } from "@/helpers";
 import { DriverAPI } from "@/services/api/driver";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -33,7 +34,7 @@ import { Link } from "react-router-dom";
 const DashboardHome = () => {
   const { user, riderProfile, driverProfile } = useAuth();
   const isDriver = user?.role === "DRIVER";
-  const profile = isDriver ? driverProfile : riderProfile;
+  // const profile = isDriver ? driverProfile : riderProfile;
   const stats = isDriver ? mockDriverStats : mockRiderStats;
   const trips = isDriver ? mockDriverTrips : mockRiderTrips;
   const wallet = isDriver ? mockDriverWallet : mockRiderWallet;
@@ -60,6 +61,10 @@ const DashboardHome = () => {
     queryFn: DriverAPI.recentRides,
   });
 
+  const profileData = profile();
+
+  const role = profileData.role;
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Welcome Header */}
@@ -67,18 +72,18 @@ const DashboardHome = () => {
         <div>
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-3xl font-bold">
-              Welcome back, {profile?.fullName?.split(" ")[0]}!
+              Welcome back, {profileData?.fullname?.split(" ")[0]}!
             </h1>
-            <RoleBadge role={user?.role || "RIDER"} />
+            <RoleBadge role={profileData?.role || "RIDER"} />
           </div>
           <p className="text-muted-foreground">
-            {isDriver
+            {role === "DRIVER"
               ? "Here's your driving performance overview"
               : "Ready to go somewhere? Book a ride now."}
           </p>
         </div>
 
-        {!isDriver && (
+        {role === "RIDER" && (
           <Link to="/dashboard/book">
             <Button
               size="lg"
@@ -121,7 +126,7 @@ const DashboardHome = () => {
 
       {/* Stats Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {isDriver ? (
+        {role === "DRIVER" ? (
           <>
             <StatCard
               title="Today's Earnings"
@@ -254,7 +259,7 @@ const DashboardHome = () => {
           <EmptyState
             className="col-span-2"
             title="No trips yet"
-            description="Trips you complete or request will show up here."
+            description="Trips you complete or cancelled will show up here."
             icon={<Car className="h-6 w-6 text-muted-foreground" />}
             actionLabel="Book a ride"
           />
@@ -265,7 +270,7 @@ const DashboardHome = () => {
             {isDriver ? "Quick Stats" : "Quick Actions"}
           </h2>
 
-          {isDriver ? (
+          {role === "DRIVER" ? (
             <div className="space-y-4">
               <div className="p-4 bg-muted rounded-xl">
                 <div className="flex items-center justify-between mb-2">

@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { profile } from "@/helpers";
 import { TOKEN } from "@/services/api/config";
 import { DriverAPI, DriverRegistrationType } from "@/services/api/driver";
 import { UploadAPI } from "@/services/api/upload";
@@ -593,8 +594,7 @@ export function DriverOnboarding({ setShowOnboarding }: DriverOnboardingProps) {
                     <Avatar className="size-56">
                       <AvatarImage src={formData?.profileImage || ""} />
                       <AvatarFallback className="bg-driver text-driver-foreground text-2xl">
-                        {"D"}
-                        {/* {formData.fullName?.charAt(0) || "D"} */}
+                        {profile()?.fullname?.charAt(0) || "U"}
                       </AvatarFallback>
                     </Avatar>
                     <Button
