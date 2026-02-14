@@ -1,18 +1,5 @@
 import { api } from "../config";
 
-// export enum VehicleType {
-//   SUV = "SUV",
-//   BIKE = "BIKE",
-//   TRICYCLE = "TRICYCLE",
-//   CAR = "CAR",
-// }
-
-// export enum VehicleDocumentType {
-//   INSURANCE_CERTIFICATE = "INSURANCE_CERTIFICATE",
-//   ROAD_WORTHINESS = "ROAD_WORTHINESS",
-//   VEHICLE_LICENSE = "VEHICLE_LICENSE",
-// }
-
 // DTO Interfaces
 export interface VehicleDocumentDTO {
   documentType: string;
@@ -40,6 +27,7 @@ export interface DriverRegistrationType {
 
 export const DriverAPI = {
   async completeProfile(payload: DriverRegistrationType) {
-    const res = await api.post("/onboard", payload);
+    const res = await api.post("/driver/onboard", payload);
+    return res.data;
   },
 };

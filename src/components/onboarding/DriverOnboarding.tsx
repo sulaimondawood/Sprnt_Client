@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { TOKEN } from "@/services/api/config";
 import { DriverAPI, DriverRegistrationType } from "@/services/api/driver";
 import { UploadAPI } from "@/services/api/upload";
 import { useMutation } from "@tanstack/react-query";
@@ -35,7 +36,6 @@ interface DriverOnboardingProps {
 }
 
 export function DriverOnboarding({ setShowOnboarding }: DriverOnboardingProps) {
-  // const { updateDriverProfile } = useAuth();
   const [step, setStep] = useState(1);
   const totalSteps = 4;
   const progress = (step / totalSteps) * 100;
@@ -90,15 +90,20 @@ export function DriverOnboarding({ setShowOnboarding }: DriverOnboardingProps) {
       return await UploadAPI.uploadFile(formData);
     },
   });
-  const { mutate: completeOnboarding } = useMutation({
-    mutationFn: (payload: DriverRegistrationType) =>
-      DriverAPI.completeProfile(payload),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onSuccess(data: any) {
-      setShowOnboarding(false);
-      toast.success(data?.message || "Driver onboarding was successfull");
-    },
-  });
+  const { mutate: completeOnboarding, isPending: isCompletingOnboarding } =
+    useMutation({
+      mutationFn: (payload: DriverRegistrationType) =>
+        DriverAPI.completeProfile(payload),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      onSuccess(data: any) {
+        setShowOnboarding(false);
+        const token = data?.data?.token;
+        localStorage.setItem(TOKEN, token);
+        toast.success(
+          data?.data?.message || "Driver onboarding was successfull",
+        );
+      },
+    });
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -216,7 +221,7 @@ export function DriverOnboarding({ setShowOnboarding }: DriverOnboardingProps) {
     { icon: User, label: "Personal" },
   ];
 
-  const vehicleTypes = ["SUV", "Bike", "Tricycle", "Car"];
+  const vehicleTypes = ["SUV", "BIKE", "TRICYCLE", "CAR"];
   const vehicleColors = [
     "Black",
     "White",
@@ -518,6 +523,7 @@ export function DriverOnboarding({ setShowOnboarding }: DriverOnboardingProps) {
                       variant="outline"
                       size="sm"
                       asChild
+                      className="disabled:cursor-not-allowed"
                     >
                       {uploadingKey === `documents-${doc.documentType}` ? (
                         <p className="text-black">Uploading...</p>
@@ -643,10 +649,16 @@ export function DriverOnboarding({ setShowOnboarding }: DriverOnboardingProps) {
           className="min-w-[140px] gradient-driver text-driver-foreground"
         >
           {step === totalSteps ? (
-            <>
-              Submit & Start Driving
-              <Sparkles className="h-4 w-4 ml-2" />
-            </>
+            <div>
+              {isCompletingOnboarding ? (
+                <p>Please wait...</p>
+              ) : (
+                <div className="flex gap-2 items-center">
+                  Submit & Start Driving
+                  <Sparkles className="h-4 w-4" />
+                </div>
+              )}
+            </div>
           ) : (
             <>
               Continue

@@ -41,6 +41,7 @@ import { jwtDecode, JwtPayload } from "jwt-decode";
 export interface CustomJwtPayload extends JwtPayload {
   role?: string;
   completedProfile?: string;
+  fullname?: string;
 }
 
 const DashboardLayout = () => {
@@ -185,19 +186,19 @@ const DashboardLayout = () => {
                           : "bg-rider text-rider-foreground"
                       }
                     >
-                      {profile?.sub?.charAt(0) || "U"}
+                      {profile?.fullname?.charAt(0) || "U"}
                     </AvatarFallback>
                   </Avatar>
                   <span className="hidden md:block font-medium">
-                    {profile?.sub || "User"}
+                    {profile?.fullname || "User"}
                   </span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>
                   <div className="flex flex-col">
-                    <span>{profile?.sub || "User"}</span>
-                    <span className="text-sm font-normal text-muted-foreground">
+                    <span>{profile?.fullname || "User"}</span>
+                    <span className="text-xs font-normal text-muted-foreground">
                       {profile.sub}
                     </span>
                   </div>
