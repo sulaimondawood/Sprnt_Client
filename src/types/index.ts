@@ -202,3 +202,11 @@ export interface DashboardStats {
   weeklyTrips: number;
   weeklyEarnings: number;
 }
+
+export interface Meta {
+  currentPage: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+  pageSize: number;
+  totalPages: number;
+}

@@ -1,3 +1,5 @@
+import { Meta } from "..";
+
 interface Ride {
   id: string;
 
@@ -25,4 +27,9 @@ interface Location {
   address: string | null;
   lat: number | null;
   lng: number | null;
+}
+
+interface RideResponse {
+  meta: Meta;
+  data: Ride[];
 }

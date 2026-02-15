@@ -35,4 +35,9 @@ export const DriverAPI = {
     const res = await api.get("/driver/rides/recent");
     return res.data.data;
   },
+
+  async allRides() {
+    const res = await api.get("/driver/rides");
+    return res.data.data;
+  },
 };
