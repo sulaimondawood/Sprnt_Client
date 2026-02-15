@@ -234,7 +234,7 @@ const CurrentTripPage = () => {
               <div className="flex items-start gap-3">
                 <div
                   className={`w-3 h-3 rounded-full mt-1.5 ${
-                    tripPhase === "picking_up"
+                    currentRide?.rideStatus === "DRIVER_EN_ROUTE"
                       ? "bg-success animate-pulse"
                       : "bg-success"
                   }`}
@@ -242,9 +242,9 @@ const CurrentTripPage = () => {
                 <div className="flex-1">
                   <p className="text-sm text-muted-foreground">Pickup</p>
                   <p className="font-medium">
-                    {activeTrip.pickupLocation.address}
+                    {currentRide?.pickupLocation?.address}
                   </p>
-                  {tripPhase === "picking_up" && (
+                  {currentRide?.rideStatus === "DRIVER_EN_ROUTE" && (
                     <p className="text-xs text-driver mt-1">
                       • Navigating here
                     </p>
@@ -257,8 +257,8 @@ const CurrentTripPage = () => {
               <div className="flex items-start gap-3">
                 <div
                   className={`w-3 h-3 rounded-full mt-1.5 ${
-                    tripPhase === "in_trip" ||
-                    tripPhase === "arriving_destination"
+                    currentRide?.rideStatus === "ON_TRIP" ||
+                    currentRide?.rideStatus === "DRIVER_ARRIVED"
                       ? "bg-destructive animate-pulse"
                       : "bg-destructive/50"
                   }`}
@@ -266,10 +266,10 @@ const CurrentTripPage = () => {
                 <div className="flex-1">
                   <p className="text-sm text-muted-foreground">Drop-off</p>
                   <p className="font-medium">
-                    {activeTrip.dropoffLocation.address}
+                    {currentRide.dropoffLocation.address}
                   </p>
-                  {(tripPhase === "in_trip" ||
-                    tripPhase === "arriving_destination") && (
+                  {(currentRide?.rideStatus === "ON_TRIP" ||
+                    currentRide?.rideStatus === "DRIVER_ARRIVED") && (
                     <p className="text-xs text-driver mt-1">
                       • Navigating here
                     </p>
@@ -287,9 +287,9 @@ const CurrentTripPage = () => {
               onClick={() =>
                 window.open(
                   `https://www.google.com/maps/dir/?api=1&destination=${
-                    tripPhase === "picking_up"
-                      ? `${pickupCoords[1]},${pickupCoords[0]}`
-                      : `${dropoffCoords[1]},${dropoffCoords[0]}`
+                    currentRide?.rideStatus === "DRIVER_EN_ROUTE"
+                      ? `${currentRide?.pickupLocation?.lat},${currentRide?.pickupLocation?.lng}`
+                      : `${currentRide?.dropoffLocation?.lat},${currentRide?.dropoffLocation?.lng}`
                   }`,
                   "_blank",
                 )
@@ -299,7 +299,7 @@ const CurrentTripPage = () => {
               Open in Google Maps
             </Button>
 
-            {tripPhase === "picking_up" && (
+            {currentRide?.rideStatus === "DRIVER_EN_ROUTE" && (
               <Button
                 className="w-full gap-2 gradient-driver text-driver-foreground"
                 onClick={handleStartTrip}
@@ -309,8 +309,8 @@ const CurrentTripPage = () => {
               </Button>
             )}
 
-            {(tripPhase === "in_trip" ||
-              tripPhase === "arriving_destination") && (
+            {(currentRide?.rideStatus === "ON_TRIP" ||
+              currentRide?.rideStatus === "DRIVER_ARRIVED") && (
               <Button
                 className="w-full gap-2 gradient-driver text-driver-foreground"
                 onClick={handleCompleteTrip}
@@ -320,7 +320,7 @@ const CurrentTripPage = () => {
               </Button>
             )}
 
-            {tripPhase === "completed" && (
+            {currentRide?.rideStatus === "COMPLETED" && (
               <Card className="p-6 bg-success/10 border-success/20">
                 <div className="text-center">
                   <CheckCircle className="h-12 w-12 text-success mx-auto mb-3" />
@@ -328,7 +328,7 @@ const CurrentTripPage = () => {
                     Trip Completed!
                   </h3>
                   <p className="text-2xl font-bold mt-2">
-                    ₦{activeTrip.finalFare || activeTrip.estimatedFare}
+                    ₦{currentRide?.estimatedFare}
                   </p>
                   <p className="text-sm text-muted-foreground">
                     Earnings added to wallet
