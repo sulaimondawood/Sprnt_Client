@@ -10,7 +10,7 @@ import { mockRiderTrips, mockDriverTrips } from "@/data/mockData";
 import {
   Car,
   MapPin,
-  Calendar,
+  Calendar as CalendarIcon,
   Search,
   Filter,
   ChevronRight,
@@ -18,61 +18,53 @@ import {
   Navigation,
   User,
 } from "lucide-react";
-import { format } from "date-fns";
+import { addDays, format } from "date-fns";
 import { profile } from "@/helpers";
 import { DriverAPI } from "@/services/api/driver";
 import { useQuery } from "@tanstack/react-query";
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { RideResponse } from "@/types/rides/indes";
 import { TripCardSkeleton } from "@/components/dashboard/trips/skeleton/TripSkeleton";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { DateRange } from "react-day-picker";
+import { Calendar } from "@/components/ui/calendar";
+import { useDebounce } from "@/hooks/useDebounce";
 
 const TripHistoryPage = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const profileData = profile();
+  const [activeTab, setActiveTab] = useState("all");
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: undefined,
+    to: undefined,
+  });
+  const [searchQuery, setSearchQuery] = useState<string | null>();
 
+  const debouncedValue = useDebounce(searchQuery);
+
+  const profileData = profile();
   const role = profileData.role;
+
+  const filter = {
+    keyword: debouncedValue,
+    status: activeTab === "all" ? null : activeTab,
+    from: date?.from && date?.from.toISOString(),
+    to: date?.to && date?.to.toISOString(),
+  };
 
   const {
     data: allRides,
     isLoading: isLoadingallRides,
     isSuccess: isSuccessLoadingallRides,
   } = useQuery<RideResponse>({
-    queryKey: ["rides", "all"],
-    queryFn: DriverAPI.allRides,
+    queryKey: ["rides", "all", filter],
+    queryFn: () => DriverAPI.allRides(filter),
   });
 
   const { user } = useAuth();
   const isDriver = user?.role === "DRIVER";
-  const [activeTab, setActiveTab] = useState("all");
-
-  const trips = !isDriver ? mockDriverTrips : mockRiderTrips;
-  // const trips = isDriver ? mockDriverTrips : mockRiderTrips;
-
-  const filteredTrips = trips.filter((trip) => {
-    const matchesSearch =
-      trip.pickupLocation.address
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      trip.dropoffLocation.address
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      (isDriver
-        ? trip.riderName?.toLowerCase().includes(searchQuery.toLowerCase())
-        : trip.driverName?.toLowerCase().includes(searchQuery.toLowerCase()));
-
-    if (activeTab === "all") return matchesSearch;
-    if (activeTab === "completed")
-      return matchesSearch && trip.status === "COMPLETED";
-    if (activeTab === "cancelled")
-      return matchesSearch && trip.status === "CANCELLED";
-    if (activeTab === "ongoing")
-      return (
-        matchesSearch &&
-        ["STARTED", "ARRIVING", "ACCEPTED"].includes(trip.status)
-      );
-
-    return matchesSearch;
-  });
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-NG", {
@@ -131,14 +123,22 @@ const TripHistoryPage = () => {
               className="pl-10"
             />
           </div>
-          <Button variant="outline" className="gap-2">
-            <Filter className="h-4 w-4" />
-            Filters
-          </Button>
-          <Button variant="outline" className="gap-2">
-            <Calendar className="h-4 w-4" />
-            Date Range
-          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="gap-2">
+                <CalendarIcon className="h-4 w-4" />
+                Date Range
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="range"
+                defaultMonth={date?.from}
+                selected={date}
+                onSelect={setDate}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
       </Card>
 
@@ -146,9 +146,10 @@ const TripHistoryPage = () => {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="ongoing">Ongoing</TabsTrigger>
-          <TabsTrigger value="completed">Completed</TabsTrigger>
-          <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
+          <TabsTrigger value="ON_TRIP">Ongoing</TabsTrigger>
+          <TabsTrigger value="COMPLETED">Completed</TabsTrigger>
+          <TabsTrigger value="DRIVER_CANCELLED">Cancelled</TabsTrigger>
+          <TabsTrigger value="RIDER_CANCELLED">Rider Cancelled</TabsTrigger>
         </TabsList>
 
         <TabsContent value={activeTab} className="mt-6">

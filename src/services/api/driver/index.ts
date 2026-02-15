@@ -25,6 +25,13 @@ export interface DriverRegistrationType {
   vehicle: VehicleDTO;
 }
 
+interface TripParams {
+  status?: string;
+  keyword?: string;
+  from?: string;
+  to?: string;
+}
+
 export const DriverAPI = {
   async completeProfile(payload: DriverRegistrationType) {
     const res = await api.post("/driver/onboard", payload);
@@ -36,8 +43,10 @@ export const DriverAPI = {
     return res.data.data;
   },
 
-  async allRides() {
-    const res = await api.get("/driver/rides");
+  async allRides(params: TripParams) {
+    const res = await api.get("/driver/rides", {
+      params,
+    });
     return res.data.data;
   },
 };
