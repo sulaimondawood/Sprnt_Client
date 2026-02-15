@@ -23,6 +23,8 @@ import { profile } from "@/helpers";
 import { DriverAPI } from "@/services/api/driver";
 import { useQuery } from "@tanstack/react-query";
 import { EmptyState } from "@/components/dashboard/EmptyState";
+import { RideResponse } from "@/types/rides/indes";
+import { TripCardSkeleton } from "@/components/dashboard/trips/skeleton/TripSkeleton";
 
 const TripHistoryPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -34,12 +36,10 @@ const TripHistoryPage = () => {
     data: allRides,
     isLoading: isLoadingallRides,
     isSuccess: isSuccessLoadingallRides,
-  } = useQuery<Ride[]>({
+  } = useQuery<RideResponse>({
     queryKey: ["rides", "all"],
     queryFn: DriverAPI.allRides,
   });
-
-  console.log(allRides);
 
   const { user } = useAuth();
   const isDriver = user?.role === "DRIVER";
@@ -152,7 +152,15 @@ const TripHistoryPage = () => {
         </TabsList>
 
         <TabsContent value={activeTab} className="mt-6">
-          {isSuccessLoadingallRides && allRides.length === 0 && (
+          {isLoadingallRides && (
+            <div className="space-y-4">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <TripCardSkeleton key={i} />
+              ))}
+            </div>
+          )}
+
+          {isSuccessLoadingallRides && allRides?.data?.length === 0 && (
             <EmptyState
               className="col-span-2"
               title="No trips found"
@@ -167,8 +175,8 @@ const TripHistoryPage = () => {
           )}
 
           {isSuccessLoadingallRides &&
-            allRides.length > 0 &&
-            allRides.map((trip) => (
+            allRides?.data.length > 0 &&
+            allRides?.data?.map((trip) => (
               <Card
                 key={trip.id}
                 className="p-6 hover:shadow-lg transition-shadow"
@@ -236,27 +244,21 @@ const TripHistoryPage = () => {
                     </div>
 
                     {/* Driver/Rider Info */}
-                    {(isDriver ? trip.riderName : trip.driverName) && (
+                    {(role === "DRIVER" ? trip.riderName : trip.driverName) && (
                       <div className="flex items-center gap-3 pt-2 border-t border-border">
                         <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
                           <User className="h-4 w-4 text-muted-foreground" />
                         </div>
                         <div>
                           <p className="text-sm text-muted-foreground">
-                            {isDriver ? "Rider" : "Driver"}
+                            {role === "DRIVER" ? "Rider" : "Driver"}
                           </p>
                           <p className="font-medium">
-                            {isDriver ? trip.riderName : trip.driverName}
+                            {role === "DRIVER"
+                              ? trip.riderName
+                              : trip.driverName}
                           </p>
                         </div>
-                        {/* {!isDriver && trip.vehicleInfo && (
-                          <div className="ml-auto text-right">
-                            <p className="text-sm text-muted-foreground">
-                              Vehicle
-                            </p>
-                            <p className="text-sm">{trip.vehicleInfo}</p>
-                          </div>
-                        )} */}
                       </div>
                     )}
                   </div>

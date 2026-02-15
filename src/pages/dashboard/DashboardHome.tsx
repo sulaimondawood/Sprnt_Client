@@ -18,6 +18,7 @@ import {
 import { profile } from "@/helpers";
 import { DriverAPI } from "@/services/api/driver";
 import { UserAPI } from "@/services/api/user";
+import { Ride } from "@/types/rides/indes";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import {
