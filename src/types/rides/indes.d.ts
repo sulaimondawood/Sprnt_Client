@@ -21,6 +21,10 @@ interface Ride {
 
   estimatedDistance: number; // km
   estimatedDurationMins: number;
+
+  riderInfo: DriverRiderInfo;
+
+  driverInfo: DriverRiderInfo;
 }
 
 interface Location {
@@ -39,4 +43,12 @@ interface RideOverview {
   totalCompleted: number;
   totalCancelled: number;
   totalOngoing: number;
+}
+
+interface DriverRiderInfo {
+  id: string;
+  fullname: string;
+  email: string;
+  status: string;
+  role: string;
 }

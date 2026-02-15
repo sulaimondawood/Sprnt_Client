@@ -90,3 +90,54 @@ export function TripStatsSkeleton() {
     </div>
   );
 }
+
+export function TripMapSkeleton() {
+  return (
+    <div className="lg:col-span-2 space-y-6">
+      {/* Map Skeleton */}
+      <Skeleton className="h-[400px] w-full rounded-md" />
+
+      {/* Trip Stats Skeleton */}
+      <div className="grid grid-cols-3 gap-4">
+        {[...Array(3)].map((_, i) => (
+          <Card key={i} className="p-4 text-center space-y-2">
+            {/* Icon skeleton */}
+            <Skeleton className="h-6 w-6 mx-auto rounded-full" />
+
+            {/* Value skeleton */}
+            <Skeleton className="h-7 w-16 mx-auto" />
+
+            {/* Label skeleton */}
+            <Skeleton className="h-4 w-20 mx-auto" />
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function RiderCardSkeleton() {
+  return (
+    <Card className="p-6 space-y-6">
+      {/* Rider info */}
+      <div className="flex items-center gap-4">
+        {/* Avatar skeleton */}
+        <Skeleton className="w-16 h-16 rounded-full" />
+
+        <div className="flex-1 space-y-2">
+          {/* Name skeleton */}
+          <Skeleton className="h-6 w-32" />
+
+          {/* Role skeleton */}
+          <Skeleton className="h-4 w-20" />
+        </div>
+      </div>
+
+      {/* Buttons skeleton */}
+      <div className="flex gap-2">
+        <Skeleton className="flex-1 h-10 rounded-md" />
+        <Skeleton className="flex-1 h-10 rounded-md" />
+      </div>
+    </Card>
+  );
+}

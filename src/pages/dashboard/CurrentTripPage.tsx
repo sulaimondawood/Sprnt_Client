@@ -1,12 +1,17 @@
+import {
+  RiderCardSkeleton,
+  TripMapSkeleton,
+} from "@/components/dashboard/trips/skeleton/TripSkeleton";
 import Map from "@/components/Map";
 import { RoleBadge } from "@/components/RoleBadge";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { mockDriverTrips } from "@/data/mockData";
-import { formatTime } from "@/helpers";
+import { formatTime, profile } from "@/helpers";
 import { useToast } from "@/hooks/use-toast";
 import { DriverAPI } from "@/services/api/driver";
+import { Ride, RideResponse } from "@/types/rides/indes";
 import { useQuery } from "@tanstack/react-query";
 import {
   AlertTriangle,
@@ -20,6 +25,7 @@ import {
   User,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 type TripPhase =
   | "picking_up"
@@ -35,10 +41,6 @@ const CurrentTripPage = () => {
   ]);
   const [elapsedTime, setElapsedTime] = useState(0);
   const { toast } = useToast();
-
-  // Pickup and dropoff coordinates for the active trip
-  const pickupCoords: [number, number] = [3.4226, 6.4281]; // Victoria Island
-  const dropoffCoords: [number, number] = [3.4792, 6.4326]; // Lekki
 
   // Simulate driver movement
   useEffect(() => {
@@ -83,27 +85,33 @@ const CurrentTripPage = () => {
     });
   };
 
+  const profileData = profile();
+  const role = profileData.role;
+
   const {
     data: currentRide,
     isLoading: isLoadingCurrentRide,
     isSuccess: isSuccessLoadingCurrentRide,
-  } = useQuery({
+    isError,
+  } = useQuery<Ride>({
     queryKey: ["rides", "current"],
     queryFn: DriverAPI.currentRide,
   });
 
-  if (!activeTrip) {
+  // Pickup and dropoff coordinates for the active trip
+  const pickupCoords: [number, number] = [3.1392, 6.4281]; // Victoria Island
+  const dropoffCoords: [number, number] = [3.4792, 6.4326]; // Lekki
+
+  if (isError) {
     return (
       <div className="space-y-6 animate-fade-in">
         <div>
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-3xl font-bold">Current Trip</h1>
-            <RoleBadge role="DRIVER" />
+            <RoleBadge role={role} />
           </div>
         </div>
-
         <Map className="h-[400px]" />
-
         <Card className="p-12 text-center">
           <Navigation className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
           <h2 className="text-xl font-semibold mb-2">No Active Trip</h2>
@@ -124,7 +132,7 @@ const CurrentTripPage = () => {
         <div>
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-3xl font-bold">Current Trip</h1>
-            <RoleBadge role="DRIVER" />
+            <RoleBadge role={role} />
           </div>
           <StatusBadge status={activeTrip.status} type="trip" />
         </div>
@@ -138,61 +146,86 @@ const CurrentTripPage = () => {
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Left: Map */}
-        <div className="lg:col-span-2 space-y-6">
-          <Map
-            pickupCoords={pickupCoords}
-            dropoffCoords={dropoffCoords}
-            driverCoords={driverCoords}
-            showRoute={true}
-            className="h-[400px]"
-          />
+        {isLoadingCurrentRide && <TripMapSkeleton />}
 
-          {/* Trip Stats */}
-          <div className="grid grid-cols-3 gap-4">
-            <Card className="p-4 text-center">
-              <Clock className="h-6 w-6 text-driver mx-auto mb-2" />
-              <p className="text-2xl font-bold">{formatTime(elapsedTime)}</p>
-              <p className="text-sm text-muted-foreground">Duration</p>
-            </Card>
-            <Card className="p-4 text-center">
-              <Route className="h-6 w-6 text-driver mx-auto mb-2" />
-              <p className="text-2xl font-bold">
-                {(activeTrip.distanceMeters / 1000).toFixed(1)} km
-              </p>
-              <p className="text-sm text-muted-foreground">Distance</p>
-            </Card>
-            <Card className="p-4 text-center">
-              <DollarSign className="h-6 w-6 text-driver mx-auto mb-2" />
-              <p className="text-2xl font-bold">₦{activeTrip.estimatedFare}</p>
-              <p className="text-sm text-muted-foreground">Est. Fare</p>
-            </Card>
+        {isSuccessLoadingCurrentRide && (
+          <div className="lg:col-span-2 space-y-6">
+            <Map
+              pickupCoords={[
+                currentRide?.pickupLocation?.lng,
+                currentRide?.pickupLocation?.lat,
+              ]}
+              dropoffCoords={[
+                currentRide?.dropoffLocation?.lng,
+                currentRide?.dropoffLocation?.lat,
+              ]}
+              driverCoords={driverCoords}
+              showRoute={true}
+              className="h-[400px]"
+            />
+
+            {/* Trip Stats */}
+            <div className="grid grid-cols-3 gap-4">
+              <Card className="p-4 text-center">
+                <Clock className="h-6 w-6 text-driver mx-auto mb-2" />
+                <p className="text-2xl font-bold">
+                  {currentRide?.estimatedDurationMins}mins
+                </p>
+                <p className="text-sm text-muted-foreground">Duration</p>
+              </Card>
+              <Card className="p-4 text-center">
+                <Route className="h-6 w-6 text-driver mx-auto mb-2" />
+                <p className="text-2xl font-bold">
+                  {currentRide?.estimatedDistance} km
+                </p>
+                <p className="text-sm text-muted-foreground">Distance</p>
+              </Card>
+              <Card className="p-4 text-center">
+                <DollarSign className="h-6 w-6 text-driver mx-auto mb-2" />
+                <p className="text-2xl font-bold">
+                  ₦{currentRide?.estimatedFare}
+                </p>
+                <p className="text-sm text-muted-foreground">Est. Fare</p>
+              </Card>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Right: Trip Details */}
         <div className="space-y-6">
           {/* Rider Info */}
-          <Card className="p-6">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 rounded-full bg-rider flex items-center justify-center">
-                <User className="h-8 w-8 text-rider-foreground" />
+          {isLoadingCurrentRide && <RiderCardSkeleton />}
+          {isSuccessLoadingCurrentRide && (
+            <Card className="p-6">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-16 h-16 rounded-full bg-rider flex items-center justify-center">
+                  <User className="h-8 w-8 text-rider-foreground" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-xl font-bold">
+                    {currentRide?.riderName}
+                  </h2>
+                  <p className="text-muted-foreground">Rider</p>
+                </div>
               </div>
-              <div className="flex-1">
-                <h2 className="text-xl font-bold">{activeTrip.riderName}</h2>
-                <p className="text-muted-foreground">Rider</p>
+              <div className="flex gap-2">
+                <Button variant="outline" className="flex-1">
+                  <Phone className="h-4 w-4 mr-2" />
+                  Call(NULL)
+                </Button>
+
+                <a
+                  href={`mailto:${currentRide?.riderInfo?.email}`}
+                  target="_blank"
+                >
+                  <Button variant="outline" className="flex-1">
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Chat
+                  </Button>
+                </a>
               </div>
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" className="flex-1">
-                <Phone className="h-4 w-4 mr-2" />
-                Call
-              </Button>
-              <Button variant="outline" className="flex-1">
-                <MessageSquare className="h-4 w-4 mr-2" />
-                Chat
-              </Button>
-            </div>
-          </Card>
+            </Card>
+          )}
 
           {/* Trip Route */}
           <Card className="p-6">
