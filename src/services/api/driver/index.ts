@@ -49,4 +49,9 @@ export const DriverAPI = {
     });
     return res.data.data;
   },
+
+  async ridesOverview() {
+    const res = await api.get("/driver/rides/overview");
+    return res.data.data;
+  },
 };

@@ -23,8 +23,11 @@ import { profile } from "@/helpers";
 import { DriverAPI } from "@/services/api/driver";
 import { useQuery } from "@tanstack/react-query";
 import { EmptyState } from "@/components/dashboard/EmptyState";
-import { RideResponse } from "@/types/rides/indes";
-import { TripCardSkeleton } from "@/components/dashboard/trips/skeleton/TripSkeleton";
+import { RideOverview, RideResponse } from "@/types/rides/indes";
+import {
+  TripCardSkeleton,
+  TripStatsSkeleton,
+} from "@/components/dashboard/trips/skeleton/TripSkeleton";
 import {
   Popover,
   PopoverContent,
@@ -63,8 +66,16 @@ const TripHistoryPage = () => {
     queryFn: () => DriverAPI.allRides(filter),
   });
 
+  const {
+    data: ridesOverview,
+    isLoading: isLoadingRideOverview,
+    isSuccess: isSuccessLoadingRideOverview,
+  } = useQuery<RideOverview>({
+    queryKey: ["rides", "overview"],
+    queryFn: DriverAPI.ridesOverview,
+  });
+
   const { user } = useAuth();
-  const isDriver = user?.role === "DRIVER";
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-NG", {
@@ -92,24 +103,33 @@ const TripHistoryPage = () => {
       </div>
 
       {/* Stats Summary */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="p-4">
-          <p className="text-sm text-muted-foreground">Total Trips</p>
-          <p className="text-2xl font-bold">{"NULL"}</p>
-        </Card>
-        <Card className="p-4">
-          <p className="text-sm text-muted-foreground">Completed</p>
-          <p className="text-2xl font-bold text-success">NULL</p>
-        </Card>
-        <Card className="p-4">
-          <p className="text-sm text-muted-foreground">Cancelled</p>
-          <p className="text-2xl font-bold text-destructive">NULL</p>
-        </Card>
-        <Card className="p-4">
-          <p className="text-sm text-muted-foreground">Ongoing</p>
-          <p className="text-2xl font-bold text-info">NULL</p>
-        </Card>
-      </div>
+      {isLoadingRideOverview && <TripStatsSkeleton />}
+      {isSuccessLoadingRideOverview && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Card className="p-4">
+            <p className="text-sm text-muted-foreground">Total Trips</p>
+            <p className="text-2xl font-bold">{ridesOverview?.totalTrips}</p>
+          </Card>
+          <Card className="p-4">
+            <p className="text-sm text-muted-foreground">Completed</p>
+            <p className="text-2xl font-bold text-success">
+              {ridesOverview?.totalCompleted}
+            </p>
+          </Card>
+          <Card className="p-4">
+            <p className="text-sm text-muted-foreground">Cancelled</p>
+            <p className="text-2xl font-bold text-destructive">
+              {ridesOverview?.totalCancelled}
+            </p>
+          </Card>
+          <Card className="p-4">
+            <p className="text-sm text-muted-foreground">Ongoing</p>
+            <p className="text-2xl font-bold text-info">
+              {ridesOverview?.totalOngoing}
+            </p>
+          </Card>
+        </div>
+      )}
 
       {/* Filters */}
       <Card className="p-4">
@@ -278,10 +298,10 @@ const TripHistoryPage = () => {
                     </div>
                     <div className="flex-1 md:flex-initial">
                       <p className="text-sm text-muted-foreground">Payment</p>
-                      <StatusBadge status={"pending"} type="payment" />
+                      <StatusBadge status={"NULL"} type="payment" />
                       {/* <StatusBadge status={trip.paymentStatus} type="payment" /> */}
                     </div>
-                    <Button variant="ghost" size="sm" className="gap-1 md:mt-4">
+                    <Button size="sm" className="gap-1 md:mt-4 self-end">
                       Details
                       <ChevronRight className="h-4 w-4" />
                     </Button>

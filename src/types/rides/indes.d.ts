@@ -33,3 +33,10 @@ interface RideResponse {
   meta: Meta;
   data: Ride[];
 }
+
+interface RideOverview {
+  totalTrips: number;
+  totalCompleted: number;
+  totalCancelled: number;
+  totalOngoing: number;
+}

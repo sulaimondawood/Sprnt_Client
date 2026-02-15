@@ -74,3 +74,19 @@ export function TripCardSkeleton() {
     </Card>
   );
 }
+
+export function TripStatsSkeleton() {
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {[...Array(4)].map((_, i) => (
+        <Card key={i} className="p-4 space-y-2">
+          {/* Label skeleton */}
+          <Skeleton className="h-4 w-20" />
+
+          {/* Value skeleton */}
+          <Skeleton className="h-7 w-16" />
+        </Card>
+      ))}
+    </div>
+  );
+}
