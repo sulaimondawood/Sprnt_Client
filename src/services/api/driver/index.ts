@@ -54,4 +54,9 @@ export const DriverAPI = {
     const res = await api.get("/driver/rides/overview");
     return res.data.data;
   },
+
+  async currentRide() {
+    const res = await api.get("/driver/rides/current");
+    return res.data.data;
+  },
 };

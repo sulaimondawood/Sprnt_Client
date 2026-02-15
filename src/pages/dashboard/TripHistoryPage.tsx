@@ -1,41 +1,36 @@
-import { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { StatusBadge } from "@/components/StatusBadge";
-import { RoleBadge } from "@/components/RoleBadge";
-import { mockRiderTrips, mockDriverTrips } from "@/data/mockData";
-import {
-  Car,
-  MapPin,
-  Calendar as CalendarIcon,
-  Search,
-  Filter,
-  ChevronRight,
-  Clock,
-  Navigation,
-  User,
-} from "lucide-react";
-import { addDays, format } from "date-fns";
-import { profile } from "@/helpers";
-import { DriverAPI } from "@/services/api/driver";
-import { useQuery } from "@tanstack/react-query";
 import { EmptyState } from "@/components/dashboard/EmptyState";
-import { RideOverview, RideResponse } from "@/types/rides/indes";
 import {
   TripCardSkeleton,
   TripStatsSkeleton,
 } from "@/components/dashboard/trips/skeleton/TripSkeleton";
+import { RoleBadge } from "@/components/RoleBadge";
+import { StatusBadge } from "@/components/StatusBadge";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { DateRange } from "react-day-picker";
-import { Calendar } from "@/components/ui/calendar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { profile } from "@/helpers";
 import { useDebounce } from "@/hooks/useDebounce";
+import { DriverAPI } from "@/services/api/driver";
+import { RideOverview, RideResponse } from "@/types/rides/indes";
+import { useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
+import {
+  Calendar as CalendarIcon,
+  Car,
+  ChevronRight,
+  Clock,
+  Search,
+  User,
+} from "lucide-react";
+import { useState } from "react";
+import { DateRange } from "react-day-picker";
 
 const TripHistoryPage = () => {
   const [activeTab, setActiveTab] = useState("all");
@@ -74,8 +69,6 @@ const TripHistoryPage = () => {
     queryKey: ["rides", "overview"],
     queryFn: DriverAPI.ridesOverview,
   });
-
-  const { user } = useAuth();
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-NG", {

@@ -1,30 +1,38 @@
-import { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { RoleBadge } from '@/components/RoleBadge';
-import { StatusBadge } from '@/components/StatusBadge';
-import Map from '@/components/Map';
-import { mockDriverTrips } from '@/data/mockData';
-import { 
-  Navigation, 
-  Phone, 
-  MessageSquare, 
-  MapPin, 
-  User, 
+import Map from "@/components/Map";
+import { RoleBadge } from "@/components/RoleBadge";
+import { StatusBadge } from "@/components/StatusBadge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { mockDriverTrips } from "@/data/mockData";
+import { formatTime } from "@/helpers";
+import { useToast } from "@/hooks/use-toast";
+import { DriverAPI } from "@/services/api/driver";
+import { useQuery } from "@tanstack/react-query";
+import {
+  AlertTriangle,
   CheckCircle,
   Clock,
   DollarSign,
+  MessageSquare,
+  Navigation,
+  Phone,
   Route,
-  AlertTriangle
-} from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+  User,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 
-type TripPhase = 'picking_up' | 'in_trip' | 'arriving_destination' | 'completed';
+type TripPhase =
+  | "picking_up"
+  | "in_trip"
+  | "arriving_destination"
+  | "completed";
 
 const CurrentTripPage = () => {
-  const activeTrip = mockDriverTrips.find(t => t.status === 'STARTED');
-  const [tripPhase, setTripPhase] = useState<TripPhase>('picking_up');
-  const [driverCoords, setDriverCoords] = useState<[number, number]>([3.3792, 6.5244]);
+  const activeTrip = mockDriverTrips.find((t) => t.status === "STARTED");
+  const [tripPhase, setTripPhase] = useState<TripPhase>("picking_up");
+  const [driverCoords, setDriverCoords] = useState<[number, number]>([
+    3.3792, 6.5244,
+  ]);
   const [elapsedTime, setElapsedTime] = useState(0);
   const { toast } = useToast();
 
@@ -37,11 +45,12 @@ const CurrentTripPage = () => {
     if (!activeTrip) return;
 
     const interval = setInterval(() => {
-      setElapsedTime(prev => prev + 1);
+      setElapsedTime((prev) => prev + 1);
 
       // Simulate movement based on trip phase
-      setDriverCoords(prev => {
-        const target = tripPhase === 'picking_up' ? pickupCoords : dropoffCoords;
+      setDriverCoords((prev) => {
+        const target =
+          tripPhase === "picking_up" ? pickupCoords : dropoffCoords;
         const newLng = prev[0] + (target[0] - prev[0]) * 0.05;
         const newLat = prev[1] + (target[1] - prev[1]) * 0.05;
         return [newLng, newLat];
@@ -52,33 +61,36 @@ const CurrentTripPage = () => {
   }, [activeTrip, tripPhase]);
 
   const handleStartTrip = () => {
-    setTripPhase('in_trip');
+    setTripPhase("in_trip");
     toast({
-      title: 'Trip Started',
-      description: 'Navigate to the drop-off location.',
+      title: "Trip Started",
+      description: "Navigate to the drop-off location.",
     });
   };
 
   const handleCompleteTrip = () => {
-    setTripPhase('completed');
+    setTripPhase("completed");
     toast({
-      title: 'Trip Completed!',
+      title: "Trip Completed!",
       description: `Earnings: ₦${activeTrip?.finalFare || activeTrip?.estimatedFare}`,
     });
   };
 
   const handleReportIssue = () => {
     toast({
-      title: 'Report Submitted',
-      description: 'Our support team will review your report.',
+      title: "Report Submitted",
+      description: "Our support team will review your report.",
     });
   };
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
+  const {
+    data: currentRide,
+    isLoading: isLoadingCurrentRide,
+    isSuccess: isSuccessLoadingCurrentRide,
+  } = useQuery({
+    queryKey: ["rides", "current"],
+    queryFn: DriverAPI.currentRide,
+  });
 
   if (!activeTrip) {
     return (
@@ -89,13 +101,15 @@ const CurrentTripPage = () => {
             <RoleBadge role="DRIVER" />
           </div>
         </div>
-        
+
         <Map className="h-[400px]" />
-        
+
         <Card className="p-12 text-center">
           <Navigation className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
           <h2 className="text-xl font-semibold mb-2">No Active Trip</h2>
-          <p className="text-muted-foreground mb-4">Go online to start receiving ride requests.</p>
+          <p className="text-muted-foreground mb-4">
+            Go online to start receiving ride requests.
+          </p>
           <Button className="gradient-driver text-driver-foreground">
             Go Online
           </Button>
@@ -142,7 +156,9 @@ const CurrentTripPage = () => {
             </Card>
             <Card className="p-4 text-center">
               <Route className="h-6 w-6 text-driver mx-auto mb-2" />
-              <p className="text-2xl font-bold">{(activeTrip.distanceMeters / 1000).toFixed(1)} km</p>
+              <p className="text-2xl font-bold">
+                {(activeTrip.distanceMeters / 1000).toFixed(1)} km
+              </p>
               <p className="text-sm text-muted-foreground">Distance</p>
             </Card>
             <Card className="p-4 text-center">
@@ -183,31 +199,47 @@ const CurrentTripPage = () => {
             <h3 className="font-semibold mb-4">Trip Route</h3>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <div className={`w-3 h-3 rounded-full mt-1.5 ${
-                  tripPhase === 'picking_up' ? 'bg-success animate-pulse' : 'bg-success'
-                }`} />
+                <div
+                  className={`w-3 h-3 rounded-full mt-1.5 ${
+                    tripPhase === "picking_up"
+                      ? "bg-success animate-pulse"
+                      : "bg-success"
+                  }`}
+                />
                 <div className="flex-1">
                   <p className="text-sm text-muted-foreground">Pickup</p>
-                  <p className="font-medium">{activeTrip.pickupLocation.address}</p>
-                  {tripPhase === 'picking_up' && (
-                    <p className="text-xs text-driver mt-1">• Navigating here</p>
+                  <p className="font-medium">
+                    {activeTrip.pickupLocation.address}
+                  </p>
+                  {tripPhase === "picking_up" && (
+                    <p className="text-xs text-driver mt-1">
+                      • Navigating here
+                    </p>
                   )}
                 </div>
               </div>
-              
+
               <div className="ml-[6px] w-[2px] h-8 bg-border" />
-              
+
               <div className="flex items-start gap-3">
-                <div className={`w-3 h-3 rounded-full mt-1.5 ${
-                  tripPhase === 'in_trip' || tripPhase === 'arriving_destination' 
-                    ? 'bg-destructive animate-pulse' 
-                    : 'bg-destructive/50'
-                }`} />
+                <div
+                  className={`w-3 h-3 rounded-full mt-1.5 ${
+                    tripPhase === "in_trip" ||
+                    tripPhase === "arriving_destination"
+                      ? "bg-destructive animate-pulse"
+                      : "bg-destructive/50"
+                  }`}
+                />
                 <div className="flex-1">
                   <p className="text-sm text-muted-foreground">Drop-off</p>
-                  <p className="font-medium">{activeTrip.dropoffLocation.address}</p>
-                  {(tripPhase === 'in_trip' || tripPhase === 'arriving_destination') && (
-                    <p className="text-xs text-driver mt-1">• Navigating here</p>
+                  <p className="font-medium">
+                    {activeTrip.dropoffLocation.address}
+                  </p>
+                  {(tripPhase === "in_trip" ||
+                    tripPhase === "arriving_destination") && (
+                    <p className="text-xs text-driver mt-1">
+                      • Navigating here
+                    </p>
                   )}
                 </div>
               </div>
@@ -216,21 +248,26 @@ const CurrentTripPage = () => {
 
           {/* Action Buttons */}
           <div className="space-y-3">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full gap-2"
-              onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${
-                tripPhase === 'picking_up' 
-                  ? `${pickupCoords[1]},${pickupCoords[0]}` 
-                  : `${dropoffCoords[1]},${dropoffCoords[0]}`
-              }`, '_blank')}
+              onClick={() =>
+                window.open(
+                  `https://www.google.com/maps/dir/?api=1&destination=${
+                    tripPhase === "picking_up"
+                      ? `${pickupCoords[1]},${pickupCoords[0]}`
+                      : `${dropoffCoords[1]},${dropoffCoords[0]}`
+                  }`,
+                  "_blank",
+                )
+              }
             >
               <Navigation className="h-4 w-4" />
               Open in Google Maps
             </Button>
 
-            {tripPhase === 'picking_up' && (
-              <Button 
+            {tripPhase === "picking_up" && (
+              <Button
                 className="w-full gap-2 gradient-driver text-driver-foreground"
                 onClick={handleStartTrip}
               >
@@ -239,8 +276,9 @@ const CurrentTripPage = () => {
               </Button>
             )}
 
-            {(tripPhase === 'in_trip' || tripPhase === 'arriving_destination') && (
-              <Button 
+            {(tripPhase === "in_trip" ||
+              tripPhase === "arriving_destination") && (
+              <Button
                 className="w-full gap-2 gradient-driver text-driver-foreground"
                 onClick={handleCompleteTrip}
               >
@@ -249,13 +287,19 @@ const CurrentTripPage = () => {
               </Button>
             )}
 
-            {tripPhase === 'completed' && (
+            {tripPhase === "completed" && (
               <Card className="p-6 bg-success/10 border-success/20">
                 <div className="text-center">
                   <CheckCircle className="h-12 w-12 text-success mx-auto mb-3" />
-                  <h3 className="text-lg font-bold text-success">Trip Completed!</h3>
-                  <p className="text-2xl font-bold mt-2">₦{activeTrip.finalFare || activeTrip.estimatedFare}</p>
-                  <p className="text-sm text-muted-foreground">Earnings added to wallet</p>
+                  <h3 className="text-lg font-bold text-success">
+                    Trip Completed!
+                  </h3>
+                  <p className="text-2xl font-bold mt-2">
+                    ₦{activeTrip.finalFare || activeTrip.estimatedFare}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Earnings added to wallet
+                  </p>
                 </div>
               </Card>
             )}
