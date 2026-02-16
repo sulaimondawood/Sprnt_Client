@@ -192,3 +192,80 @@ export function TripRouteSkeleton() {
     </Card>
   );
 }
+
+export function RideInfoSkeleton() {
+  return (
+    <Card className="p-6 space-y-4">
+      {/* Header */}
+      <Skeleton className="h-5 w-32" />
+
+      {/* Avatar + Name + Rating */}
+      <div className="flex items-center gap-4">
+        {/* Avatar */}
+        <Skeleton className="w-14 h-14 rounded-full" />
+
+        <div className="flex-1 space-y-2">
+          {/* Name */}
+          <Skeleton className="h-5 w-40" />
+
+          {/* Rating */}
+          <Skeleton className="h-4 w-16" />
+        </div>
+      </div>
+
+      {/* Buttons */}
+      <div className="flex gap-2">
+        <Skeleton className="flex-1 h-9 rounded-md" />
+        <Skeleton className="flex-1 h-9 rounded-md" />
+      </div>
+    </Card>
+  );
+}
+
+export function PaymentCardSkeleton() {
+  return (
+    <Card className="p-6 space-y-4">
+      {/* Header */}
+      <div className="flex items-center gap-2 mb-2">
+        <Skeleton className="h-4 w-4 rounded-sm" />
+        <Skeleton className="h-5 w-24" />
+      </div>
+
+      {/* Payment details */}
+      <div className="space-y-3">
+        {/* Base fare */}
+        <div className="flex justify-between">
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-4 w-12" />
+        </div>
+
+        {/* Distance */}
+        <div className="flex justify-between">
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-4 w-12" />
+        </div>
+
+        {/* Service fee */}
+        <div className="flex justify-between">
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-4 w-12" />
+        </div>
+
+        {/* Separator */}
+        <Skeleton className="h-[1px] w-full" />
+
+        {/* Total */}
+        <div className="flex justify-between">
+          <Skeleton className="h-5 w-24" />
+          <Skeleton className="h-5 w-20" />
+        </div>
+
+        {/* Wallet + Payment status */}
+        <div className="flex justify-between items-center pt-2">
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-5 w-16 rounded-full" />
+        </div>
+      </div>
+    </Card>
+  );
+}

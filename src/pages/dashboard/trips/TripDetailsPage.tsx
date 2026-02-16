@@ -30,19 +30,17 @@ import { useQuery } from "@tanstack/react-query";
 import { RideAPI } from "@/services/api/rides";
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import {
+  PaymentCardSkeleton,
+  RideInfoSkeleton,
   TripRouteSkeleton,
   TripSingleStatSkeleton,
 } from "@/components/dashboard/trips/skeleton/TripSkeleton";
-import { formatCurrency } from "@/helpers";
+import { formatCurrency, profile } from "@/helpers";
 import { ElementType } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 const TripDetailsPage = () => {
   const { tripId } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const isDriver = user?.role === "DRIVER";
-  const trips = isDriver ? mockDriverTrips : mockRiderTrips;
-  const trip = trips.find((t) => t.id === tripId);
 
   const {
     data: rideDetails,
@@ -54,6 +52,9 @@ const TripDetailsPage = () => {
     queryFn: () => RideAPI.tripDetails(tripId),
     enabled: !!tripId,
   });
+
+  const profileData = profile();
+  const role = profileData?.role;
 
   if (isError || !rideDetails) {
     return (
@@ -186,12 +187,14 @@ const TripDetailsPage = () => {
           )}
 
           {isLoadingRideDetails && (
-            <div className="space-y-4">
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-4 w-3/4" />
-            </div>
+            <Card className="p-6">
+              <div className="space-y-4">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-3/4" />
+              </div>
+            </Card>
           )}
 
           {isSuccessLoadingRideDetails && (
@@ -227,78 +230,75 @@ const TripDetailsPage = () => {
         {/* Right column */}
         <div className="space-y-6">
           {/* Person Info */}
-          <Card className="p-6">
-            <h3 className="font-semibold mb-4">
-              {isDriver ? "Rider Info" : "Driver Info"}
-            </h3>
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center">
-                <User className="h-7 w-7 text-muted-foreground" />
-              </div>
-              <div>
-                <p className="font-bold text-lg">
-                  {isDriver
-                    ? trip.riderName || "Unknown Rider"
-                    : trip.driverName || "Unknown Driver"}
-                </p>
-                <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                  <Star className="h-3 w-3 fill-primary text-primary" /> 4.8
+          {isLoadingRideDetails && <RideInfoSkeleton />}
+
+          {isSuccessLoadingRideDetails && (
+            <Card className="p-6">
+              <h3 className="font-semibold mb-4">
+                {role === "DRIVER" ? "Rider Info" : "Driver Info"}
+              </h3>
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center">
+                  <User className="h-7 w-7 text-muted-foreground" />
+                </div>
+                <div>
+                  <p className="font-bold text-lg">
+                    {role === "DRIVER"
+                      ? rideDetails?.riderName || "Unknown Rider"
+                      : rideDetails.driverName || "Unknown Driver"}
+                  </p>
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <Star className="h-3 w-3 fill-primary text-primary" /> 4.8
+                  </div>
                 </div>
               </div>
-            </div>
-            {trip.status !== "CANCELLED" && (
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="flex-1 gap-1">
-                  <Phone className="h-3.5 w-3.5" /> Call
-                </Button>
-                <Button variant="outline" size="sm" className="flex-1 gap-1">
-                  <MessageSquare className="h-3.5 w-3.5" /> Chat
-                </Button>
-              </div>
-            )}
-          </Card>
-          {/* Vehicle Info (rider view) */}
-          {!isDriver && trip.vehicleInfo && (
-            <Card className="p-6">
-              <h3 className="font-semibold mb-4 flex items-center gap-2">
-                <Car className="h-4 w-4 text-primary" /> Vehicle
-              </h3>
-              <p className="font-medium">{trip.vehicleInfo}</p>
+              {!["RIDER_CANCELLED", "DRIVER_CANCELLED"].includes(
+                rideDetails.rideStatus,
+              ) && (
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="flex-1 gap-1">
+                    <Phone className="h-3.5 w-3.5" /> Call (NULL)
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex-1 gap-1">
+                    <MessageSquare className="h-3.5 w-3.5" /> Chat
+                  </Button>
+                </div>
+              )}
             </Card>
           )}
-          {/* Payment Summary */}
-          <Card className="p-6">
-            <h3 className="font-semibold mb-4 flex items-center gap-2">
-              <Receipt className="h-4 w-4 text-primary" /> Payment
-            </h3>
-            <div className="space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Base fare</span>
-                <span>{formatCurrency(trip.estimatedFare * 0.6)}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Distance</span>
-                <span>{formatCurrency(trip.estimatedFare * 0.3)}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Service fee</span>
-                <span>{formatCurrency(trip.estimatedFare * 0.1)}</span>
-              </div>
-              <Separator />
-              <div className="flex justify-between font-bold text-lg">
-                <span>Total</span>
-                <span>
-                  {formatCurrency(trip.finalFare || trip.estimatedFare)}
-                </span>
-              </div>
-              <div className="flex items-center justify-between pt-2">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CreditCard className="h-4 w-4" /> Wallet
+
+          {isLoadingRideDetails && <PaymentCardSkeleton />}
+
+          {isSuccessLoadingRideDetails && (
+            <Card className="p-6">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <Receipt className="h-4 w-4 text-primary" /> Payment
+              </h3>
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Base fare</span>
+                  <span>{formatCurrency(rideDetails.estimatedFare)}</span>
                 </div>
-                <StatusBadge status={trip.paymentStatus} type="payment" />
+
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Service fee</span>
+                  <span>NULL</span>
+                </div>
+                <Separator />
+                <div className="flex justify-between font-bold text-lg">
+                  <span>Total</span>
+                  <span>{formatCurrency(rideDetails?.estimatedFare)}</span>
+                </div>
+                <div className="flex items-center justify-between pt-2">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <CreditCard className="h-4 w-4" /> Wallet
+                  </div>
+                  <StatusBadge status={"NULL"} type="payment" />
+                </div>
               </div>
-            </div>
-          </Card>
+            </Card>
+          )}
+
           {/* Actions */}
           <div className="space-y-2">
             <Button variant="outline" className="w-full gap-2">
@@ -337,7 +337,7 @@ const TimelineComponent = ({
         <p className="font-medium text-sm">{text}</p>
       </div>
       <p className="text-sm text-muted-foreground">
-        {time && format(new Date(time), "h:mm:ss a")}
+        {time ? format(new Date(time), "h:mm:ss a") : "-"}
       </p>
     </div>
   );

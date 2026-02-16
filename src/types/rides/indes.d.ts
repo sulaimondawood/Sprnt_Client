@@ -1,5 +1,48 @@
 import { Meta } from "..";
 
+interface Rider {
+  id: string;
+
+  displayName: string;
+  profileImage?: string;
+
+  defaultPickupLocation?: Location;
+
+  totalRides: number;
+
+  referralCode?: string;
+
+  status: string;
+
+  rating: number;
+  totalRatings: number;
+
+  completedProfile: boolean;
+}
+
+interface Driver {
+  id: string;
+
+  displayName: string;
+  profileImage?: string;
+
+  licenseNumber: string;
+  licenseExpiry: string;
+
+  nin: string;
+
+  status: DriverStatus;
+  availabilityStatus: string;
+
+  rating: number;
+  totalRatings: number;
+  totalCompletedTrips: number;
+
+  kycStatus: string;
+
+  completedProfile: boolean;
+}
+
 interface Ride {
   id: string;
 
@@ -25,6 +68,9 @@ interface Ride {
   riderInfo: DriverRiderInfo;
 
   driverInfo: DriverRiderInfo;
+
+  rider: Rider;
+  driver: Driver;
 }
 
 interface Location {
