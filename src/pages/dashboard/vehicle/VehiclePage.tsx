@@ -1,20 +1,37 @@
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { RoleBadge } from '@/components/RoleBadge';
-import { StatusBadge } from '@/components/StatusBadge';
-import { mockVehicle } from '@/data/mockData';
-import { Car, Edit, Plus, Calendar, Palette, Users } from 'lucide-react';
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { RoleBadge } from "@/components/RoleBadge";
+import { StatusBadge } from "@/components/StatusBadge";
+import { mockVehicle } from "@/data/mockData";
+import { Car, Edit, Plus, Calendar, Palette, Users } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { DriverAPI } from "@/services/api/driver";
+import { profile } from "@/helpers";
 
 const VehiclePage = () => {
+  const {
+    data: allVehicles,
+    isLoading: isLoadingallVehicles,
+    isSuccess: isSuccessLoadingallVehicles,
+  } = useQuery<Array<VehicleType>>({
+    queryKey: ["vehicles", "all"],
+    queryFn: DriverAPI.vehicles,
+  });
+
+  const profileData = profile();
+  const role = profileData?.role;
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-3xl font-bold">My Vehicle</h1>
-            <RoleBadge role="DRIVER" />
+            <RoleBadge role={role} />
           </div>
-          <p className="text-muted-foreground">Manage your vehicle information</p>
+          <p className="text-muted-foreground">
+            Manage your vehicle information
+          </p>
         </div>
         <Button className="gap-2">
           <Plus className="h-4 w-4" />
@@ -29,7 +46,9 @@ const VehiclePage = () => {
               <Car className="h-8 w-8 text-driver-foreground" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold">{mockVehicle.brand} {mockVehicle.model}</h2>
+              <h2 className="text-2xl font-bold">
+                {mockVehicle.brand} {mockVehicle.model}
+              </h2>
               <p className="text-muted-foreground">{mockVehicle.plateNumber}</p>
             </div>
           </div>
