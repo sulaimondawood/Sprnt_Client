@@ -15,6 +15,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ROUTES } from "@/constants/routes";
 import { profile } from "@/helpers";
 import { useDebounce } from "@/hooks/useDebounce";
 import { DriverAPI } from "@/services/api/driver";
@@ -31,6 +32,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
+import { useNavigate } from "react-router-dom";
 
 const TripHistoryPage = () => {
   const [activeTab, setActiveTab] = useState("all");
@@ -41,6 +43,8 @@ const TripHistoryPage = () => {
   const [searchQuery, setSearchQuery] = useState<string | null>();
 
   const debouncedValue = useDebounce(searchQuery);
+
+  const navigate = useNavigate();
 
   const profileData = profile();
   const role = profileData.role;
@@ -294,7 +298,13 @@ const TripHistoryPage = () => {
                       <StatusBadge status={"NULL"} type="payment" />
                       {/* <StatusBadge status={trip.paymentStatus} type="payment" /> */}
                     </div>
-                    <Button size="sm" className="gap-1 md:mt-4 self-end">
+                    <Button
+                      onClick={() =>
+                        navigate(`${ROUTES.dashboardRides}/${trip?.id}`)
+                      }
+                      size="sm"
+                      className="gap-1 md:mt-4 self-end"
+                    >
                       Details
                       <ChevronRight className="h-4 w-4" />
                     </Button>

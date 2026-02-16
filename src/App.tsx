@@ -22,6 +22,7 @@ import NotFound from "./pages/NotFound";
 import { TanstackProvider } from "./services/providers/tanstack-provider";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import TripDetailsPage from "./pages/dashboard/trips/TripDetailsPage";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ const App = () => (
               <Route index element={<DashboardHome />} />
               <Route path="book" element={<BookRidePage />} />
               <Route path="trips" element={<TripHistoryPage />} />
+              <Route path="trips/:tripId" element={<TripDetailsPage />} />
               <Route path="wallet" element={<WalletPage />} />
               <Route path="earnings" element={<WalletPage />} />
               <Route path="support" element={<SupportPage />} />

@@ -141,3 +141,42 @@ export function RiderCardSkeleton() {
     </Card>
   );
 }
+
+export function TripRouteSkeleton() {
+  return (
+    <Card className="p-6">
+      {/* Header */}
+      <div className="flex items-center gap-2 mb-4">
+        <Skeleton className="h-4 w-4 rounded-sm" />
+        <Skeleton className="h-4 w-24" />
+      </div>
+
+      <div className="space-y-4">
+        {/* Pickup skeleton */}
+        <div className="flex items-start gap-3">
+          <div className="flex flex-col items-center">
+            <Skeleton className="w-4 h-4 rounded-full" />
+            <Skeleton className="w-[2px] h-16 mt-1" />
+          </div>
+
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-3 w-16" /> {/* label */}
+            <Skeleton className="h-6 w-3/4" /> {/* address */}
+            <Skeleton className="h-4 w-40" /> {/* time */}
+          </div>
+        </div>
+
+        {/* Drop-off skeleton */}
+        <div className="flex items-start gap-3">
+          <Skeleton className="w-4 h-4 rounded-full mt-1" />
+
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-3 w-20" /> {/* label */}
+            <Skeleton className="h-6 w-3/4" /> {/* address */}
+            <Skeleton className="h-4 w-36" /> {/* time */}
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+}
