@@ -8,11 +8,11 @@ import AuthPage from "./pages/RegisterPage";
 import DashboardLayout from "./pages/DashboardLayout";
 import DashboardHome from "./pages/dashboard/DashboardHome";
 import BookRidePage from "./pages/dashboard/BookRidePage";
-import TripHistoryPage from "./pages/dashboard/TripHistoryPage";
+import TripHistoryPage from "./pages/dashboard/trips/TripHistoryPage";
 import WalletPage from "./pages/dashboard/WalletPage";
 import SupportPage from "./pages/dashboard/SupportPage";
 import SettingsPage from "./pages/dashboard/SettingsPage";
-import VehiclePage from "./pages/dashboard/VehiclePage";
+import VehiclePage from "./pages/dashboard/vehicle/VehiclePage";
 import DocumentsPage from "./pages/dashboard/DocumentsPage";
 import RatingsPage from "./pages/dashboard/RatingsPage";
 import CurrentTripPage from "./pages/dashboard/CurrentTripPage";
@@ -23,6 +23,7 @@ import { TanstackProvider } from "./services/providers/tanstack-provider";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import TripDetailsPage from "./pages/dashboard/trips/TripDetailsPage";
+import AddVehiclePage from "./pages/dashboard/vehicle/AddVehiclePage";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ const App = () => (
               <Route path="support" element={<SupportPage />} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="vehicle" element={<VehiclePage />} />
+              <Route path="vehicle/add" element={<AddVehiclePage />} />
               <Route path="documents" element={<DocumentsPage />} />
               <Route path="ratings" element={<RatingsPage />} />
               <Route path="current-trip" element={<CurrentTripPage />} />
