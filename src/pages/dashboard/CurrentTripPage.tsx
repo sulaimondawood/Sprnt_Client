@@ -1,3 +1,4 @@
+"use client";
 import {
   RiderCardSkeleton,
   TripMapSkeleton,
@@ -7,11 +8,9 @@ import { RoleBadge } from "@/components/RoleBadge";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { mockDriverTrips } from "@/data/mockData";
-import { formatTime, profile } from "@/helpers";
-import { useToast } from "@/hooks/use-toast";
+import { profile } from "@/helpers";
 import { DriverAPI } from "@/services/api/driver";
-import { Ride, RideResponse } from "@/types/rides/indes";
+import { Ride } from "@/types/rides/indes";
 import { useQuery } from "@tanstack/react-query";
 import {
   AlertTriangle,
@@ -24,63 +23,16 @@ import {
   Route,
   User,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-
-type TripPhase =
-  | "picking_up"
-  | "in_trip"
-  | "arriving_destination"
-  | "completed";
+import { useState } from "react";
+import { toast } from "sonner";
 
 const CurrentTripPage = () => {
-  const activeTrip = mockDriverTrips.find((t) => t.status === "STARTED");
-  const [tripPhase, setTripPhase] = useState<TripPhase>("picking_up");
   const [driverCoords, setDriverCoords] = useState<[number, number]>([
     3.3792, 6.5244,
   ]);
-  const [elapsedTime, setElapsedTime] = useState(0);
-  const { toast } = useToast();
-
-  // Simulate driver movement
-  useEffect(() => {
-    if (!activeTrip) return;
-
-    const interval = setInterval(() => {
-      setElapsedTime((prev) => prev + 1);
-
-      // Simulate movement based on trip phase
-      setDriverCoords((prev) => {
-        const target =
-          tripPhase === "picking_up" ? pickupCoords : dropoffCoords;
-        const newLng = prev[0] + (target[0] - prev[0]) * 0.05;
-        const newLat = prev[1] + (target[1] - prev[1]) * 0.05;
-        return [newLng, newLat];
-      });
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, [activeTrip, tripPhase]);
-
-  const handleStartTrip = () => {
-    setTripPhase("in_trip");
-    toast({
-      title: "Trip Started",
-      description: "Navigate to the drop-off location.",
-    });
-  };
-
-  const handleCompleteTrip = () => {
-    setTripPhase("completed");
-    toast({
-      title: "Trip Completed!",
-      description: `Earnings: ₦${activeTrip?.finalFare || activeTrip?.estimatedFare}`,
-    });
-  };
 
   const handleReportIssue = () => {
-    toast({
-      title: "Report Submitted",
+    toast("Report Submitted", {
       description: "Our support team will review your report.",
     });
   };
@@ -97,10 +49,6 @@ const CurrentTripPage = () => {
     queryKey: ["rides", "current"],
     queryFn: DriverAPI.currentRide,
   });
-
-  // Pickup and dropoff coordinates for the active trip
-  const pickupCoords: [number, number] = [3.1392, 6.4281]; // Victoria Island
-  const dropoffCoords: [number, number] = [3.4792, 6.4326]; // Lekki
 
   if (isError) {
     return (
@@ -134,7 +82,7 @@ const CurrentTripPage = () => {
             <h1 className="text-3xl font-bold">Current Trip</h1>
             <RoleBadge role={role} />
           </div>
-          <StatusBadge status={activeTrip.status} type="trip" />
+          <StatusBadge status={currentRide?.rideStatus || ""} type="trip" />
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={handleReportIssue}>
@@ -215,8 +163,9 @@ const CurrentTripPage = () => {
                 </Button>
 
                 <a
-                  href={`mailto:${currentRide?.riderInfo?.email}`}
+                  href={`mailto:${currentRide.riderInfo.email}`}
                   target="_blank"
+                  rel="noopener noreferrer"
                 >
                   <Button variant="outline" className="flex-1">
                     <MessageSquare className="h-4 w-4 mr-2" />
@@ -266,7 +215,7 @@ const CurrentTripPage = () => {
                 <div className="flex-1">
                   <p className="text-sm text-muted-foreground">Drop-off</p>
                   <p className="font-medium">
-                    {currentRide.dropoffLocation.address}
+                    {currentRide?.dropoffLocation?.address}
                   </p>
                   {(currentRide?.rideStatus === "ON_TRIP" ||
                     currentRide?.rideStatus === "DRIVER_ARRIVED") && (
@@ -281,28 +230,30 @@ const CurrentTripPage = () => {
 
           {/* Action Buttons */}
           <div className="space-y-3">
-            <Button
-              variant="outline"
-              className="w-full gap-2"
-              onClick={() =>
-                window.open(
-                  `https://www.google.com/maps/dir/?api=1&destination=${
-                    currentRide?.rideStatus === "DRIVER_EN_ROUTE"
-                      ? `${currentRide?.pickupLocation?.lat},${currentRide?.pickupLocation?.lng}`
-                      : `${currentRide?.dropoffLocation?.lat},${currentRide?.dropoffLocation?.lng}`
-                  }`,
-                  "_blank",
-                )
-              }
-            >
-              <Navigation className="h-4 w-4" />
-              Open in Google Maps
-            </Button>
+            {isSuccessLoadingCurrentRide && (
+              <Button
+                variant="outline"
+                className="w-full gap-2"
+                onClick={() =>
+                  window.open(
+                    `https://www.google.com/maps/dir/?api=1&destination=${
+                      currentRide?.rideStatus === "DRIVER_EN_ROUTE"
+                        ? `${currentRide?.pickupLocation?.lat},${currentRide?.pickupLocation?.lng}`
+                        : `${currentRide?.dropoffLocation?.lat},${currentRide?.dropoffLocation?.lng}`
+                    }`,
+                    "_blank",
+                  )
+                }
+              >
+                <Navigation className="h-4 w-4" />
+                Open in Google Maps
+              </Button>
+            )}
 
             {currentRide?.rideStatus === "DRIVER_EN_ROUTE" && (
               <Button
                 className="w-full gap-2 gradient-driver text-driver-foreground"
-                onClick={handleStartTrip}
+                // onClick={handleStartTrip}
               >
                 <CheckCircle className="h-4 w-4" />
                 Rider Picked Up - Start Trip
@@ -313,7 +264,7 @@ const CurrentTripPage = () => {
               currentRide?.rideStatus === "DRIVER_ARRIVED") && (
               <Button
                 className="w-full gap-2 gradient-driver text-driver-foreground"
-                onClick={handleCompleteTrip}
+                // onClick={handleCompleteTrip}
               >
                 <CheckCircle className="h-4 w-4" />
                 Complete Trip

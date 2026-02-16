@@ -57,6 +57,7 @@ export const DriverAPI = {
 
   async currentRide() {
     const res = await api.get("/driver/rides/current");
+
     return res.data.data;
   },
 };
