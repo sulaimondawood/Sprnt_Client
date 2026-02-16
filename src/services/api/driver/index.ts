@@ -64,4 +64,9 @@ export const DriverAPI = {
     const res = await api.get("/driver/vehicles");
     return res.data.data;
   },
+
+  async vehicle() {
+    const res = await api.get("/driver/vehicle");
+    return res.data.data;
+  },
 };
