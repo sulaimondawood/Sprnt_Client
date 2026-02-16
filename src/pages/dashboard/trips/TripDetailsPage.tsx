@@ -22,13 +22,20 @@ import {
   CreditCard,
   CheckCircle,
   XCircle,
+  IconNode,
 } from "lucide-react";
 import { format } from "date-fns";
 import { Ride } from "@/types/rides/indes";
 import { useQuery } from "@tanstack/react-query";
 import { RideAPI } from "@/services/api/rides";
 import { EmptyState } from "@/components/dashboard/EmptyState";
-import { TripRouteSkeleton } from "@/components/dashboard/trips/skeleton/TripSkeleton";
+import {
+  TripRouteSkeleton,
+  TripSingleStatSkeleton,
+} from "@/components/dashboard/trips/skeleton/TripSkeleton";
+import { formatCurrency } from "@/helpers";
+import { ElementType } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 const TripDetailsPage = () => {
   const { tripId } = useParams();
   const navigate = useNavigate();
@@ -36,12 +43,6 @@ const TripDetailsPage = () => {
   const isDriver = user?.role === "DRIVER";
   const trips = isDriver ? mockDriverTrips : mockRiderTrips;
   const trip = trips.find((t) => t.id === tripId);
-  const formatCurrency = (amount: number) =>
-    new Intl.NumberFormat("en-NG", {
-      style: "currency",
-      currency: "NGN",
-      minimumFractionDigits: 0,
-    }).format(amount);
 
   const {
     data: rideDetails,
@@ -140,76 +141,88 @@ const TripDetailsPage = () => {
             </Card>
           )}
           {/* Trip Stats */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <Card className="p-4 text-center">
-              <Route className="h-5 w-5 text-primary mx-auto mb-2" />
-              <p className="text-xl font-bold">
-                {rideDetails?.estimatedDistance} km
-              </p>
-              <p className="text-xs text-muted-foreground">Distance</p>
-            </Card>
-            <Card className="p-4 text-center">
-              <Clock className="h-5 w-5 text-primary mx-auto mb-2" />
-              <p className="text-xl font-bold">
-                {rideDetails?.estimatedDurationMins
-                  ? `${rideDetails?.estimatedDurationMins} min`
-                  : "—"}
-              </p>
-              <p className="text-xs text-muted-foreground">Duration</p>
-            </Card>
-            <Card className="p-4 text-center">
-              <DollarSign className="h-5 w-5 text-primary mx-auto mb-2" />
-              <p className="text-xl font-bold">
-                {formatCurrency(rideDetails?.estimatedFare)}
-              </p>
-              <p className="text-xs text-muted-foreground">Est. Fare</p>
-            </Card>
-            <Card className="p-4 text-center">
-              <Calendar className="h-5 w-5 text-primary mx-auto mb-2" />
-              <p className="text-xl font-bold">
-                {trip.requestedAt &&
-                  format(new Date(trip.requestedAt), "h:mm a")}
-              </p>
-              <p className="text-xs text-muted-foreground">Requested</p>
-            </Card>
-          </div>
-          {/* Timeline */}
-          <Card className="p-6">
-            <h3 className="font-semibold mb-4 flex items-center gap-2">
-              <Clock className="h-4 w-4 text-primary" /> Trip Timeline
-            </h3>
-            <div className="space-y-4">
-              {[
-                { label: "Requested", time: trip.requestedAt, icon: MapPin },
-                { label: "Accepted", time: trip.acceptedAt, icon: CheckCircle },
-                {
-                  label: "Trip Started",
-                  time: trip.startedAt,
-                  icon: Navigation,
-                },
-                {
-                  label: "Completed",
-                  time: trip.completedAt,
-                  icon: CheckCircle,
-                },
-                { label: "Cancelled", time: trip.cancelledAt, icon: XCircle },
-              ]
-                .filter((e) => e.time)
-                .map((event, i) => (
-                  <div key={i} className="flex items-center gap-4">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                      <event.icon className="h-4 w-4 text-primary" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-sm">{event.label}</p>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {format(new Date(event.time!), "h:mm:ss a")}
-                    </p>
-                  </div>
-                ))}
+          {isLoadingRideDetails && (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <TripSingleStatSkeleton />
+              <TripSingleStatSkeleton />
+              <TripSingleStatSkeleton />
             </div>
-          </Card>
+          )}
+
+          {isSuccessLoadingRideDetails && (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <Card className="p-4 text-center">
+                <Route className="h-5 w-5 text-primary mx-auto mb-2" />
+                <p className="text-xl font-bold">
+                  {rideDetails?.estimatedDistance} km
+                </p>
+                <p className="text-xs text-muted-foreground">Distance</p>
+              </Card>
+              <Card className="p-4 text-center">
+                <Clock className="h-5 w-5 text-primary mx-auto mb-2" />
+                <p className="text-xl font-bold">
+                  {rideDetails?.estimatedDurationMins
+                    ? `${rideDetails?.estimatedDurationMins} min`
+                    : "—"}
+                </p>
+                <p className="text-xs text-muted-foreground">Duration</p>
+              </Card>
+              <Card className="p-4 text-center">
+                <DollarSign className="h-5 w-5 text-primary mx-auto mb-2" />
+                <p className="text-xl font-bold">
+                  {formatCurrency(rideDetails?.estimatedFare)}
+                </p>
+                <p className="text-xs text-muted-foreground">Est. Fare</p>
+              </Card>
+              <Card className="p-4 text-center">
+                <Calendar className="h-5 w-5 text-primary mx-auto mb-2" />
+                <p className="text-xl font-bold">
+                  {rideDetails?.createdAt &&
+                    format(new Date(rideDetails?.createdAt), "h:mm a")}
+                </p>
+                <p className="text-xs text-muted-foreground">Requested</p>
+              </Card>
+            </div>
+          )}
+
+          {isLoadingRideDetails && (
+            <div className="space-y-4">
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-4 w-3/4" />
+            </div>
+          )}
+
+          {isSuccessLoadingRideDetails && (
+            <Card className="p-6">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <Clock className="h-4 w-4 text-primary" /> Trip Timeline
+              </h3>
+              <div className="space-y-4">
+                <TimelineComponent
+                  icon={MapPin}
+                  text="Request"
+                  time={rideDetails?.createdAt}
+                />
+                <TimelineComponent
+                  icon={CheckCircle}
+                  text="Accepted"
+                  time={rideDetails?.acceptedAt}
+                />
+                <TimelineComponent
+                  icon={Navigation}
+                  text="Trip Started"
+                  time={rideDetails?.arrivalTime}
+                />
+                <TimelineComponent
+                  icon={CheckCircle}
+                  text="Completed"
+                  time={rideDetails?.dropOffTime}
+                />
+              </div>
+            </Card>
+          )}
         </div>
         {/* Right column */}
         <div className="space-y-6">
@@ -305,3 +318,27 @@ const TripDetailsPage = () => {
   );
 };
 export default TripDetailsPage;
+
+const TimelineComponent = ({
+  icon: Icon,
+  text,
+  time,
+}: {
+  icon: ElementType;
+  text: string;
+  time: string;
+}) => {
+  return (
+    <div className="flex items-center gap-4">
+      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+        <Icon className="h-4 w-4 text-primary" />
+      </div>
+      <div className="flex-1">
+        <p className="font-medium text-sm">{text}</p>
+      </div>
+      <p className="text-sm text-muted-foreground">
+        {time && format(new Date(time), "h:mm:ss a")}
+      </p>
+    </div>
+  );
+};

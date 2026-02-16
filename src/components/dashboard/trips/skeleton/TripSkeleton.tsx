@@ -91,6 +91,18 @@ export function TripStatsSkeleton() {
   );
 }
 
+export function TripSingleStatSkeleton() {
+  return (
+    <Card className="p-4 space-y-2">
+      {/* Label skeleton */}
+      <Skeleton className="h-4 w-20" />
+
+      {/* Value skeleton */}
+      <Skeleton className="h-7 w-16" />
+    </Card>
+  );
+}
+
 export function TripMapSkeleton() {
   return (
     <div className="lg:col-span-2 space-y-6">
