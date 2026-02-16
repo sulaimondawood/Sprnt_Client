@@ -131,14 +131,6 @@ const DashboardLayout = () => {
             </button>
 
             <Link to="/" className="flex items-center gap-2">
-              <div
-                className={cn(
-                  "w-10 h-10 rounded-xl flex items-center justify-center",
-                  role !== "RIDER" ? "gradient-driver" : "gradient-rider",
-                )}
-              >
-                <Car className="h-6 w-6 text-white" />
-              </div>
               <span className="text-xl font-bold hidden sm:block">Sprnt</span>
             </Link>
 
