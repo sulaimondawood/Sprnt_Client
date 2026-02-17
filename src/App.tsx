@@ -16,7 +16,7 @@ import VehiclePage from "./pages/dashboard/vehicle/VehiclePage";
 import DocumentsPage from "./pages/dashboard/document/DocumentsPage";
 import RatingsPage from "./pages/dashboard/rating/RatingsPage";
 import CurrentTripPage from "./pages/dashboard/CurrentTripPage";
-import ProfilePage from "./pages/dashboard/ProfilePage";
+import ProfilePage from "./pages/dashboard/profile/ProfilePage";
 import OnboardingPage from "./pages/OnboardingPage";
 import NotFound from "./pages/NotFound";
 import { TanstackProvider } from "./services/providers/tanstack-provider";

@@ -1,38 +1,12 @@
-import { Card } from "@/components/ui/card";
-import { RoleBadge } from "@/components/RoleBadge";
-import { mockDriverStats } from "@/data/mockData";
-import { Star, TrendingUp } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { DriverAPI } from "@/services/api/driver";
-import { Skeleton } from "@/components/ui/skeleton";
-import { formatDate } from "date-fns";
 import { EmptyState } from "@/components/dashboard/EmptyState";
+import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { DriverAPI } from "@/services/api/driver";
+import { useQuery } from "@tanstack/react-query";
+import { formatDate } from "date-fns";
+import { Star } from "lucide-react";
 
 const RatingsPage = () => {
-  const recentRatings = [
-    {
-      id: 1,
-      rider: "John A.",
-      rating: 5,
-      comment: "Excellent driver, very professional!",
-      date: "Today",
-    },
-    {
-      id: 2,
-      rider: "Amaka E.",
-      rating: 5,
-      comment: "Smooth ride, arrived on time.",
-      date: "Yesterday",
-    },
-    {
-      id: 3,
-      rider: "Bola T.",
-      rating: 4,
-      comment: "Good experience overall.",
-      date: "2 days ago",
-    },
-  ];
-
   const {
     data: ratingData,
     isPending: isLoadingRatingData,
@@ -102,7 +76,8 @@ const RatingsPage = () => {
       <Card className="p-6">
         <h2 className="text-lg font-semibold mb-4">Recent Reviews</h2>
         <div className="space-y-4">
-          {ratingData?.ratings.length > 0 &&
+          {isSuccessLoadingRatingData &&
+            ratingData?.ratings.length > 0 &&
             ratingData?.ratings?.map((review) => (
               <div key={review?.id} className="p-4 bg-muted rounded-xl">
                 <div className="flex items-center justify-between mb-2">

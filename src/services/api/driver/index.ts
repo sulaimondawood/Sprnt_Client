@@ -80,4 +80,9 @@ export const DriverAPI = {
     const res = await api.get("/ratings/driver");
     return res.data.data;
   },
+
+  async uploadProfileImage(payload: Record<string, string>) {
+    const res = await api.patch("/driver/me/profile-image", payload);
+    return res.data.data;
+  },
 };
