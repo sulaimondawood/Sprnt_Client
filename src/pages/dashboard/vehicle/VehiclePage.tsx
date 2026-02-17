@@ -44,6 +44,8 @@ import {
 } from "@/components/ui/select";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ROUTES } from "@/constants/routes";
 
 interface Vehicle {
   plateNumber: string;
@@ -132,68 +134,78 @@ const VehiclePage = () => {
             Manage your registered vehicle
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          {isEditing ? (
-            <>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-1"
-                onClick={handleCancel}
-              >
-                <X className="h-4 w-4" /> Cancel
-              </Button>
-              <Button size="sm" className="gap-1" onClick={handleSave}>
-                <Check className="h-4 w-4" /> Save
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-1"
-                onClick={handleEdit}
-              >
-                <Edit className="h-4 w-4" /> Edit
-              </Button>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="destructive" size="sm" className="gap-1">
-                    <Trash2 className="h-4 w-4" /> Delete
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Delete Vehicle</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Are you sure you want to delete{" "}
-                      <strong>
-                        {vehicleData?.brand} {vehicleData?.model}
-                      </strong>{" "}
-                      ({vehicleData?.plateNumber})? This action cannot be
-                      undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleDelete}
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    >
-                      Delete
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </>
-          )}
-        </div>
+        {isLoadingVehicles && (
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-9 w-20 rounded-md" />
+
+            <Skeleton className="h-9 w-24 rounded-md" />
+          </div>
+        )}
+        {isSuccessLoadingVehicles && (
+          <div className="flex items-center gap-2">
+            {isEditing ? (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1"
+                  onClick={handleCancel}
+                >
+                  <X className="h-4 w-4" /> Cancel
+                </Button>
+                <Button size="sm" className="gap-1" onClick={handleSave}>
+                  <Check className="h-4 w-4" /> Save
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1"
+                  onClick={handleEdit}
+                >
+                  <Edit className="h-4 w-4" /> Edit
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" size="sm" className="gap-1">
+                      <Trash2 className="h-4 w-4" /> Delete
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete Vehicle</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to delete{" "}
+                        <strong>
+                          {vehicleData?.brand} {vehicleData?.model}
+                        </strong>{" "}
+                        ({vehicleData?.plateNumber})? This action cannot be
+                        undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleDelete}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Hero Card with Vehicle Image */}
       <Card className="overflow-hidden">
-        <div className="relative h-48 sm:h-56 lg:h-64">
+        {isLoadingVehicles && <Skeleton className="h-48 sm:h-56 lg:h-64" />}
+        <div className="relative h-48 sm:h-56 lg:h-[400px]">
           <img
             src={vehicleHero}
             alt={`${vehicleData?.brand} ${vehicleData?.model}`}
@@ -243,93 +255,103 @@ const VehiclePage = () => {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Left Column - Specs & Stats */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Vehicle Specifications */}
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <Car className="h-5 w-5 text-primary" />
               Specifications
             </h3>
             <div className="grid sm:grid-cols-2 gap-4">
-              {[
-                {
-                  icon: Car,
-                  label: "Type",
-                  editContent: (
-                    <Select
-                      value={editForm.vehicleType}
-                      onValueChange={(v) => updateField("vehicleType", v)}
-                    >
-                      <SelectTrigger className="h-8 mt-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {vehicleTypes.map((t) => (
-                          <SelectItem key={t} value={t}>
-                            {t}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  ),
-                  value: vehicleData?.type,
-                },
-                {
-                  icon: Calendar,
-                  label: "Year",
-                  editContent: (
-                    <Input
-                      type="number"
-                      value={editForm.year}
-                      onChange={(e) =>
-                        updateField("year", parseInt(e.target.value) || 0)
-                      }
-                      className="h-8 mt-1"
-                    />
-                  ),
-                  value: vehicleData?.year,
-                },
-                {
-                  icon: Palette,
-                  label: "Color",
-                  editContent: (
-                    <Input
-                      value={editForm.color}
-                      onChange={(e) => updateField("color", e.target.value)}
-                      className="h-8 mt-1"
-                    />
-                  ),
-                  value: vehicleData?.color,
-                },
-                {
-                  icon: Users,
-                  label: "Capacity",
-                  editContent: (
-                    <Input
-                      type="number"
-                      value={editForm.capacity}
-                      onChange={(e) =>
-                        updateField("capacity", parseInt(e.target.value) || 0)
-                      }
-                      className="h-8 mt-1"
-                      min={1}
-                      max={10}
-                    />
-                  ),
-                  value: `${vehicleData?.capacity} passengers`,
-                },
-              ].map(({ icon: Icon, label, editContent, value }) => (
-                <div key={label} className="p-4 bg-muted rounded-xl">
-                  <div className="flex items-center gap-2 text-muted-foreground mb-1">
-                    <Icon className="h-4 w-4" />
-                    <span className="text-sm">{label}</span>
+              {isLoadingVehicles && (
+                <div className="p-4 bg-muted rounded-xl space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-4 w-4 rounded-sm" />
+                    <Skeleton className="h-4 w-20" />
                   </div>
-                  {isEditing ? (
-                    editContent
-                  ) : (
-                    <p className="font-semibold">{value}</p>
-                  )}
+
+                  <Skeleton className="h-5 w-24" />
                 </div>
-              ))}
+              )}
+              {isSuccessLoadingVehicles &&
+                [
+                  {
+                    icon: Car,
+                    label: "Type",
+                    editContent: (
+                      <Select
+                        value={editForm?.vehicleType}
+                        onValueChange={(v) => updateField("vehicleType", v)}
+                      >
+                        <SelectTrigger className="h-8 mt-1">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {vehicleTypes.map((t) => (
+                            <SelectItem key={t} value={t}>
+                              {t}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ),
+                    value: vehicleData?.type,
+                  },
+                  {
+                    icon: Calendar,
+                    label: "Year",
+                    editContent: (
+                      <Input
+                        type="number"
+                        value={editForm?.year}
+                        onChange={(e) =>
+                          updateField("year", parseInt(e.target.value) || 0)
+                        }
+                        className="h-8 mt-1"
+                      />
+                    ),
+                    value: vehicleData?.year,
+                  },
+                  {
+                    icon: Palette,
+                    label: "Color",
+                    editContent: (
+                      <Input
+                        value={editForm?.color}
+                        onChange={(e) => updateField("color", e.target.value)}
+                        className="h-8 mt-1"
+                      />
+                    ),
+                    value: vehicleData?.color,
+                  },
+                  {
+                    icon: Users,
+                    label: "Capacity",
+                    editContent: (
+                      <Input
+                        type="number"
+                        value={editForm?.capacity}
+                        onChange={(e) =>
+                          updateField("capacity", parseInt(e.target.value) || 0)
+                        }
+                        className="h-8 mt-1"
+                        min={1}
+                        max={10}
+                      />
+                    ),
+                    value: `${vehicleData?.capacity} passengers`,
+                  },
+                ].map(({ icon: Icon, label, editContent, value }) => (
+                  <div key={label} className="p-4 bg-muted rounded-xl">
+                    <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                      <Icon className="h-4 w-4" />
+                      <span className="text-sm">{label}</span>
+                    </div>
+                    {isEditing ? (
+                      editContent
+                    ) : (
+                      <p className="font-semibold">{value}</p>
+                    )}
+                  </div>
+                ))}
             </div>
           </Card>
         </div>
@@ -344,6 +366,23 @@ const VehiclePage = () => {
             </h3>
 
             <div className="space-y-3">
+              {isLoadingVehicles &&
+                Array.from({ length: 3 }).map((_, idx) => {
+                  return (
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between p-3 bg-muted rounded-xl"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="w-8 h-8 rounded-lg" />
+                        <div>
+                          <Skeleton className="h-4 w-28" />
+                        </div>
+                      </div>
+                      <Skeleton className="h-5 w-20 rounded-full" />
+                    </div>
+                  );
+                })}
               {vehicleData?.vehicleDocument?.map((doc) => (
                 <div
                   key={doc.documentType}
@@ -356,7 +395,7 @@ const VehiclePage = () => {
                       <Shield className="h-4 w-4 text-emerald-500" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium">{doc.documentType}</p>
+                      <p className="text-sm font-medium">{doc?.documentType}</p>
                     </div>
                   </div>
                   <StatusBadge status={"APPROVED"} type="document" />
@@ -368,32 +407,11 @@ const VehiclePage = () => {
               variant="outline"
               size="sm"
               className="w-full gap-2"
-              onClick={() => navigate("/dashboard/documents")}
+              onClick={() => navigate(ROUTES.dashboardDocument)}
             >
               <FileText className="h-4 w-4" />
               Manage Documents
             </Button>
-          </Card>
-
-          {/* Quick Info Card */}
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Quick Info</h3>
-            <div className="space-y-3 text-sm">
-              {[
-                { label: "Registered Since", value: "Feb 2024" },
-                { label: "Insurance Status", value: "Valid" },
-                { label: "Last Inspection", value: "Mar 2024" },
-                { label: "Mileage", value: "45,200 km" },
-              ].map(({ label, value }) => (
-                <div
-                  key={label}
-                  className="flex items-center justify-between py-2 border-b border-border last:border-0"
-                >
-                  <span className="text-muted-foreground">{label}</span>
-                  <span className="font-medium">{value}</span>
-                </div>
-              ))}
-            </div>
           </Card>
         </div>
       </div>
