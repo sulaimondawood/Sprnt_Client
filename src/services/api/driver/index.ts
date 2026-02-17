@@ -75,4 +75,9 @@ export const DriverAPI = {
     const res = await api.patch("/driver/vehicle/" + id, payload);
     return res.data?.data;
   },
+
+  async ratings() {
+    const res = await api.get("/ratings/driver");
+    return res.data.data;
+  },
 };

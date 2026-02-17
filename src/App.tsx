@@ -14,7 +14,7 @@ import SupportPage from "./pages/dashboard/SupportPage";
 import SettingsPage from "./pages/dashboard/SettingsPage";
 import VehiclePage from "./pages/dashboard/vehicle/VehiclePage";
 import DocumentsPage from "./pages/dashboard/document/DocumentsPage";
-import RatingsPage from "./pages/dashboard/RatingsPage";
+import RatingsPage from "./pages/dashboard/rating/RatingsPage";
 import CurrentTripPage from "./pages/dashboard/CurrentTripPage";
 import ProfilePage from "./pages/dashboard/ProfilePage";
 import OnboardingPage from "./pages/OnboardingPage";
