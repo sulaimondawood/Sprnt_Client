@@ -13,7 +13,7 @@ import WalletPage from "./pages/dashboard/WalletPage";
 import SupportPage from "./pages/dashboard/SupportPage";
 import SettingsPage from "./pages/dashboard/SettingsPage";
 import VehiclePage from "./pages/dashboard/vehicle/VehiclePage";
-import DocumentsPage from "./pages/dashboard/DocumentsPage";
+import DocumentsPage from "./pages/dashboard/document/DocumentsPage";
 import RatingsPage from "./pages/dashboard/RatingsPage";
 import CurrentTripPage from "./pages/dashboard/CurrentTripPage";
 import ProfilePage from "./pages/dashboard/ProfilePage";

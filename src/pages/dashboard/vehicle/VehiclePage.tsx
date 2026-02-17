@@ -1,7 +1,19 @@
-import { VehicleCardSkeleton } from "@/components/dashboard/vehicle/VehicleSkeleton";
+import vehicleHero from "@/assets/vehicle-hero.jpg";
 import { RoleBadge } from "@/components/RoleBadge";
+import { StatusBadge } from "@/components/StatusBadge";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { profile } from "@/helpers";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ROUTES } from "@/constants/routes";
 import { DriverAPI } from "@/services/api/driver";
 import { VehicleType, VehicleTypeDTO } from "@/types/vehicle";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -13,39 +25,12 @@ import {
   FileText,
   Palette,
   Shield,
-  Trash2,
-  TrendingUp,
   Users,
   X,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import vehicleHero from "@/assets/vehicle-hero.jpg";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { StatusBadge } from "@/components/StatusBadge";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ROUTES } from "@/constants/routes";
 
 interface Vehicle {
   id: string;
