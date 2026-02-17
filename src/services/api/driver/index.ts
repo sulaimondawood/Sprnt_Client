@@ -85,4 +85,9 @@ export const DriverAPI = {
     const res = await api.patch("/driver/me/profile-image", payload);
     return res.data.data;
   },
+
+  async updateProfileData(payload: Record<string, string>) {
+    const res = await api.patch("/driver/me", payload);
+    return res.data.data;
+  },
 };

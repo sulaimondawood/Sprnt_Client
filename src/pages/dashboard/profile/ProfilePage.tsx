@@ -10,12 +10,11 @@ import { UploadAPI } from "@/services/api/upload";
 import { UserAPI } from "@/services/api/user";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Camera, Loader2, Star } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const ProfilePage = () => {
   const [fullname, setFullname] = useState("");
-  const [image, setImage] = useState<File | null>();
 
   const profileData = profile();
   const role = profileData?.role;
@@ -61,6 +60,36 @@ const ProfilePage = () => {
       toast.error("Failed to upload profile image");
     },
   });
+
+  const { mutate: updateData, isPending: isUpdatingData } = useMutation({
+    mutationFn: () => DriverAPI.updateProfileData({ fullname }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["user", "profile"],
+      });
+      toast.success("Profile data updated");
+    },
+    onError: () => {
+      toast.error("Failed to update profile data");
+    },
+  });
+
+  const handleSaveProfileData = () => {
+    if (fullname === userProfile?.fullname) {
+      toast("You've not modified any info.");
+      return;
+    }
+
+    if (!fullname) return;
+
+    updateData();
+  };
+
+  useEffect(() => {
+    if (userProfile?.fullname) {
+      setFullname(userProfile?.fullname);
+    }
+  }, [userProfile?.fullname]);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -199,7 +228,14 @@ const ProfilePage = () => {
             )}
           </div>
 
-          <Button className="mt-6">Save Changes</Button>
+          <Button
+            disabled={fullname === userProfile?.fullname || isUpdatingData}
+            onClick={handleSaveProfileData}
+            className="mt-6 disabled:cursor-not-allowed flex items-center gap-2"
+          >
+            {isUpdatingData && <Loader2 className="h-4 w-4 animate-spin" />}
+            {isUpdatingData ? "Saving..." : "Save Changes"}
+          </Button>
         </Card>
       )}
     </div>
