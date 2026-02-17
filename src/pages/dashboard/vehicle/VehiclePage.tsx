@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { profile } from "@/helpers";
 import { DriverAPI } from "@/services/api/driver";
 import { VehicleType, VehicleTypeDTO } from "@/types/vehicle";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Calendar,
   Car,
@@ -48,29 +48,70 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ROUTES } from "@/constants/routes";
 
 interface Vehicle {
+  id: string;
   plateNumber: string;
   brand: string;
   model: string;
   year: string;
   color: string;
   capacity: number;
-  vehicleType: string;
+  type: string;
 }
 
 const vehicleTypes: VehicleType[] = ["SUV", "BIKE", "TRICYCLE", "CAR"];
 
 const VehiclePage = () => {
   const [isEditing, setIsEditing] = useState(false);
-  // const [vehicle, setVehicle] = useState<Vehicle>();
   const [editForm, setEditForm] = useState<Vehicle | null>();
-
-  const profileData = profile();
-  const role = profileData?.role;
-
   const navigate = useNavigate();
 
+  const queryClient = useQueryClient();
+
+  const updateField = (field: keyof Vehicle, value: string | number) => {
+    setEditForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const {
+    data: vehicleData,
+    isPending: isLoadingVehicles,
+    isSuccess: isSuccessLoadingVehicles,
+  } = useQuery<VehicleTypeDTO>({
+    queryKey: ["vehicle", "details"],
+    queryFn: DriverAPI.vehicle,
+  });
+
+  const { mutate, isPending, isSuccess } = useMutation({
+    mutationFn: () => DriverAPI.editVehicle(editForm, editForm?.id),
+    onSuccess() {
+      toast("Vehicle updated", {
+        description: "Your vehicle details have been saved successfully.",
+      });
+      setIsEditing(false);
+      setEditForm(null);
+      queryClient.invalidateQueries({
+        queryKey: ["vehicle", "details"],
+      });
+    },
+  });
+
+  const hasVehicleChanged = (
+    original: Vehicle | undefined,
+    edited: Vehicle | null,
+  ) => {
+    if (!original || !edited) return false;
+
+    return (
+      original.plateNumber !== edited.plateNumber ||
+      original.brand !== edited.brand ||
+      original.model !== edited.model ||
+      original.color !== edited.color ||
+      original.year !== edited.year ||
+      original.capacity !== edited.capacity ||
+      original.type !== edited.type
+    );
+  };
+
   const handleEdit = () => {
-    // setEditForm({ ...vehicle });
     setIsEditing(true);
   };
 
@@ -80,32 +121,14 @@ const VehiclePage = () => {
   };
 
   const handleSave = () => {
-    // setVehicle({ ...editForm });
-    setIsEditing(false);
-    toast("Vehicle updated", {
-      description: "Your vehicle details have been saved successfully.",
-    });
+    if (!hasVehicleChanged(vehicleData, editForm)) {
+      toast("No changes detected", {
+        description: "You haven't modified any vehicle details.",
+      });
+      return;
+    }
+    mutate();
   };
-
-  const handleDelete = () => {
-    toast("Vehicle deleted", {
-      // description: `${vehicle.brand} ${vehicle.model} has been removed.`,
-    });
-    navigate("/dashboard");
-  };
-
-  const updateField = (field: keyof Vehicle, value: string | number) => {
-    setEditForm((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const {
-    data: vehicleData,
-    isLoading: isLoadingVehicles,
-    isSuccess: isSuccessLoadingVehicles,
-  } = useQuery<VehicleTypeDTO>({
-    queryKey: ["vehicle", "details"],
-    queryFn: DriverAPI.vehicle,
-  });
 
   useEffect(() => {
     if (isSuccessLoadingVehicles) {
@@ -115,11 +138,12 @@ const VehiclePage = () => {
         color: vehicleData?.color,
         model: vehicleData?.model,
         plateNumber: vehicleData?.plateNumber,
-        vehicleType: vehicleData?.type || "",
+        type: vehicleData?.type || "",
         year: vehicleData?.year,
+        id: vehicleData?.id,
       });
     }
-  }, []);
+  }, [isEditing]);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -153,8 +177,21 @@ const VehiclePage = () => {
                 >
                   <X className="h-4 w-4" /> Cancel
                 </Button>
-                <Button size="sm" className="gap-1" onClick={handleSave}>
-                  <Check className="h-4 w-4" /> Save
+                <Button
+                  size="sm"
+                  className="gap-1"
+                  onClick={handleSave}
+                  disabled={
+                    !hasVehicleChanged(vehicleData, editForm) || isPending
+                  }
+                >
+                  {isPending ? (
+                    "Saving..."
+                  ) : (
+                    <>
+                      <Check className="h-4 w-4" /> Save
+                    </>
+                  )}
                 </Button>
               </>
             ) : (
@@ -167,35 +204,6 @@ const VehiclePage = () => {
                 >
                   <Edit className="h-4 w-4" /> Edit
                 </Button>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="destructive" size="sm" className="gap-1">
-                      <Trash2 className="h-4 w-4" /> Delete
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Delete Vehicle</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Are you sure you want to delete{" "}
-                        <strong>
-                          {vehicleData?.brand} {vehicleData?.model}
-                        </strong>{" "}
-                        ({vehicleData?.plateNumber})? This action cannot be
-                        undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={handleDelete}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                      >
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
               </>
             )}
           </div>
@@ -203,8 +211,8 @@ const VehiclePage = () => {
       </div>
 
       {/* Hero Card with Vehicle Image */}
+      {isLoadingVehicles && <Skeleton className="h-48 sm:h-56 lg:h-64" />}
       <Card className="overflow-hidden">
-        {isLoadingVehicles && <Skeleton className="h-48 sm:h-56 lg:h-64" />}
         <div className="relative h-48 sm:h-56 lg:h-[400px]">
           <img
             src={vehicleHero}
@@ -217,13 +225,13 @@ const VehiclePage = () => {
               {isEditing ? (
                 <div className="flex gap-2 mb-1">
                   <Input
-                    value={editForm.brand}
+                    value={editForm?.brand}
                     onChange={(e) => updateField("brand", e.target.value)}
                     placeholder="Brand"
                     className="h-9 w-32 bg-background/80 backdrop-blur-sm"
                   />
                   <Input
-                    value={editForm.model}
+                    value={editForm?.model}
                     onChange={(e) => updateField("model", e.target.value)}
                     placeholder="Model"
                     className="h-9 w-32 bg-background/80 backdrop-blur-sm"
@@ -236,7 +244,7 @@ const VehiclePage = () => {
               )}
               {isEditing ? (
                 <Input
-                  value={editForm.plateNumber}
+                  value={editForm?.plateNumber}
                   onChange={(e) => updateField("plateNumber", e.target.value)}
                   placeholder="Plate Number"
                   className="h-8 w-40 mt-1 text-sm bg-background/80 backdrop-blur-sm"
@@ -278,8 +286,8 @@ const VehiclePage = () => {
                     label: "Type",
                     editContent: (
                       <Select
-                        value={editForm?.vehicleType}
-                        onValueChange={(v) => updateField("vehicleType", v)}
+                        value={editForm?.type}
+                        onValueChange={(v) => updateField("type", v)}
                       >
                         <SelectTrigger className="h-8 mt-1">
                           <SelectValue />

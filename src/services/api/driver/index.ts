@@ -1,3 +1,4 @@
+import { Vehicle } from "@/types/vehicle";
 import { api } from "../config";
 
 // DTO Interfaces
@@ -68,5 +69,10 @@ export const DriverAPI = {
   async vehicle() {
     const res = await api.get("/driver/vehicle");
     return res.data.data;
+  },
+
+  async editVehicle(payload: Vehicle, id: string) {
+    const res = await api.patch("/driver/vehicle/" + id, payload);
+    return res.data?.data;
   },
 };

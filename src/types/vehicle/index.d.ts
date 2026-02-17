@@ -1,4 +1,5 @@
 interface VehicleTypeDTO {
+  id: string;
   plateNumber: string;
   brand: string;
   model: string;
@@ -7,6 +8,17 @@ interface VehicleTypeDTO {
   capacity: number;
   type: VehicleType;
   vehicleDocument: VehicleDocument[];
+}
+
+interface Vehicle {
+  id: string;
+  plateNumber: string;
+  brand: string;
+  model: string;
+  year: string;
+  color: string;
+  capacity: number;
+  type: string;
 }
 
 interface VehicleDocument {
