@@ -4,11 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { mockVehicleDocuments } from "@/data/mockData";
 import { DriverAPI } from "@/services/api/driver";
 import { VehicleTypeDTO } from "@/types/vehicle";
 import { useQuery } from "@tanstack/react-query";
-import { differenceInDays } from "date-fns";
 import {
   AlertCircle,
   CheckCircle2,
@@ -19,33 +17,7 @@ import {
   XCircle,
 } from "lucide-react";
 
-const documentLabels: Record<string, string> = {
-  INSURANCE: "Vehicle Insurance",
-  ROAD_WORTHINESS: "Road Worthiness Certificate",
-  REGISTRATION: "Vehicle Registration",
-};
-
 const DocumentsPage = () => {
-  const approvedDocs = mockVehicleDocuments.filter(
-    (d) => d.status === "APPROVED",
-  ).length;
-  const pendingDocs = mockVehicleDocuments.filter(
-    (d) => d.status === "PENDING",
-  ).length;
-  const rejectedDocs = mockVehicleDocuments.filter(
-    (d) => d.status === "REJECTED",
-  ).length;
-  const totalDocs = mockVehicleDocuments.length;
-  const docsProgress = Math.round((approvedDocs / totalDocs) * 100);
-
-  const getExpiryInfo = (expiresAt: Date) => {
-    const daysLeft = differenceInDays(new Date(expiresAt), new Date());
-    if (daysLeft < 0) return { label: "Expired", color: "text-destructive" };
-    if (daysLeft < 30)
-      return { label: `${daysLeft} days left`, color: "text-warning" };
-    return { label: `${daysLeft} days left`, color: "text-muted-foreground" };
-  };
-
   const {
     data: vehicleData,
     isPending: isLoadingVehicle,
