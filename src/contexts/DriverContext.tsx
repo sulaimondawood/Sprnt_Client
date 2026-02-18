@@ -1,3 +1,4 @@
+import { profile } from "@/helpers";
 import { token } from "@/services/api/config";
 import { DriverAPI } from "@/services/api/driver";
 import { UserAPI } from "@/services/api/user";
@@ -23,6 +24,8 @@ export const DriverProvider = ({ children }: { children: ReactNode }) => {
   const [isOnline, setIsOnline] = useState(false);
 
   const queryClient = useQueryClient();
+  const user = profile();
+  const isDriver = user?.role === "DRIVER";
 
   const { data: userProfile } = useQuery({
     queryKey: ["user", "profile"],
@@ -62,7 +65,7 @@ export const DriverProvider = ({ children }: { children: ReactNode }) => {
   useQuery({
     queryKey: ["driver", "heartbeat"],
     queryFn: DriverAPI.heartBeat,
-    enabled: isOnline,
+    enabled: isOnline && isDriver,
     refetchInterval: 60000,
     refetchIntervalInBackground: true,
     refetchOnWindowFocus: false,

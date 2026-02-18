@@ -77,20 +77,15 @@ const DashboardLayout = () => {
   const { isOnline, toggleAvailabilityStatus, isPendingAvailabiltyStatus } =
     useDriver();
 
-  // const [isOnline, setIsOnline] = useState(false);
-  // const [isOnline, setIsOnline] = useState(driverProfile?.status === "ONLINE");
+  const profile = useMemo(() => {
+    try {
+      return token ? jwtDecode<CustomJwtPayload>(token) : null;
+    } catch {
+      return null;
+    }
+  }, []);
 
-  // const profile = useMemo(() => {
-  //   try {
-  //     return token ? jwtDecode<CustomJwtPayload>(token) : null;
-  //   } catch {
-  //     return null;
-  //   }
-  // }, []);
-
-  const profileData = profile();
-
-  const role = profileData?.role;
+  const role = profile?.role;
 
   useEffect(() => {
     if (!token) {
@@ -99,7 +94,7 @@ const DashboardLayout = () => {
   }, [navigate, profile]);
 
   useEffect(() => {
-    if (profileData?.completedProfile === "false") {
+    if (profile?.completedProfile === "false") {
       setShowOnboarding(true);
     }
   }, [navigate, location, profile]);
@@ -183,20 +178,20 @@ const DashboardLayout = () => {
                           : "bg-rider text-rider-foreground"
                       }
                     >
-                      {profileData?.fullname?.charAt(0) || "U"}
+                      {profile?.fullname?.charAt(0) || "U"}
                     </AvatarFallback>
                   </Avatar>
                   <span className="hidden md:block font-medium">
-                    {profileData?.fullname || "User"}
+                    {profile?.fullname || "User"}
                   </span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>
                   <div className="flex flex-col">
-                    <span>{profileData?.fullname || "User"}</span>
+                    <span>{profile?.fullname || "User"}</span>
                     <span className="text-xs font-normal text-muted-foreground">
-                      {profileData?.sub}
+                      {profile?.sub}
                     </span>
                   </div>
                 </DropdownMenuLabel>

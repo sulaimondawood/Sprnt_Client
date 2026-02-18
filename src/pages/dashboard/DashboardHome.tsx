@@ -37,9 +37,8 @@ import { Link } from "react-router-dom";
 const DashboardHome = () => {
   const { user } = useAuth();
   const isDriver = user?.role === "DRIVER";
-  // const profile = isDriver ? driverProfile : riderProfile;
+
   const stats = isDriver ? mockDriverStats : mockRiderStats;
-  const trips = isDriver ? mockDriverTrips : mockRiderTrips;
   const wallet = isDriver ? mockDriverWallet : mockRiderWallet;
 
   const formatCurrency = (amount: number) => {
@@ -50,15 +49,12 @@ const DashboardHome = () => {
     }).format(amount);
   };
 
-  const {
-    data: currentRide,
-    isLoading: isLoadingCurrentRide,
-    isSuccess: isSuccessLoadingCurrentRide,
-    isError,
-  } = useQuery<Ride>({
-    queryKey: ["rides", "current"],
-    queryFn: DriverAPI.currentRide,
-  });
+  const { data: currentRide, isSuccess: isSuccessLoadingCurrentRide } =
+    useQuery<Ride>({
+      queryKey: ["rides", "current"],
+      queryFn: DriverAPI.currentRide,
+      enabled: isDriver,
+    });
 
   const {
     data: recentRides,
@@ -67,6 +63,7 @@ const DashboardHome = () => {
   } = useQuery<Ride[]>({
     queryKey: ["rides", "recent"],
     queryFn: DriverAPI.recentRides,
+    enabled: isDriver,
   });
 
   const {
