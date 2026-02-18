@@ -1,3 +1,4 @@
+import { token } from "@/services/api/config";
 import { DriverAPI } from "@/services/api/driver";
 import { UserAPI } from "@/services/api/user";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -19,17 +20,19 @@ interface DriverContextType {
 const DriverContext = createContext<DriverContextType | undefined>(undefined);
 
 export const DriverProvider = ({ children }: { children: ReactNode }) => {
+  const [isOnline, setIsOnline] = useState(false);
+
   const queryClient = useQueryClient();
 
   const { data: userProfile } = useQuery({
     queryKey: ["user", "profile"],
     queryFn: UserAPI.profile,
+    enabled: !!token,
   });
-  const [isOnline, setIsOnline] = useState(false);
 
   useEffect(() => {
     if (userProfile?.driver) {
-      const status = userProfile.driver.availabilityStatus;
+      const status = userProfile?.driver?.availabilityStatus;
       setIsOnline(status !== "OFFLINE");
     }
   }, [userProfile?.driver?.availabilityStatus, userProfile?.driver]);
