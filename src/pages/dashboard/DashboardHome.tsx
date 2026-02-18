@@ -1,21 +1,17 @@
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { QuickActionsSkeleton } from "@/components/dashboard/home/QuickActionsSkeleton";
 import { RecentTripsSkeleton } from "@/components/dashboard/home/RecentTripsSkeleton";
-import { RoleBadge } from "@/components/RoleBadge";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useAuth } from "@/contexts/AuthContext";
 import {
   mockDriverStats,
-  mockDriverTrips,
   mockDriverWallet,
   mockRiderStats,
-  mockRiderTrips,
   mockRiderWallet,
 } from "@/data/mockData";
-import { profile } from "@/helpers";
+import { formatCurrency, profile } from "@/helpers";
 import { DriverAPI } from "@/services/api/driver";
 import { UserAPI } from "@/services/api/user";
 import { Ride } from "@/types/rides/indes";
@@ -35,20 +31,14 @@ import {
 import { Link } from "react-router-dom";
 
 const DashboardHome = () => {
-  const { user } = useAuth();
-  const isDriver = user?.role === "DRIVER";
+  const profileData = profile();
+
+  const isDriver = profileData?.role === "DRIVER";
 
   const stats = isDriver ? mockDriverStats : mockRiderStats;
   const wallet = isDriver ? mockDriverWallet : mockRiderWallet;
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-NG", {
-      style: "currency",
-      currency: "NGN",
-      minimumFractionDigits: 0,
-    }).format(amount);
-  };
-
+  //Driver API
   const { data: currentRide, isSuccess: isSuccessLoadingCurrentRide } =
     useQuery<Ride>({
       queryKey: ["rides", "current"],
@@ -65,6 +55,7 @@ const DashboardHome = () => {
     queryFn: DriverAPI.recentRides,
     enabled: isDriver,
   });
+  //Driver API
 
   const {
     data: userProfile,
@@ -74,8 +65,6 @@ const DashboardHome = () => {
     queryKey: ["user", "profile"],
     queryFn: UserAPI.profile,
   });
-
-  const profileData = profile();
 
   const role = profileData?.role;
 
@@ -89,13 +78,13 @@ const DashboardHome = () => {
           </h1>
 
           <p className="text-muted-foreground">
-            {role === "DRIVER"
+            {isDriver
               ? "Here's your driving performance overview"
               : "Ready to go somewhere? Book a ride now."}
           </p>
         </div>
 
-        {role === "RIDER" && (
+        {!isDriver && (
           <Link to="/dashboard/book">
             <Button
               size="lg"
@@ -136,31 +125,31 @@ const DashboardHome = () => {
 
       {/* Stats Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {role === "DRIVER" ? (
+        {isDriver ? (
           <>
             <StatCard
               title="Today's Earnings"
-              value={formatCurrency(stats.todayEarnings)}
-              subtitle={`${stats.todayTrips} trips completed`}
+              value={"N/A"}
+              subtitle={`N/A trips completed`}
               icon={Wallet}
               variant="driver"
             />
             <StatCard
               title="Weekly Earnings"
-              value={formatCurrency(stats.weeklyEarnings)}
-              subtitle={`${stats.weeklyTrips} trips this week`}
+              value={"N/A"}
+              subtitle={`N/A trips this week`}
               icon={TrendingUp}
               trend={{ value: 12, isPositive: true }}
             />
             <StatCard
               title="Rating"
-              value={stats.rating.toFixed(1)}
+              value={"N/A"}
               subtitle="Based on recent trips"
               icon={Star}
             />
             <StatCard
               title="Completion Rate"
-              value={`${stats.completionRate}%`}
+              value={"N/A"}
               subtitle="Trip completion"
               icon={CheckCircle}
             />
@@ -169,36 +158,32 @@ const DashboardHome = () => {
           <>
             <StatCard
               title="Total Rides"
-              value={stats.totalTrips}
+              value={"N/A"}
               subtitle="Lifetime rides"
               icon={Car}
               variant="rider"
             />
             <StatCard
               title="This Week"
-              value={stats.weeklyTrips}
+              value={"N/A"}
               subtitle="Rides taken"
               icon={Clock}
               trend={{ value: 8, isPositive: true }}
             />
             <StatCard
               title="Rating"
-              value={stats.rating.toFixed(1)}
+              value={"N/A"}
               subtitle="Your rider rating"
               icon={Star}
             />
-            <StatCard
-              title="Wallet Balance"
-              value={formatCurrency(wallet.balance)}
-              subtitle="Available balance"
-              icon={Wallet}
-            />
+            <StatCard title="Wallet Balance" value={"N/A"} icon={Wallet} />
           </>
         )}
       </div>
 
       {/* Recent Trips & Quick Actions */}
       <div className="grid lg:grid-cols-3 gap-6">
+        {/* {DRIVER} */}
         {/* Recent Trips */}
         {isLoadingRecentRides && <RecentTripsSkeleton />}
         {isSuccessLoadingRecentRides && recentRides.length > 0 && (
@@ -262,7 +247,6 @@ const DashboardHome = () => {
             </div>
           </Card>
         )}
-
         {isSuccessLoadingRecentRides && recentRides.length === 0 && (
           <EmptyState
             className="col-span-2"
@@ -272,6 +256,12 @@ const DashboardHome = () => {
             actionLabel="Book a ride"
           />
         )}
+        {/* {DRIVER} */}
+
+        {/* {RIDER**********************} */}
+
+        {/* {RIDER**********************} */}
+
         {/* Quick Actions / Summary */}
         <Card className="p-6">
           <h2 className="text-xl font-semibold mb-6">

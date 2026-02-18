@@ -1,4 +1,3 @@
-import { RoleBadge } from "@/components/RoleBadge";
 import { DriverOnboarding } from "@/components/onboarding/DriverOnboarding";
 import { RiderOnboarding } from "@/components/onboarding/RiderOnboarding";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -14,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { token } from "@/services/api/config";
+import { TOKEN, token } from "@/services/api/config";
 import {
   Bell,
   Car,
@@ -35,11 +34,9 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 
 import { ROUTES } from "@/constants/routes";
-import { logout, profile } from "@/helpers";
-import { jwtDecode, JwtPayload } from "jwt-decode";
-import { useQuery } from "@tanstack/react-query";
-import { DriverAPI } from "@/services/api/driver";
 import { useDriver } from "@/contexts/DriverContext";
+import { logout } from "@/helpers";
+import { jwtDecode, JwtPayload } from "jwt-decode";
 
 export interface CustomJwtPayload extends JwtPayload {
   role?: string;
@@ -78,19 +75,23 @@ const DashboardLayout = () => {
     useDriver();
 
   const profile = useMemo(() => {
+    const activeToken = localStorage.getItem(TOKEN);
+    if (!activeToken) return null;
     try {
-      return token ? jwtDecode<CustomJwtPayload>(token) : null;
+      return jwtDecode<CustomJwtPayload>(activeToken);
     } catch {
       return null;
     }
-  }, []);
+  }, [location.pathname]);
 
   const role = profile?.role;
 
   useEffect(() => {
-    if (!token) {
+    if (!profile) {
       navigate(ROUTES.login);
+      console.log("SOmetn");
     }
+    console.log("SOmetn");
   }, [navigate, profile]);
 
   useEffect(() => {
@@ -103,8 +104,11 @@ const DashboardLayout = () => {
 
   const handleLogout = () => {
     logout();
-    navigate("/");
   };
+
+  if (!profile) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background">

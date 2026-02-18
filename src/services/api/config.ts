@@ -5,6 +5,7 @@ const baseURL = import.meta.env.VITE_API_BASE_URL;
 export const TOKEN = "_token";
 
 export const token = localStorage.getItem(TOKEN);
+export const getToken = () => localStorage.getItem(TOKEN);
 
 export const api = axios.create({
   baseURL,
@@ -74,7 +75,7 @@ export function clearToken() {
   try {
     if (typeof window !== "undefined") {
       localStorage.removeItem(TOKEN);
-      window.location.replace("/");
+      window.location.href = "/";
     }
   } catch (error) {
     console.error("Error clearing token:", error);

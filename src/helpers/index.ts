@@ -1,4 +1,4 @@
-import { clearToken, token } from "@/services/api/config";
+import { clearToken, getToken } from "@/services/api/config";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 
 export interface CustomJwtPayload extends JwtPayload {
@@ -12,6 +12,7 @@ export const logout = () => {
 };
 
 export const profile = () => {
+  const token = getToken();
   if (!token) return null;
   try {
     return token ? jwtDecode<CustomJwtPayload>(token) : null;
