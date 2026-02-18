@@ -72,6 +72,15 @@ const DashboardHome = () => {
     queryFn: RiderAPI.recentRides,
     enabled: isRider,
   });
+
+  const {
+    data: riderCurrentRide,
+    isSuccess: isSuccessLoadingRiderCurrentRide,
+  } = useQuery<Ride>({
+    queryKey: ["rides", "current", "rider"],
+    queryFn: RiderAPI.currentRide,
+    enabled: isRider,
+  });
   // RIDER API****************
 
   const {
@@ -128,7 +137,34 @@ const DashboardHome = () => {
                 </p>
               </div>
             </div>
-            <Link to="/dashboard/current-trip">
+            <Link to={ROUTES.dashboardCurrentRide}>
+              <Button variant="secondary" className="gap-2">
+                View Trip
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+        </Card>
+      )}
+      {/* Active Trip Banner (Rider) */}
+      {isSuccessLoadingRiderCurrentRide && riderCurrentRide && (
+        <Card className="p-6 gradient-driver text-driver-foreground">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                <Navigation className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-sm opacity-80">Active Trip</p>
+                <p className="text-xl font-bold">
+                  {riderCurrentRide?.driverName}
+                </p>
+                <p className="text-sm opacity-80">
+                  {riderCurrentRide?.dropoffLocation?.address}
+                </p>
+              </div>
+            </div>
+            <Link to={ROUTES.dashboardCurrentRide}>
               <Button variant="secondary" className="gap-2">
                 View Trip
                 <ChevronRight className="h-4 w-4" />
@@ -198,7 +234,7 @@ const DashboardHome = () => {
 
       {/* Recent Trips & Quick Actions */}
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* {DRIVER} */}
+        {/* {DRIVER}*********/}
         {/* Recent Trips */}
         <>
           {isLoadingRecentRides && <RecentTripsSkeleton />}
@@ -273,7 +309,7 @@ const DashboardHome = () => {
             />
           )}
         </>
-        {/* {DRIVER} */}
+        {/* {DRIVER}*********/}
 
         {/* {RIDER**********************} */}
         <>

@@ -11,4 +11,5 @@ export const ROUTES = {
   dashboardDocument: "/dashboard/documents",
   dashboardBookRide: "/dashboard/book-ride",
   dashboardWallet: "/dashboard/wallet",
+  dashboardCurrentRide: "/dashboard/current-trip",
 };

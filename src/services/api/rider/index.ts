@@ -5,4 +5,9 @@ export const RiderAPI = {
     const res = await api.get("/riders/rides/recent");
     return res.data.data;
   },
+
+  async currentRide() {
+    const res = await api.get("/riders/rides/current");
+    return res.data.data;
+  },
 };

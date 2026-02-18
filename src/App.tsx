@@ -7,7 +7,7 @@ import LandingPage from "./pages/LandingPage";
 import AuthPage from "./pages/RegisterPage";
 import DashboardLayout from "./pages/DashboardLayout";
 import DashboardHome from "./pages/dashboard/DashboardHome";
-import BookRidePage from "./pages/dashboard/BookRidePage";
+import BookRidePage from "./pages/dashboard/trips/BookRidePage";
 import TripHistoryPage from "./pages/dashboard/trips/TripHistoryPage";
 import WalletPage from "./pages/dashboard/WalletPage";
 import SupportPage from "./pages/dashboard/SupportPage";
