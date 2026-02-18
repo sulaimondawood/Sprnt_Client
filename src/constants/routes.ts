@@ -9,4 +9,6 @@ export const ROUTES = {
   dashboardAddVehicle: "/dashboard/vehicle/add",
 
   dashboardDocument: "/dashboard/documents",
+  dashboardBookRide: "/dashboard/book-ride",
+  dashboardWallet: "/dashboard/wallet",
 };

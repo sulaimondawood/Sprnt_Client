@@ -5,6 +5,7 @@ import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { ROUTES } from "@/constants/routes";
 import {
   mockDriverStats,
   mockDriverWallet,
@@ -13,6 +14,7 @@ import {
 } from "@/data/mockData";
 import { formatCurrency, profile } from "@/helpers";
 import { DriverAPI } from "@/services/api/driver";
+import { RiderAPI } from "@/services/api/rider";
 import { UserAPI } from "@/services/api/user";
 import { Ride } from "@/types/rides/indes";
 import { useQuery } from "@tanstack/react-query";
@@ -28,17 +30,20 @@ import {
   TrendingUp,
   Wallet,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const DashboardHome = () => {
   const profileData = profile();
 
+  const role = profileData?.role;
   const isDriver = profileData?.role === "DRIVER";
+  const isRider = profileData?.role === "RIDER";
+  const navigate = useNavigate();
 
   const stats = isDriver ? mockDriverStats : mockRiderStats;
   const wallet = isDriver ? mockDriverWallet : mockRiderWallet;
 
-  //Driver API
+  //Driver API*********************
   const { data: currentRide, isSuccess: isSuccessLoadingCurrentRide } =
     useQuery<Ride>({
       queryKey: ["rides", "current"],
@@ -55,7 +60,19 @@ const DashboardHome = () => {
     queryFn: DriverAPI.recentRides,
     enabled: isDriver,
   });
-  //Driver API
+  //Driver API*********************
+
+  // RIDER API****************
+  const {
+    data: recentRiderRides,
+    isLoading: isLoadingRecentRiderRides,
+    isSuccess: isSuccessLoadingRecentRiderRides,
+  } = useQuery<Ride[]>({
+    queryKey: ["rides", "rider", "recent"],
+    queryFn: RiderAPI.recentRides,
+    enabled: isRider,
+  });
+  // RIDER API****************
 
   const {
     data: userProfile,
@@ -65,8 +82,6 @@ const DashboardHome = () => {
     queryKey: ["user", "profile"],
     queryFn: UserAPI.profile,
   });
-
-  const role = profileData?.role;
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -85,7 +100,7 @@ const DashboardHome = () => {
         </div>
 
         {!isDriver && (
-          <Link to="/dashboard/book">
+          <Link to={ROUTES.dashboardBookRide}>
             <Button
               size="lg"
               className="gradient-rider text-rider-foreground gap-2"
@@ -185,81 +200,158 @@ const DashboardHome = () => {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* {DRIVER} */}
         {/* Recent Trips */}
-        {isLoadingRecentRides && <RecentTripsSkeleton />}
-        {isSuccessLoadingRecentRides && recentRides.length > 0 && (
-          <Card className="lg:col-span-2 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold">Recent Trips</h2>
-              <Link to="/dashboard/trips">
-                <Button variant="ghost" size="sm" className="gap-1">
-                  View All
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
+        <>
+          {isLoadingRecentRides && <RecentTripsSkeleton />}
+          {isSuccessLoadingRecentRides && recentRides.length > 0 && (
+            <Card className="lg:col-span-2 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold">Recent Trips</h2>
+                <Link to={ROUTES.dashboardRides}>
+                  <Button variant="ghost" size="sm" className="gap-1">
+                    View All
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
 
-            <div className="space-y-4">
-              {recentRides.map((trip) => (
-                <div
-                  key={trip.id}
-                  className="flex items-center gap-4 p-4 bg-muted/50 rounded-xl hover:bg-muted transition-colors"
-                >
+              <div className="space-y-4">
+                {recentRides.map((trip) => (
                   <div
-                    className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                      trip.rideStatus === "COMPLETED"
-                        ? "bg-success/10 text-success"
-                        : trip.rideStatus === "CANCELLED"
-                          ? "bg-destructive/10 text-destructive"
-                          : "bg-info/10 text-info"
-                    }`}
+                    key={trip.id}
+                    className="flex items-center gap-4 p-4 bg-muted/50 rounded-xl hover:bg-muted transition-colors"
                   >
-                    <Car className="h-5 w-5" />
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="font-medium truncate">
-                        {role === "DRIVER"
-                          ? trip.riderName
-                          : trip.dropoffLocation.address}
-                      </p>
-                      <StatusBadge status={trip.rideStatus} type="trip" />
+                    <div
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                        trip.rideStatus === "COMPLETED"
+                          ? "bg-success/10 text-success"
+                          : trip.rideStatus === "RIDER_CANCELLED" ||
+                              trip.rideStatus === "DRIVER_CANCELLED"
+                            ? "bg-destructive/10 text-destructive"
+                            : "bg-info/10 text-info"
+                      }`}
+                    >
+                      <Car className="h-5 w-5" />
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      {trip.createdAt &&
-                        format(
-                          new Date(trip.createdAt),
-                          "MMM d, yyyy • h:mm a",
-                        )}
-                    </p>
-                  </div>
 
-                  <div className="text-right">
-                    <p className="font-semibold">
-                      {formatCurrency(trip.estimatedFare)}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {trip.estimatedDistance} km
-                    </p>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-medium truncate">
+                          {role === "DRIVER"
+                            ? trip.riderName
+                            : trip.dropoffLocation.address}
+                        </p>
+                        <StatusBadge status={trip.rideStatus} type="trip" />
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {trip.createdAt &&
+                          format(
+                            new Date(trip.createdAt),
+                            "MMM d, yyyy • h:mm a",
+                          )}
+                      </p>
+                    </div>
+
+                    <div className="text-right">
+                      <p className="font-semibold">
+                        {formatCurrency(trip.estimatedFare)}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {trip.estimatedDistance} km
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-        )}
-        {isSuccessLoadingRecentRides && recentRides.length === 0 && (
-          <EmptyState
-            className="col-span-2"
-            title="No trips yet"
-            description="Trips you complete or cancelled will show up here."
-            icon={<Car className="h-6 w-6 text-muted-foreground" />}
-            actionLabel="Book a ride"
-          />
-        )}
+                ))}
+              </div>
+            </Card>
+          )}
+          {isSuccessLoadingRecentRides && recentRides.length === 0 && (
+            <EmptyState
+              className="col-span-2"
+              title="No trips yet"
+              description="Trips you complete or cancelled will show up here."
+              icon={<Car className="h-6 w-6 text-muted-foreground" />}
+            />
+          )}
+        </>
         {/* {DRIVER} */}
 
         {/* {RIDER**********************} */}
+        <>
+          {isLoadingRecentRiderRides && <RecentTripsSkeleton />}
+          {isSuccessLoadingRecentRiderRides && recentRiderRides.length > 0 && (
+            <Card className="lg:col-span-2 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold">Recent Trips</h2>
+                <Link to={ROUTES.dashboardRides}>
+                  <Button variant="ghost" size="sm" className="gap-1">
+                    View All
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
 
+              <div className="space-y-4">
+                {recentRiderRides.map((trip) => (
+                  <div
+                    key={trip.id}
+                    className="flex items-center gap-4 p-4 bg-muted/50 rounded-xl hover:bg-muted transition-colors"
+                  >
+                    <div
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                        trip.rideStatus === "COMPLETED"
+                          ? "bg-success/10 text-success"
+                          : trip.rideStatus === "RIDER_CANCELLED" ||
+                              trip.rideStatus === "DRIVER_CANCELLED"
+                            ? "bg-destructive/10 text-destructive"
+                            : "bg-info/10 text-info"
+                      }`}
+                    >
+                      <Car className="h-5 w-5" />
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-medium truncate">
+                          {role === "DRIVER"
+                            ? trip.riderName
+                            : trip.dropoffLocation.address}
+                        </p>
+                        <StatusBadge status={trip.rideStatus} type="trip" />
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {trip.createdAt &&
+                          format(
+                            new Date(trip.createdAt),
+                            "MMM d, yyyy • h:mm a",
+                          )}
+                      </p>
+                    </div>
+
+                    <div className="text-right">
+                      <p className="font-semibold">
+                        {formatCurrency(trip.estimatedFare)}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {trip.estimatedDistance} km
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+          {isSuccessLoadingRecentRiderRides &&
+            recentRiderRides.length === 0 && (
+              <EmptyState
+                className="col-span-2"
+                title="No trips yet"
+                description="Trips you complete or cancelled will show up here."
+                icon={<Car className="h-6 w-6 text-muted-foreground" />}
+                actionLabel="Book a ride"
+                onAction={() => navigate(ROUTES.dashboardBookRide)}
+              />
+            )}
+        </>
         {/* {RIDER**********************} */}
 
         {/* Quick Actions / Summary */}
@@ -326,7 +418,7 @@ const DashboardHome = () => {
               {isLoadingUserProfileData && <QuickActionsSkeleton />}
               {isSuccessLoadingUserProfileData && (
                 <div className="space-y-3">
-                  <Link to="/dashboard/book" className="block">
+                  <Link to={ROUTES.dashboardBookRide} className="block">
                     <Button
                       variant="outline"
                       className="w-full justify-start gap-3 h-14"
@@ -343,7 +435,7 @@ const DashboardHome = () => {
                     </Button>
                   </Link>
 
-                  <Link to="/dashboard/wallet" className="block">
+                  <Link to={ROUTES.dashboardWallet} className="block">
                     <Button
                       variant="outline"
                       className="w-full justify-start gap-3 h-14"
@@ -360,7 +452,7 @@ const DashboardHome = () => {
                     </Button>
                   </Link>
 
-                  <Link to="/dashboard/trips" className="block">
+                  <Link to={ROUTES.dashboardRides} className="block">
                     <Button
                       variant="outline"
                       className="w-full justify-start gap-3 h-14"

@@ -45,21 +45,21 @@ export interface CustomJwtPayload extends JwtPayload {
 }
 
 const riderNavItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
-  { icon: MapPin, label: "Book a Ride", path: "/dashboard/book" },
-  { icon: History, label: "Trip History", path: "/dashboard/trips" },
-  { icon: Wallet, label: "Wallet", path: "/dashboard/wallet" },
+  { icon: LayoutDashboard, label: "Dashboard", path: ROUTES.dashboard },
+  { icon: MapPin, label: "Book a Ride", path: ROUTES.dashboardBookRide },
+  { icon: History, label: "Trip History", path: ROUTES.dashboardRides },
+  { icon: Wallet, label: "Wallet", path: ROUTES.dashboardWallet },
   { icon: HelpCircle, label: "Support", path: "/dashboard/support" },
   { icon: Settings, label: "Settings", path: "/dashboard/settings" },
 ];
 
 const driverNavItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
+  { icon: LayoutDashboard, label: "Dashboard", path: ROUTES.dashboard },
   { icon: MapPin, label: "Current Trip", path: "/dashboard/current-trip" },
-  { icon: History, label: "Trip History", path: "/dashboard/trips" },
+  { icon: History, label: "Trip History", path: ROUTES.dashboardRides },
   { icon: Wallet, label: "Earnings", path: "/dashboard/earnings" },
-  { icon: Car, label: "My Vehicle", path: "/dashboard/vehicle" },
-  { icon: FileText, label: "Documents", path: "/dashboard/documents" },
+  { icon: Car, label: "My Vehicle", path: ROUTES.dashboardVehicle },
+  { icon: FileText, label: "Documents", path: ROUTES.dashboardDocument },
   { icon: Star, label: "Ratings", path: "/dashboard/ratings" },
   { icon: HelpCircle, label: "Support", path: "/dashboard/support" },
   { icon: Settings, label: "Settings", path: "/dashboard/settings" },
