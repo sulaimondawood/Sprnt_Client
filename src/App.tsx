@@ -24,40 +24,41 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import TripDetailsPage from "./pages/dashboard/trips/TripDetailsPage";
 import AddVehiclePage from "./pages/dashboard/vehicle/AddVehiclePage";
-
-const queryClient = new QueryClient();
+import { DriverProvider } from "./contexts/DriverContext";
 
 const App = () => (
   <TanstackProvider>
     <AuthProvider>
-      <TooltipProvider>
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/auth/register" element={<RegisterPage />} />
-            <Route path="/auth/login" element={<LoginPage />} />
-            <Route path="/onboarding" element={<OnboardingPage />} />
-            <Route path="/dashboard" element={<DashboardLayout />}>
-              <Route index element={<DashboardHome />} />
-              <Route path="book" element={<BookRidePage />} />
-              <Route path="trips" element={<TripHistoryPage />} />
-              <Route path="trips/:tripId" element={<TripDetailsPage />} />
-              <Route path="wallet" element={<WalletPage />} />
-              <Route path="earnings" element={<WalletPage />} />
-              <Route path="support" element={<SupportPage />} />
-              <Route path="settings" element={<SettingsPage />} />
-              <Route path="vehicle" element={<VehiclePage />} />
-              <Route path="vehicle/add" element={<AddVehiclePage />} />
-              <Route path="documents" element={<DocumentsPage />} />
-              <Route path="ratings" element={<RatingsPage />} />
-              <Route path="current-trip" element={<CurrentTripPage />} />
-              <Route path="profile" element={<ProfilePage />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <DriverProvider>
+        <TooltipProvider>
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/auth/register" element={<RegisterPage />} />
+              <Route path="/auth/login" element={<LoginPage />} />
+              <Route path="/onboarding" element={<OnboardingPage />} />
+              <Route path="/dashboard" element={<DashboardLayout />}>
+                <Route index element={<DashboardHome />} />
+                <Route path="book" element={<BookRidePage />} />
+                <Route path="trips" element={<TripHistoryPage />} />
+                <Route path="trips/:tripId" element={<TripDetailsPage />} />
+                <Route path="wallet" element={<WalletPage />} />
+                <Route path="earnings" element={<WalletPage />} />
+                <Route path="support" element={<SupportPage />} />
+                <Route path="settings" element={<SettingsPage />} />
+                <Route path="vehicle" element={<VehiclePage />} />
+                <Route path="vehicle/add" element={<AddVehiclePage />} />
+                <Route path="documents" element={<DocumentsPage />} />
+                <Route path="ratings" element={<RatingsPage />} />
+                <Route path="current-trip" element={<CurrentTripPage />} />
+                <Route path="profile" element={<ProfilePage />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </DriverProvider>
     </AuthProvider>
   </TanstackProvider>
 );

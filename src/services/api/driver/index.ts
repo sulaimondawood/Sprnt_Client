@@ -95,4 +95,9 @@ export const DriverAPI = {
     const res = await api.get("/driver/me/heartbeat");
     return res.data.data;
   },
+
+  async toggleAvailabilityStatus() {
+    const res = await api.patch("/driver/me/availibilty-status");
+    return res.data.message;
+  },
 };

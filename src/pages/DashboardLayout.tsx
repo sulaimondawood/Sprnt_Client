@@ -106,15 +106,6 @@ const DashboardLayout = () => {
     navigate("/");
   };
 
-  useQuery({
-    queryKey: ["driver", "heartbeat"],
-    queryFn: DriverAPI.heartBeat,
-    enabled: isOnline,
-    refetchInterval: 60000,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  });
-
   return (
     <div className="min-h-screen bg-background">
       {/* Onboarding Modal */}
