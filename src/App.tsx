@@ -15,7 +15,7 @@ import SettingsPage from "./pages/dashboard/SettingsPage";
 import VehiclePage from "./pages/dashboard/vehicle/VehiclePage";
 import DocumentsPage from "./pages/dashboard/document/DocumentsPage";
 import RatingsPage from "./pages/dashboard/rating/RatingsPage";
-import CurrentTripPage from "./pages/dashboard/CurrentTripPage";
+import CurrentTripPage from "./pages/dashboard/trips/CurrentTripPage";
 import ProfilePage from "./pages/dashboard/profile/ProfilePage";
 import OnboardingPage from "./pages/OnboardingPage";
 import NotFound from "./pages/NotFound";

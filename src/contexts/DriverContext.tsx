@@ -13,6 +13,7 @@ import { toast } from "sonner";
 interface DriverContextType {
   isOnline: boolean;
   toggleAvailabilityStatus: () => void;
+  isPendingAvailabiltyStatus: boolean;
 }
 
 const DriverContext = createContext<DriverContextType | undefined>(undefined);
@@ -20,7 +21,7 @@ const DriverContext = createContext<DriverContextType | undefined>(undefined);
 export const DriverProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient();
 
-  const { data: userProfile, isLoading } = useQuery({
+  const { data: userProfile } = useQuery({
     queryKey: ["user", "profile"],
     queryFn: UserAPI.profile,
   });
@@ -29,18 +30,29 @@ export const DriverProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (userProfile?.driver) {
       const status = userProfile.driver.availabilityStatus;
-      setIsOnline(status === "ONLINE" ? true : false);
+      setIsOnline(status !== "OFFLINE");
     }
   }, [userProfile?.driver?.availabilityStatus, userProfile?.driver]);
 
-  const { mutate: toggleAvailabilityStatus } = useMutation({
+  const {
+    mutate: toggleAvailabilityStatus,
+    isPending: isPendingAvailabiltyStatus,
+  } = useMutation({
     mutationFn: () => DriverAPI.toggleAvailabilityStatus(),
+    onMutate: async () => {
+      setIsOnline((prev) => !prev);
+    },
     onSuccess() {
       queryClient.invalidateQueries({ queryKey: ["user", "profile"] });
       toast.success("Your availability status was updated");
     },
-    onError() {
-      toast.error("Something went wrong. Try again later");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError(error: any) {
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong. Try again later",
+      );
+      setIsOnline((prev) => !prev); // rollback
     },
   });
 
@@ -55,7 +67,9 @@ export const DriverProvider = ({ children }: { children: ReactNode }) => {
   });
 
   return (
-    <DriverContext.Provider value={{ isOnline, toggleAvailabilityStatus }}>
+    <DriverContext.Provider
+      value={{ isOnline, toggleAvailabilityStatus, isPendingAvailabiltyStatus }}
+    >
       {children}
     </DriverContext.Provider>
   );

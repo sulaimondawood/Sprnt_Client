@@ -50,9 +50,15 @@ const DashboardHome = () => {
     }).format(amount);
   };
 
-  const activeTrip = isDriver
-    ? trips.find((t) => t.status === "STARTED")
-    : null;
+  const {
+    data: currentRide,
+    isLoading: isLoadingCurrentRide,
+    isSuccess: isSuccessLoadingCurrentRide,
+    isError,
+  } = useQuery<Ride>({
+    queryKey: ["rides", "current"],
+    queryFn: DriverAPI.currentRide,
+  });
 
   const {
     data: recentRides,
@@ -81,12 +87,10 @@ const DashboardHome = () => {
       {/* Welcome Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-3xl font-bold">
-              Welcome back, {profileData?.fullname?.split(" ")[0]}!
-            </h1>
-            <RoleBadge role={profileData?.role || "RIDER"} />
-          </div>
+          <h1 className="text-3xl font-bold mb-2">
+            Welcome back, {profileData?.fullname?.split(" ")[0]}!
+          </h1>
+
           <p className="text-muted-foreground">
             {role === "DRIVER"
               ? "Here's your driving performance overview"
@@ -108,7 +112,7 @@ const DashboardHome = () => {
       </div>
 
       {/* Active Trip Banner (Driver) */}
-      {activeTrip && (
+      {isSuccessLoadingCurrentRide && currentRide && (
         <Card className="p-6 gradient-driver text-driver-foreground">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -117,11 +121,9 @@ const DashboardHome = () => {
               </div>
               <div>
                 <p className="text-sm opacity-80">Active Trip</p>
-                <p className="text-xl font-bold">{"riderName"}</p>
-                {/* <p className="text-xl font-bold">{activeTrip.riderName}</p> */}
+                <p className="text-xl font-bold">{currentRide?.riderName}</p>
                 <p className="text-sm opacity-80">
-                  Address
-                  {/* {activeTrip.dropoffLocation.address} */}
+                  {currentRide?.dropoffLocation?.address}
                 </p>
               </div>
             </div>

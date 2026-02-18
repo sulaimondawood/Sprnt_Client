@@ -39,6 +39,7 @@ import { logout, profile } from "@/helpers";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 import { useQuery } from "@tanstack/react-query";
 import { DriverAPI } from "@/services/api/driver";
+import { useDriver } from "@/contexts/DriverContext";
 
 export interface CustomJwtPayload extends JwtPayload {
   role?: string;
@@ -72,7 +73,11 @@ const DashboardLayout = () => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [isOnline, setIsOnline] = useState(false);
+
+  const { isOnline, toggleAvailabilityStatus, isPendingAvailabiltyStatus } =
+    useDriver();
+
+  // const [isOnline, setIsOnline] = useState(false);
   // const [isOnline, setIsOnline] = useState(driverProfile?.status === "ONLINE");
 
   // const profile = useMemo(() => {
@@ -140,7 +145,6 @@ const DashboardLayout = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Driver Online/Offline Toggle */}
             {role === "DRIVER" && (
               <div className="hidden sm:flex items-center gap-3 px-4 py-2 bg-muted rounded-full">
                 <span
@@ -153,13 +157,13 @@ const DashboardLayout = () => {
                 </span>
                 <Switch
                   checked={isOnline}
-                  onCheckedChange={setIsOnline}
+                  disabled={isPendingAvailabiltyStatus}
+                  onCheckedChange={toggleAvailabilityStatus}
                   className="data-[state=checked]:bg-success"
                 />
               </div>
             )}
 
-            {/* Notifications */}
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="h-5 w-5" />
               <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground text-xs rounded-full flex items-center justify-center">
@@ -167,7 +171,6 @@ const DashboardLayout = () => {
               </span>
             </Button>
 
-            {/* Profile Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="gap-2 px-2">

@@ -78,10 +78,7 @@ const CurrentTripPage = () => {
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-3xl font-bold">Current Trip</h1>
-            <RoleBadge role={role} />
-          </div>
+          <h1 className="text-3xl font-bold mb-2">Current Trip</h1>
           <StatusBadge status={currentRide?.rideStatus || ""} type="trip" />
         </div>
         <div className="flex items-center gap-2">
