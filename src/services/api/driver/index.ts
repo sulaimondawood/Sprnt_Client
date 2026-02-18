@@ -90,4 +90,9 @@ export const DriverAPI = {
     const res = await api.patch("/driver/me", payload);
     return res.data.data;
   },
+
+  async heartBeat() {
+    const res = await api.get("/driver/me/heartbeat");
+    return res.data.data;
+  },
 };

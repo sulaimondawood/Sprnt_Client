@@ -35,14 +35,37 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 
 import { ROUTES } from "@/constants/routes";
-import { logout } from "@/helpers";
+import { logout, profile } from "@/helpers";
 import { jwtDecode, JwtPayload } from "jwt-decode";
+import { useQuery } from "@tanstack/react-query";
+import { DriverAPI } from "@/services/api/driver";
 
 export interface CustomJwtPayload extends JwtPayload {
   role?: string;
   completedProfile?: string;
   fullname?: string;
 }
+
+const riderNavItems = [
+  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
+  { icon: MapPin, label: "Book a Ride", path: "/dashboard/book" },
+  { icon: History, label: "Trip History", path: "/dashboard/trips" },
+  { icon: Wallet, label: "Wallet", path: "/dashboard/wallet" },
+  { icon: HelpCircle, label: "Support", path: "/dashboard/support" },
+  { icon: Settings, label: "Settings", path: "/dashboard/settings" },
+];
+
+const driverNavItems = [
+  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
+  { icon: MapPin, label: "Current Trip", path: "/dashboard/current-trip" },
+  { icon: History, label: "Trip History", path: "/dashboard/trips" },
+  { icon: Wallet, label: "Earnings", path: "/dashboard/earnings" },
+  { icon: Car, label: "My Vehicle", path: "/dashboard/vehicle" },
+  { icon: FileText, label: "Documents", path: "/dashboard/documents" },
+  { icon: Star, label: "Ratings", path: "/dashboard/ratings" },
+  { icon: HelpCircle, label: "Support", path: "/dashboard/support" },
+  { icon: Settings, label: "Settings", path: "/dashboard/settings" },
+];
 
 const DashboardLayout = () => {
   const navigate = useNavigate();
@@ -52,15 +75,17 @@ const DashboardLayout = () => {
   const [isOnline, setIsOnline] = useState(false);
   // const [isOnline, setIsOnline] = useState(driverProfile?.status === "ONLINE");
 
-  const profile = useMemo(() => {
-    try {
-      return token ? jwtDecode<CustomJwtPayload>(token) : null;
-    } catch {
-      return null;
-    }
-  }, []);
+  // const profile = useMemo(() => {
+  //   try {
+  //     return token ? jwtDecode<CustomJwtPayload>(token) : null;
+  //   } catch {
+  //     return null;
+  //   }
+  // }, []);
 
-  const role = profile?.role;
+  const profileData = profile();
+
+  const role = profileData?.role;
 
   useEffect(() => {
     if (!token) {
@@ -69,31 +94,10 @@ const DashboardLayout = () => {
   }, [navigate, profile]);
 
   useEffect(() => {
-    if (profile?.completedProfile === "false") {
+    if (profileData?.completedProfile === "false") {
       setShowOnboarding(true);
     }
   }, [navigate, location, profile]);
-
-  const riderNavItems = [
-    { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
-    { icon: MapPin, label: "Book a Ride", path: "/dashboard/book" },
-    { icon: History, label: "Trip History", path: "/dashboard/trips" },
-    { icon: Wallet, label: "Wallet", path: "/dashboard/wallet" },
-    { icon: HelpCircle, label: "Support", path: "/dashboard/support" },
-    { icon: Settings, label: "Settings", path: "/dashboard/settings" },
-  ];
-
-  const driverNavItems = [
-    { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
-    { icon: MapPin, label: "Current Trip", path: "/dashboard/current-trip" },
-    { icon: History, label: "Trip History", path: "/dashboard/trips" },
-    { icon: Wallet, label: "Earnings", path: "/dashboard/earnings" },
-    { icon: Car, label: "My Vehicle", path: "/dashboard/vehicle" },
-    { icon: FileText, label: "Documents", path: "/dashboard/documents" },
-    { icon: Star, label: "Ratings", path: "/dashboard/ratings" },
-    { icon: HelpCircle, label: "Support", path: "/dashboard/support" },
-    { icon: Settings, label: "Settings", path: "/dashboard/settings" },
-  ];
 
   const navItems = role === "RIDER" ? riderNavItems : driverNavItems;
 
@@ -101,6 +105,15 @@ const DashboardLayout = () => {
     logout();
     navigate("/");
   };
+
+  useQuery({
+    queryKey: ["driver", "heartbeat"],
+    queryFn: DriverAPI.heartBeat,
+    enabled: isOnline,
+    refetchInterval: 60000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -133,8 +146,6 @@ const DashboardLayout = () => {
             <Link to="/" className="flex items-center gap-2">
               <span className="text-xl font-bold hidden sm:block">Sprnt</span>
             </Link>
-
-            <RoleBadge role={role || "RIDER"} size="sm" />
           </div>
 
           <div className="flex items-center gap-4">
@@ -178,20 +189,20 @@ const DashboardLayout = () => {
                           : "bg-rider text-rider-foreground"
                       }
                     >
-                      {profile?.fullname?.charAt(0) || "U"}
+                      {profileData?.fullname?.charAt(0) || "U"}
                     </AvatarFallback>
                   </Avatar>
                   <span className="hidden md:block font-medium">
-                    {profile?.fullname || "User"}
+                    {profileData?.fullname || "User"}
                   </span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>
                   <div className="flex flex-col">
-                    <span>{profile?.fullname || "User"}</span>
+                    <span>{profileData?.fullname || "User"}</span>
                     <span className="text-xs font-normal text-muted-foreground">
-                      {profile.sub}
+                      {profileData?.sub}
                     </span>
                   </div>
                 </DropdownMenuLabel>
