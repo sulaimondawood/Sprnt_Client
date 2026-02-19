@@ -189,7 +189,7 @@ interface RideRequestModalProps {
   };
   onAccept: () => void;
   onReject: () => void;
-  timeLeft?: number;
+  timeLeft?: string;
 }
 
 export const RideRequestModal = ({
@@ -197,7 +197,7 @@ export const RideRequestModal = ({
   rider,
   onAccept,
   onReject,
-  timeLeft = 15,
+  timeLeft,
 }: RideRequestModalProps) => (
   <Dialog open={open}>
     <DialogContent
@@ -246,7 +246,7 @@ export const RideRequestModal = ({
             </div>
           </div>
 
-          {timeLeft > 0 && (
+          {timeLeft && (
             <div className="text-center">
               <span className="text-sm text-muted-foreground">Expires in </span>
               <span className="font-bold text-primary">{timeLeft}s</span>

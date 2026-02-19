@@ -99,8 +99,6 @@ export const DriverAPI = {
   async toggleAvailabilityStatus() {
     const res = await api.patch("/driver/me/availibilty-status");
 
-    console.log(res?.data.data);
-
     return res.data.data;
   },
 };

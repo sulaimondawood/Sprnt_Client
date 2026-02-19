@@ -37,6 +37,11 @@ import { ROUTES } from "@/constants/routes";
 import { useDriver } from "@/contexts/DriverContext";
 import { logout } from "@/helpers";
 import { jwtDecode, JwtPayload } from "jwt-decode";
+import { useSubscription } from "@/hooks/useStompSubscription";
+import { RideRequestSockType } from "@/types/riders";
+import { RideRequestModal } from "@/components/RideModals";
+import { toast } from "sonner";
+import { format } from "date-fns";
 
 export interface CustomJwtPayload extends JwtPayload {
   role?: string;
@@ -70,6 +75,9 @@ const DashboardLayout = () => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showRideRequest, setShowRideRequest] = useState(false);
+  const [rideRequestData, setRideRequestData] =
+    useState<RideRequestSockType | null>();
 
   const { isOnline, toggleAvailabilityStatus, isPendingAvailabiltyStatus } =
     useDriver();
@@ -102,6 +110,16 @@ const DashboardLayout = () => {
 
   const navItems = role === "RIDER" ? riderNavItems : driverNavItems;
 
+  useSubscription(
+    `/user/queue/ride-request`,
+    (updatedRide: RideRequestSockType) => {
+      setShowRideRequest(true);
+      setRideRequestData(updatedRide);
+      // Update your local state or invalidate TanStack Query
+    },
+    role === "DRIVER",
+  );
+
   const handleLogout = () => {
     logout();
   };
@@ -112,6 +130,29 @@ const DashboardLayout = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* RIde request modal */}
+      <RideRequestModal
+        open={showRideRequest}
+        // rider={mockRider}
+        timeLeft={
+          rideRequestData?.expiresAt
+            ? format(rideRequestData.expiresAt, "s")
+            : "-"
+        }
+        onAccept={() => {
+          setShowRideRequest(false);
+          toast("Ride Accepted", {
+            description: "You accepted the ride request.",
+          });
+        }}
+        onReject={() => {
+          setShowRideRequest(false);
+          toast("Ride Declined", {
+            description: "You declined the ride request.",
+          });
+        }}
+      />
+
       {/* Onboarding Modal */}
       <Dialog open={showOnboarding} onOpenChange={() => {}}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 [&>button]:hidden">

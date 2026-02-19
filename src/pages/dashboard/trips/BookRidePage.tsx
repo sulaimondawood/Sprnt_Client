@@ -14,6 +14,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { profile } from "@/helpers";
+import { useSubscription } from "@/hooks/useStompSubscription";
 import { RiderAPI } from "@/services/api/rider";
 import { CreateRideRequest } from "@/types/riders";
 import { useMutation } from "@tanstack/react-query";
@@ -181,6 +183,12 @@ const BookRidePage = () => {
   // Demo triggers for driver-side modals
   const handleSimulateRideRequest = () => setShowRideRequest(true);
   const handleSimulateRiderCancel = () => setShowRiderCancelled(true);
+
+  useSubscription(` "/user/queue/no-driver-found`, (updatedRide) => {
+    console.log("Ride status changed:", updatedRide.status);
+    console.log("Ride status changed:", updatedRide);
+    // Update your local state or invalidate TanStack Query
+  });
 
   const { mutate: sendRideRequest, isPending: isPendingSendRideRequest } =
     useMutation({

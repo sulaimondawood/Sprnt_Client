@@ -10,10 +10,6 @@ import {
 } from "react";
 import SockJS from "sockjs-client";
 
-const client = new Client({
-  brokerURL: `http://localhost:8080/api/v1/ws?token=${getToken()}`,
-});
-
 interface WebSocketContextType {
   stompClient: Client | null;
   isConnected: boolean;
@@ -24,24 +20,19 @@ const StompContext = createContext<WebSocketContextType>({
   isConnected: false,
 });
 
-export const StompProvider = ({
-  children,
-  token,
-}: {
-  children: ReactNode;
-  token: string;
-}) => {
+const sessionToken = getToken();
+
+export const StompProvider = ({ children }: { children: ReactNode }) => {
   const [isConnected, setIsConnected] = useState(false);
   const stompClientRef = useRef<Client | null>(null);
 
   useEffect(() => {
-    if (!token) return;
+    if (!sessionToken) return;
 
     // 1. Initialize the Client
     const client = new Client({
-      webSocketFactory: new SockJS(
-        `http://localhost:8080/api/v1/ws?token=${getToken()}`,
-      ),
+      webSocketFactory: () =>
+        new SockJS(`http://localhost:8080/api/v1/ws?token=${sessionToken}`),
 
       debug: (str) => console.log("STOMP: " + str),
       reconnectDelay: 5000,
@@ -65,12 +56,14 @@ export const StompProvider = ({
     return () => {
       client.deactivate();
     };
-  }, [token]);
+  }, [sessionToken]);
 
   return (
     <StompContext.Provider
       value={{ isConnected, stompClient: stompClientRef.current }}
-    ></StompContext.Provider>
+    >
+      {children}
+    </StompContext.Provider>
   );
 };
 

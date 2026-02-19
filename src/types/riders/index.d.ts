@@ -5,3 +5,12 @@ interface CreateRideRequest {
   dropoffLocation: Location;
   rideType: string;
 }
+
+interface RideRequestSockType {
+  driverId: string;
+  rideId: string;
+  expiresAt: string;
+  estimatedFare: string;
+  pickupLng: number;
+  pickupLat: number;
+}
