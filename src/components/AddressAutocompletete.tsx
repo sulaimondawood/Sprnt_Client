@@ -18,8 +18,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { useLocation } from "@/hooks/useLocation";
 
-// Define the interface to match your Spring Boot LocationDTO
 export interface LocationValue {
   address: string;
   lat: number;
@@ -41,35 +43,39 @@ export function LocationSearch({
 }: LocationSearchProps) {
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState(defaultValue);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [suggestions, setSuggestions] = React.useState<any[]>([]);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const debouncedQuery = useDebounce(query, 700);
+  const locationBound = useLocation();
 
-  const debouncedQuery = useDebounce(query, 400);
-
-  React.useEffect(() => {
-    if (debouncedQuery.length < 3) {
-      setSuggestions([]);
-      return;
-    }
-
-    const fetchAddresses = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch(
-          `https://photon.komoot.io/api/?q=${encodeURIComponent(debouncedQuery)}&limit=5`,
-        );
-        const data = await response.json();
-        setSuggestions(data.features || []);
-      } catch (err) {
-        console.error("Photon Fetch Error:", err);
-      } finally {
-        setIsLoading(false);
+  const { data: suggestions = [], isFetching } = useQuery({
+    queryKey: ["locations", debouncedQuery],
+    queryFn: async () => {
+      const boundingBox: Record<string, number | string> = {};
+      if (locationBound) {
+        boundingBox.lon = locationBound.lon;
+        boundingBox.lat = locationBound.lat;
       }
-    };
 
-    fetchAddresses();
-  }, [debouncedQuery]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const queryParams: Record<string, any> = {
+        q: encodeURIComponent(debouncedQuery),
+        limit: 10,
+      };
+
+      if (locationBound?.lat && locationBound?.lon) {
+        queryParams.lat = locationBound.lat;
+        queryParams.lon = locationBound.lon;
+        queryParams.location_bias_scale = 0.5;
+      }
+      const res = await axios.get("https://photon.komoot.io/api/", {
+        params: queryParams,
+      });
+      const data = res.data.features || [];
+      return data;
+    },
+    enabled: debouncedQuery.length > 3,
+    placeholderData: (previousData) => previousData,
+    staleTime: 1000 * 60 * 5,
+  });
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -100,12 +106,12 @@ export function LocationSearch({
             onValueChange={setQuery}
           />
           <CommandList>
-            {isLoading && (
+            {isFetching && (
               <div className="flex items-center justify-center py-6">
                 <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
               </div>
             )}
-            {!isLoading && suggestions.length === 0 && query.length >= 3 && (
+            {!isFetching && suggestions.length === 0 && query.length >= 3 && (
               <CommandEmpty>No results found.</CommandEmpty>
             )}
             <CommandGroup>
