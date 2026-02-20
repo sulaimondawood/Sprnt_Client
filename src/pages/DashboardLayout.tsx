@@ -145,6 +145,8 @@ const DashboardLayout = () => {
         }
         onAccept={() => acceptRideRequest(rideRequestData?.rideId)}
         onReject={() => rejectRideRequest(rideRequestData.rideId)}
+        isAccepting={isPendingAcceptRideRequest}
+        isRejecting={isPendingRejectRideRequest}
       />
 
       {/* Onboarding Modal */}

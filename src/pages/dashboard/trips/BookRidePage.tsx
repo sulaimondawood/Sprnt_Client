@@ -18,7 +18,9 @@ import { profile } from "@/helpers";
 import { useSubscription } from "@/hooks/useStompSubscription";
 import { RiderAPI } from "@/services/api/rider";
 import { CreateRideRequest, DriverSummary } from "@/types/riders";
-import { useMutation } from "@tanstack/react-query";
+import { Ride } from "@/types/rides/indes";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { formatDate } from "date-fns";
 import {
   Car,
   ChevronRight,
@@ -29,7 +31,7 @@ import {
   Wallet,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 type BookingStep =
@@ -64,47 +66,16 @@ const BookRidePage = () => {
   const user = profile();
   const isDriver = user?.role === "DRIVER";
 
-  // const [pickupCoords, setPickupCoords] = useState<
-  //   [number, number] | undefined
-  // >();
-  // const [dropoffCoords, setDropoffCoords] = useState<
-  //   [number, number] | undefined
-  // >();
-  // const [driverCoords, setDriverCoords] = useState<
-  //   [number, number] | undefined
-  // >();
-  // const [eta, setEta] = useState(5);
-
-  const mockDriver = {
-    name: "Adebayo Johnson",
-    rating: 4.9,
-    trips: 1247,
-    vehicle: "Toyota Camry",
-    plate: "LG-234-KJA",
-    phone: "+234 801 234 5678",
-  };
-
   const handleDriverAcceptConfirm = () => {
     setDriverResponseType(null);
     setBookingStep("arriving");
   };
 
   const handleDriverResponseClose = () => {
-    if (driverResponseType === "rejected") {
-      // Search again
-      setDriverResponseType(null);
-      setShowSearchingModal(true);
-      setTimeout(() => {
-        setShowSearchingModal(false);
-        setDriverResponseType("accepted");
-      }, 3000);
-    } else if (driverResponseType === "cancelled") {
-      setDriverResponseType(null);
-      setBookingStep("location");
-    } else {
-      setDriverResponseType(null);
+    if (driverResponseType === "cancelled" || showNoDriverFound) {
       setBookingStep("location");
     }
+    setDriverResponseType(null);
   };
 
   const handleCancelRide = () => {
@@ -117,7 +88,7 @@ const BookRidePage = () => {
   };
 
   useSubscription(
-    ` "/user/queue/no-driver-found`,
+    "/user/queue/no-driver-found",
     (message) => {
       console.log("Ride status changed:", message);
       setShowNoDriverFound(true);
@@ -128,7 +99,7 @@ const BookRidePage = () => {
   );
 
   useSubscription(
-    ` "/user/queue/ride-accepted`,
+    "/user/queue/ride-accepted",
     (message: DriverSummary) => {
       console.log("Ride status changed:", message);
       setDriverResponseType("accepted");
@@ -140,6 +111,11 @@ const BookRidePage = () => {
     },
     !isDriver,
   );
+
+  const { data: currentRide } = useQuery<Ride>({
+    queryKey: ["rides", "rider", "current"],
+    queryFn: RiderAPI.currentRide,
+  });
 
   const { mutate: sendRideRequest, isPending: isPendingSendRideRequest } =
     useMutation({
@@ -169,8 +145,14 @@ const BookRidePage = () => {
           error?.response?.data?.message || "Unable to send ride request",
         );
       },
-      onSuccess(data, variables, onMutateResult, context) {},
     });
+
+  useEffect(() => {
+    if (currentRide) {
+      if (currentRide.rideStatus === "ACCEPTED") setBookingStep("arriving");
+      if (currentRide.rideStatus === "ONGOING") setBookingStep("inProgress");
+    }
+  }, [currentRide]);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -182,7 +164,8 @@ const BookRidePage = () => {
             {bookingStep === "location" && "Where would you like to go?"}
             {bookingStep === "searching" && "Finding you a driver..."}
             {bookingStep === "matched" && "Driver found!"}
-            {bookingStep === "arriving" && `Driver arriving in ${eta} min`}
+            {bookingStep === "arriving" &&
+              `Driver arriving in ${currentRide?.estimatedArrivalTime ? formatDate(currentRide?.estimatedArrivalTime, "m") : "N/A"} min`}
             {bookingStep === "inProgress" && "Trip in progress"}
           </p>
         </div>
@@ -199,10 +182,19 @@ const BookRidePage = () => {
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           <Map
-            pickupCoords={pickupCoords}
-            dropoffCoords={dropoffCoords}
-            driverCoords={driverCoords}
-            showRoute={!!pickupCoords && !!dropoffCoords}
+            pickupCoords={[
+              pickup?.lng || currentRide?.pickupLocation?.lng,
+              pickup?.lat || currentRide?.pickupLocation?.lat,
+            ]}
+            dropoffCoords={[
+              dropoff?.lng || currentRide?.dropoffLocation?.lng,
+              dropoff?.lat || currentRide?.dropoffLocation?.lat,
+            ]}
+            // driverCoords={driverCoords}
+            showRoute={
+              !!(pickup || currentRide?.pickupLocation) &&
+              !!(dropoff || currentRide?.dropoffLocation)
+            }
             className="h-[70vh]"
           />
 
@@ -318,10 +310,12 @@ const BookRidePage = () => {
                   <User className="h-8 w-8 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-xl font-bold">{mockDriver.name}</h2>
+                  <h2 className="text-xl font-bold">
+                    {currentRide?.driverName}
+                  </h2>
                   <p className="text-muted-foreground">
                     {bookingStep === "arriving"
-                      ? `Arriving in ${eta} minutes`
+                      ? `Arriving in ${currentRide?.estimatedArrivalTime ? formatDate(currentRide?.estimatedArrivalTime, "m") : "N/A"} minutes`
                       : "Trip in progress"}
                   </p>
                 </div>
@@ -339,14 +333,18 @@ const BookRidePage = () => {
                   <div className="w-3 h-3 rounded-full bg-success mt-1.5" />
                   <div>
                     <p className="text-sm text-muted-foreground">Pickup</p>
-                    <p className="font-medium">{pickup.address}</p>
+                    <p className="font-medium">
+                      {currentRide?.pickupLocation?.address}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-3 h-3 rounded-full bg-destructive mt-1.5" />
                   <div>
                     <p className="text-sm text-muted-foreground">Drop-off</p>
-                    <p className="font-medium">{"N/A"}</p>
+                    <p className="font-medium">
+                      {currentRide?.dropoffLocation?.address}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -354,11 +352,15 @@ const BookRidePage = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground">Vehicle</p>
-                    <p className="font-semibold">{mockDriver.vehicle}</p>
+                    <p className="font-semibold">
+                      {driverSummary?.vehicleName}
+                    </p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-muted-foreground">Plate</p>
-                    <p className="font-bold text-lg">{mockDriver.plate}</p>
+                    <p className="font-bold text-lg">
+                      {driverSummary?.vehiclePlate}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -461,14 +463,6 @@ const BookRidePage = () => {
       />
       <NoDriverFoundModal
         open={showNoDriverFound}
-        // onRetry={() => {
-        //   setShowNoDriverFound(false);
-        //   setShowSearchingModal(true);
-        //   setTimeout(() => {
-        //     setShowSearchingModal(false);
-        //     setDriverResponseType("accepted");
-        //   }, 4000);
-        // }}
         onClose={() => {
           setShowNoDriverFound(false);
           setBookingStep("location");

@@ -276,10 +276,20 @@ export const RideRequestModal = ({
         <Button
           variant="outline"
           className="w-full text-destructive"
+          disabled={isRejecting}
           onClick={onReject}
         >
-          <XCircle className="h-4 w-4 mr-2" />
-          Decline
+          {isRejecting ? (
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <p>Please wait</p>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <XCircle className="h-4 w-4 mr-2" />
+              <p>Decline</p>
+            </div>
+          )}
         </Button>
       </DialogFooter>
     </DialogContent>
