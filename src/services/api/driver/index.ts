@@ -98,7 +98,16 @@ export const DriverAPI = {
 
   async toggleAvailabilityStatus() {
     const res = await api.patch("/driver/me/availibilty-status");
-
     return res.data.data;
+  },
+
+  async acceptRide(rideId: string) {
+    const res = await api.patch(`/driver/ride/${rideId}/accept`);
+    return res.data.message;
+  },
+
+  async rejectRide(rideId: string) {
+    const res = await api.patch(`/driver/ride/${rideId}/reject`);
+    return res.data.message;
   },
 };

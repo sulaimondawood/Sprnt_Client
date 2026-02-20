@@ -6,8 +6,8 @@ import {
 import Map from "@/components/Map";
 import {
   DriverResponseModal,
+  NoDriverFoundModal,
   RiderCancelledModal,
-  RideRequestModal,
   SearchingDriverModal,
 } from "@/components/RideModals";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { profile } from "@/helpers";
 import { useSubscription } from "@/hooks/useStompSubscription";
 import { RiderAPI } from "@/services/api/rider";
-import { CreateRideRequest } from "@/types/riders";
+import { CreateRideRequest, DriverSummary } from "@/types/riders";
 import { useMutation } from "@tanstack/react-query";
 import {
   Car,
@@ -29,7 +29,7 @@ import {
   Wallet,
   X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 type BookingStep =
@@ -55,21 +55,25 @@ const BookRidePage = () => {
   const [driverResponseType, setDriverResponseType] = useState<
     "accepted" | "rejected" | "cancelled" | null
   >(null);
-  const [showRideRequest, setShowRideRequest] = useState(false);
-  const [showRiderCancelled, setShowRiderCancelled] = useState(false);
-  const [requestCountdown, setRequestCountdown] = useState(15);
+  const [driverSummary, setDriverSummary] = useState<DriverSummary>();
 
-  const [pickupCoords, setPickupCoords] = useState<
-    [number, number] | undefined
-  >();
-  const [dropoffCoords, setDropoffCoords] = useState<
-    [number, number] | undefined
-  >();
+  const [showRiderCancelled, setShowRiderCancelled] = useState(false);
+  const [showNoDriverFound, setShowNoDriverFound] = useState(false);
   const [bookingStep, setBookingStep] = useState<BookingStep>("location");
-  const [driverCoords, setDriverCoords] = useState<
-    [number, number] | undefined
-  >();
-  const [eta, setEta] = useState(5);
+
+  const user = profile();
+  const isDriver = user?.role === "DRIVER";
+
+  // const [pickupCoords, setPickupCoords] = useState<
+  //   [number, number] | undefined
+  // >();
+  // const [dropoffCoords, setDropoffCoords] = useState<
+  //   [number, number] | undefined
+  // >();
+  // const [driverCoords, setDriverCoords] = useState<
+  //   [number, number] | undefined
+  // >();
+  // const [eta, setEta] = useState(5);
 
   const mockDriver = {
     name: "Adebayo Johnson",
@@ -80,70 +84,9 @@ const BookRidePage = () => {
     phone: "+234 801 234 5678",
   };
 
-  const mockRider = {
-    name: "Chioma Adeyemi",
-    rating: 4.7,
-    pickup: pickup || "Victoria Island, Lagos",
-    dropoff: dropoff || "Lekki Phase 1, Lagos",
-  };
-
-  // Simulate driver approaching
-  useEffect(() => {
-    if (bookingStep === "arriving" && pickupCoords) {
-      const interval = setInterval(() => {
-        setEta((prev) => {
-          if (prev <= 1) {
-            clearInterval(interval);
-            setBookingStep("inProgress");
-            return 0;
-          }
-          return prev - 1;
-        });
-        setDriverCoords((prev) => {
-          if (!prev || !pickupCoords) return [3.38, 6.52];
-          const newLng = prev[0] + (pickupCoords[0] - prev[0]) * 0.2;
-          const newLat = prev[1] + (pickupCoords[1] - prev[1]) * 0.2;
-          return [newLng, newLat];
-        });
-      }, 2000);
-      return () => clearInterval(interval);
-    }
-  }, [bookingStep, pickupCoords]);
-
-  // Ride request countdown for driver-side modal
-  useEffect(() => {
-    if (!showRideRequest) return;
-    setRequestCountdown(15);
-    const interval = setInterval(() => {
-      setRequestCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          setShowRideRequest(false);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [showRideRequest]);
-
-  // const handleBookRide = () => {
-  //   // Simulate: driver accepts after 4s
-  //   setTimeout(() => {
-  //     setShowSearchingModal(false);
-  //     setDriverResponseType("accepted");
-  //   }, 4000);
-  // };
-
   const handleDriverAcceptConfirm = () => {
     setDriverResponseType(null);
     setBookingStep("arriving");
-    setDriverCoords([3.36, 6.54]);
-    setEta(5);
-    toast({
-      title: "Driver Confirmed!",
-      description: `${mockDriver.name} is on the way in ${mockDriver.vehicle}.`,
-    });
   };
 
   const handleDriverResponseClose = () => {
@@ -158,7 +101,6 @@ const BookRidePage = () => {
     } else if (driverResponseType === "cancelled") {
       setDriverResponseType(null);
       setBookingStep("location");
-      setDriverCoords(undefined);
     } else {
       setDriverResponseType(null);
       setBookingStep("location");
@@ -169,26 +111,35 @@ const BookRidePage = () => {
     setShowSearchingModal(false);
     setDriverResponseType(null);
     setBookingStep("location");
-    setDriverCoords(undefined);
     toast("Ride Cancelled", {
       description: "Your ride has been cancelled.",
     });
   };
 
-  // const handlePickupSelect = (coords: [number, number], address: string) => {
-  //   setPickupCoords(coords);
-  //   setPickup(address);
-  // };
+  useSubscription(
+    ` "/user/queue/no-driver-found`,
+    (message) => {
+      console.log("Ride status changed:", message);
+      setShowNoDriverFound(true);
+      toast(message);
+      // Update your local state or invalidate TanStack Query
+    },
+    !isDriver,
+  );
 
-  // Demo triggers for driver-side modals
-  const handleSimulateRideRequest = () => setShowRideRequest(true);
-  const handleSimulateRiderCancel = () => setShowRiderCancelled(true);
-
-  useSubscription(` "/user/queue/no-driver-found`, (updatedRide) => {
-    console.log("Ride status changed:", updatedRide.status);
-    console.log("Ride status changed:", updatedRide);
-    // Update your local state or invalidate TanStack Query
-  });
+  useSubscription(
+    ` "/user/queue/ride-accepted`,
+    (message: DriverSummary) => {
+      console.log("Ride status changed:", message);
+      setDriverResponseType("accepted");
+      setDriverSummary(message);
+      toast("Driver Confirmed!", {
+        description: `${message.driverName} is on the way in ${message.vehicleName}.`,
+      });
+      // Update your local state or invalidate TanStack Query
+    },
+    !isDriver,
+  );
 
   const { mutate: sendRideRequest, isPending: isPendingSendRideRequest } =
     useMutation({
@@ -252,7 +203,6 @@ const BookRidePage = () => {
             dropoffCoords={dropoffCoords}
             driverCoords={driverCoords}
             showRoute={!!pickupCoords && !!dropoffCoords}
-            // onPickupSelect={handlePickupSelect}
             className="h-[70vh]"
           />
 
@@ -425,7 +375,6 @@ const BookRidePage = () => {
               <button
                 onClick={() => {
                   // setPickup("123 Victoria Island, Lagos");
-                  setPickupCoords([3.4226, 6.4281]);
                 }}
                 className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors text-left"
               >
@@ -480,31 +429,6 @@ const BookRidePage = () => {
                 </TabsContent>
               </Tabs>
             </Card>
-
-            {/* Demo: Driver-Side Modal Triggers */}
-            <Card className="p-6 border-dashed">
-              <h2 className="text-sm font-semibold mb-3 text-muted-foreground">
-                Demo: Driver-Side Modals
-              </h2>
-              <div className="space-y-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                  onClick={handleSimulateRideRequest}
-                >
-                  Simulate Ride Request
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                  onClick={handleSimulateRiderCancel}
-                >
-                  Simulate Rider Cancel
-                </Button>
-              </div>
-            </Card>
           </div>
         )}
       </div>
@@ -518,33 +442,37 @@ const BookRidePage = () => {
       <DriverResponseModal
         open={!!driverResponseType}
         type={driverResponseType || "accepted"}
-        driver={mockDriver}
+        driver={{
+          name: driverSummary?.driverName,
+          phone: "",
+          plate: driverSummary?.vehicleName,
+          rating: driverSummary?.rating,
+          trips: driverSummary?.totalTrips,
+          vehicle: driverSummary?.vehicleName,
+        }}
         onConfirm={handleDriverAcceptConfirm}
         onClose={handleDriverResponseClose}
-      />
-
-      <RideRequestModal
-        open={showRideRequest}
-        // rider={mockRider}
-        timeLeft={requestCountdown}
-        onAccept={() => {
-          setShowRideRequest(false);
-          toast("Ride Accepted", {
-            description: "You accepted the ride request.",
-          });
-        }}
-        onReject={() => {
-          setShowRideRequest(false);
-          toast("Ride Declined", {
-            description: "You declined the ride request.",
-          });
-        }}
       />
 
       <RiderCancelledModal
         open={showRiderCancelled}
         riderName="Chioma Adeyemi"
         onClose={() => setShowRiderCancelled(false)}
+      />
+      <NoDriverFoundModal
+        open={showNoDriverFound}
+        // onRetry={() => {
+        //   setShowNoDriverFound(false);
+        //   setShowSearchingModal(true);
+        //   setTimeout(() => {
+        //     setShowSearchingModal(false);
+        //     setDriverResponseType("accepted");
+        //   }, 4000);
+        // }}
+        onClose={() => {
+          setShowNoDriverFound(false);
+          setBookingStep("location");
+        }}
       />
     </div>
   );

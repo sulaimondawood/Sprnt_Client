@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { DriverOnboarding } from "@/components/onboarding/DriverOnboarding";
 import { RiderOnboarding } from "@/components/onboarding/RiderOnboarding";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -13,35 +14,22 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { TOKEN, token } from "@/services/api/config";
-import {
-  Bell,
-  Car,
-  FileText,
-  HelpCircle,
-  History,
-  LayoutDashboard,
-  LogOut,
-  MapPin,
-  Menu,
-  Settings,
-  Star,
-  User,
-  Wallet,
-  X,
-} from "lucide-react";
+import { TOKEN } from "@/services/api/config";
+import { Bell, LogOut, Menu, Settings, User, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 
-import { ROUTES } from "@/constants/routes";
+import { RideRequestModal } from "@/components/RideModals";
+import { driverNavItems, riderNavItems, ROUTES } from "@/constants/routes";
 import { useDriver } from "@/contexts/DriverContext";
 import { logout } from "@/helpers";
-import { jwtDecode, JwtPayload } from "jwt-decode";
 import { useSubscription } from "@/hooks/useStompSubscription";
-import { RideRequestSockType } from "@/types/riders";
-import { RideRequestModal } from "@/components/RideModals";
-import { toast } from "sonner";
+import { DriverAPI } from "@/services/api/driver";
+import { RideOffer } from "@/types/riders";
+import { useMutation } from "@tanstack/react-query";
 import { format } from "date-fns";
+import { jwtDecode, JwtPayload } from "jwt-decode";
+import { toast } from "sonner";
 
 export interface CustomJwtPayload extends JwtPayload {
   role?: string;
@@ -49,35 +37,18 @@ export interface CustomJwtPayload extends JwtPayload {
   fullname?: string;
 }
 
-const riderNavItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: ROUTES.dashboard },
-  { icon: MapPin, label: "Book a Ride", path: ROUTES.dashboardBookRide },
-  { icon: History, label: "Trip History", path: ROUTES.dashboardRides },
-  { icon: Wallet, label: "Wallet", path: ROUTES.dashboardWallet },
-  { icon: HelpCircle, label: "Support", path: "/dashboard/support" },
-  { icon: Settings, label: "Settings", path: "/dashboard/settings" },
-];
-
-const driverNavItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: ROUTES.dashboard },
-  { icon: MapPin, label: "Current Trip", path: "/dashboard/current-trip" },
-  { icon: History, label: "Trip History", path: ROUTES.dashboardRides },
-  { icon: Wallet, label: "Earnings", path: "/dashboard/earnings" },
-  { icon: Car, label: "My Vehicle", path: ROUTES.dashboardVehicle },
-  { icon: FileText, label: "Documents", path: ROUTES.dashboardDocument },
-  { icon: Star, label: "Ratings", path: "/dashboard/ratings" },
-  { icon: HelpCircle, label: "Support", path: "/dashboard/support" },
-  { icon: Settings, label: "Settings", path: "/dashboard/settings" },
-];
+const handleLogout = () => {
+  logout();
+};
 
 const DashboardLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+
   const [showRideRequest, setShowRideRequest] = useState(false);
-  const [rideRequestData, setRideRequestData] =
-    useState<RideRequestSockType | null>();
+  const [rideRequestData, setRideRequestData] = useState<RideOffer | null>();
 
   const { isOnline, toggleAvailabilityStatus, isPendingAvailabiltyStatus } =
     useDriver();
@@ -94,12 +65,12 @@ const DashboardLayout = () => {
 
   const role = profile?.role;
 
+  const navItems = role === "RIDER" ? riderNavItems : driverNavItems;
+
   useEffect(() => {
     if (!profile) {
       navigate(ROUTES.login);
-      console.log("SOmetn");
     }
-    console.log("SOmetn");
   }, [navigate, profile]);
 
   useEffect(() => {
@@ -108,11 +79,9 @@ const DashboardLayout = () => {
     }
   }, [navigate, location, profile]);
 
-  const navItems = role === "RIDER" ? riderNavItems : driverNavItems;
-
   useSubscription(
     `/user/queue/ride-request`,
-    (updatedRide: RideRequestSockType) => {
+    (updatedRide: RideOffer) => {
       setShowRideRequest(true);
       setRideRequestData(updatedRide);
       // Update your local state or invalidate TanStack Query
@@ -120,9 +89,39 @@ const DashboardLayout = () => {
     role === "DRIVER",
   );
 
-  const handleLogout = () => {
-    logout();
-  };
+  const { mutate: acceptRideRequest, isPending: isPendingAcceptRideRequest } =
+    useMutation({
+      mutationFn: (payload: string) => DriverAPI.acceptRide(payload),
+      onError(error: any) {
+        toast.error(
+          error?.response?.data?.message || "Unable to accept ride request",
+        );
+      },
+      onSuccess() {
+        // setDriverResponseType("accepted");
+        setShowRideRequest(false);
+        toast("Ride Accepted", {
+          description: "You accepted the ride request.",
+        });
+      },
+    });
+
+  const { mutate: rejectRideRequest, isPending: isPendingRejectRideRequest } =
+    useMutation({
+      mutationFn: (payload: string) => DriverAPI.rejectRide(payload),
+      onError(error: any) {
+        toast.error(
+          error?.response?.data?.message || "Unable to reject ride request",
+        );
+      },
+      onSuccess() {
+        toast("Ride Declined", {
+          description: "You declined the ride request.",
+        });
+        // setDriverResponseType("rejected");
+        setShowRideRequest(false);
+      },
+    });
 
   if (!profile) {
     return null;
@@ -130,27 +129,22 @@ const DashboardLayout = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* RIde request modal */}
+      {/* Ride request modal for Driver */}
       <RideRequestModal
         open={showRideRequest}
-        // rider={mockRider}
+        rider={{
+          name: rideRequestData?.riderName,
+          rating: rideRequestData?.rating,
+          dropoff: rideRequestData?.dropoff,
+          pickup: rideRequestData?.pickup,
+        }}
         timeLeft={
           rideRequestData?.expiresAt
             ? format(rideRequestData.expiresAt, "s")
             : "-"
         }
-        onAccept={() => {
-          setShowRideRequest(false);
-          toast("Ride Accepted", {
-            description: "You accepted the ride request.",
-          });
-        }}
-        onReject={() => {
-          setShowRideRequest(false);
-          toast("Ride Declined", {
-            description: "You declined the ride request.",
-          });
-        }}
+        onAccept={() => acceptRideRequest(rideRequestData?.rideId)}
+        onReject={() => rejectRideRequest(rideRequestData.rideId)}
       />
 
       {/* Onboarding Modal */}

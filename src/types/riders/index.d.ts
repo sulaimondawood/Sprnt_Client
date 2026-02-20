@@ -6,11 +6,24 @@ interface CreateRideRequest {
   rideType: string;
 }
 
-interface RideRequestSockType {
+export interface RideOffer {
   driverId: string;
   rideId: string;
+  riderName: string;
+  pickup: string;
+  dropoff: string;
+  rating: number;
   expiresAt: string;
-  estimatedFare: string;
+  estimatedFare: number;
   pickupLng: number;
   pickupLat: number;
+}
+
+export interface DriverSummary {
+  message: string;
+  driverName: string;
+  vehicleName: string;
+  vehiclePlate: string;
+  totalTrips: number;
+  rating: number;
 }

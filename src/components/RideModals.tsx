@@ -190,6 +190,8 @@ interface RideRequestModalProps {
   onAccept: () => void;
   onReject: () => void;
   timeLeft?: string;
+  isAccepting: boolean;
+  isRejecting: boolean;
 }
 
 export const RideRequestModal = ({
@@ -198,6 +200,8 @@ export const RideRequestModal = ({
   onAccept,
   onReject,
   timeLeft,
+  isAccepting,
+  isRejecting,
 }: RideRequestModalProps) => (
   <Dialog open={open}>
     <DialogContent
@@ -256,9 +260,18 @@ export const RideRequestModal = ({
       )}
 
       <DialogFooter className="flex-col gap-2 sm:flex-col">
-        <Button className="w-full" onClick={onAccept}>
-          <CheckCircle className="h-4 w-4 mr-2" />
-          Accept Ride
+        <Button className="w-full" onClick={onAccept} disabled={isAccepting}>
+          {isAccepting ? (
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <p>Please wait</p>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-4 w-4 mr-2" />
+              <p>Accept Ride</p>
+            </div>
+          )}
         </Button>
         <Button
           variant="outline"
@@ -297,6 +310,48 @@ export const RiderCancelledModal = ({
           </DialogDescription>
         </DialogHeader>
         <Button onClick={onClose}>Got it</Button>
+      </div>
+    </DialogContent>
+  </Dialog>
+);
+
+// === NO DRIVER FOUND MODAL ===
+
+interface NoDriverFoundModalProps {
+  open: boolean;
+  onRetry?: () => void;
+  onClose: () => void;
+}
+
+export const NoDriverFoundModal = ({
+  open,
+  onRetry,
+  onClose,
+}: NoDriverFoundModalProps) => (
+  <Dialog open={open} onOpenChange={onClose}>
+    <DialogContent className="sm:max-w-md">
+      <div className="flex flex-col items-center py-6 gap-4">
+        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+          <Car className="h-10 w-10 text-muted-foreground" />
+        </div>
+        <DialogHeader className="text-center">
+          <DialogTitle className="text-xl">No Drivers Available</DialogTitle>
+          <DialogDescription>
+            We couldn't find any drivers near your pickup location right now.
+            Please try again in a moment.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex flex-col gap-2 w-full">
+          {onRetry && (
+            <Button className="w-full" onClick={onRetry}>
+              <Loader2 className="h-4 w-4 mr-2" />
+              Try Again
+            </Button>
+          )}
+          <Button variant="outline" className="w-full" onClick={onClose}>
+            Cancel
+          </Button>
+        </div>
       </div>
     </DialogContent>
   </Dialog>
