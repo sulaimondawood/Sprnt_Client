@@ -93,7 +93,6 @@ const BookRidePage = () => {
       console.log("Ride status changed:", message);
       setShowNoDriverFound(true);
       toast(message);
-      // Update your local state or invalidate TanStack Query
     },
     !isDriver,
   );
@@ -107,7 +106,6 @@ const BookRidePage = () => {
       toast("Driver Confirmed!", {
         description: `${message.driverName} is on the way in ${message.vehicleName}.`,
       });
-      // Update your local state or invalidate TanStack Query
     },
     !isDriver,
   );
@@ -149,10 +147,23 @@ const BookRidePage = () => {
 
   useEffect(() => {
     if (currentRide) {
-      if (currentRide.rideStatus === "ACCEPTED") setBookingStep("arriving");
-      if (currentRide.rideStatus === "ONGOING") setBookingStep("inProgress");
+      if (bookingStep === "location") {
+        if (currentRide.rideStatus === "ACCEPTED") setBookingStep("arriving");
+        if (currentRide.rideStatus === "ONGOING") setBookingStep("inProgress");
+      }
+
+      if (currentRide.driverName) {
+        setDriverSummary({
+          driverName: currentRide?.driverName,
+          vehicleName: currentRide?.vehicleName || "Vehicle",
+          vehiclePlate: currentRide?.vehiclePlate || "N/A",
+          message: "Driver is coming!",
+          rating: currentRide?.driver?.rating,
+          totalTrips: currentRide?.driver?.totalCompletedTrips,
+        });
+      }
     }
-  }, [currentRide]);
+  }, [currentRide, bookingStep]);
 
   return (
     <div className="space-y-6 animate-fade-in">

@@ -80,7 +80,7 @@ const DashboardLayout = () => {
   }, [navigate, location, profile]);
 
   useSubscription(
-    `/user/queue/ride-request`,
+    "/user/queue/ride-request",
     (updatedRide: RideOffer) => {
       setShowRideRequest(true);
       setRideRequestData(updatedRide);
