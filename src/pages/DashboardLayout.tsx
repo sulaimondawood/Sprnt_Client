@@ -83,10 +83,19 @@ const DashboardLayout = () => {
 
   useSubscription(
     "/user/queue/ride-request",
-    (updatedRide: RideOffer) => {
+    (data: RideOffer) => {
       setShowRideRequest(true);
-      setRideRequestData(updatedRide);
-      // Update your local state or invalidate TanStack Query
+      setRideRequestData(data);
+    },
+    role === "DRIVER",
+  );
+  useSubscription(
+    "/user/queue/rider-reject",
+    (data) => {
+      setShowRideRequest(false);
+      setRideRequestData(null);
+      setShowRiderCancelled(true);
+      toast.error(data.message);
     },
     role === "DRIVER",
   );
