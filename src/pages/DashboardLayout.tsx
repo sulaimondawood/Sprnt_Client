@@ -188,6 +188,21 @@ const DashboardLayout = () => {
 
     if (role === "DRIVER" && currentRide) {
       const status = currentRide.rideStatus;
+      if (status === "REQUESTED") {
+        setShowRideRequest(true);
+        setRideRequestData({
+          driverId: currentRide?.driver?.id,
+          dropoff: currentRide?.dropoffLocation?.address,
+          estimatedFare: currentRide?.estimatedFare,
+          expiresAt: "15",
+          pickup: currentRide?.pickupLocation?.address,
+          pickupLat: currentRide?.pickupLocation?.lat,
+          pickupLng: currentRide?.pickupLocation?.lng,
+          rating: currentRide?.rider?.rating,
+          rideId: currentRide?.id,
+          riderName: currentRide?.riderName,
+        });
+      }
 
       if (status === "DRIVER_ACCEPTED" || status === "DRIVER_EN_ROUTE") {
         setShowProceedToRiderLocation(true);
@@ -214,11 +229,7 @@ const DashboardLayout = () => {
           dropoff: rideRequestData?.dropoff,
           pickup: rideRequestData?.pickup,
         }}
-        timeLeft={
-          rideRequestData?.expiresAt
-            ? format(rideRequestData?.expiresAt, "s")
-            : "-"
-        }
+        timeLeft={"15"}
         onAccept={() => acceptRideRequest(rideRequestData?.rideId)}
         onReject={() => rejectRideRequest(rideRequestData.rideId)}
         isAccepting={isPendingAcceptRideRequest}
@@ -237,7 +248,7 @@ const DashboardLayout = () => {
 
       <ProceedToRiderDriverModal
         open={showProceedToRiderLocation}
-        onArrived={() => driverArrivedAtPickup(rideRequestData?.rideId)}
+        onArrived={() => driverArrivedAtPickup(currentRide?.id)}
         isArriving={isPendingArivedAtPickup}
       />
 
