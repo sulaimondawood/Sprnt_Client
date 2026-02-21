@@ -20,6 +20,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 
 import {
+  DriverArrivedModal,
   ProceedToRiderDriverModal,
   RiderCancelledModal,
   RideRequestModal,
@@ -59,6 +60,7 @@ const DashboardLayout = () => {
   const [showRideRequest, setShowRideRequest] = useState(false);
   const [hasAccepted, setHasAccepted] = useState(false);
   const [showRiderCancelled, setShowRiderCancelled] = useState(false);
+  const [showDriverArrived, setShowDriverArrived] = useState(false);
 
   const [rideRequestData, setRideRequestData] = useState<RideOffer | null>();
 
@@ -93,9 +95,17 @@ const DashboardLayout = () => {
       setShowRideRequest(false);
       setRideRequestData(null);
       setShowRiderCancelled(true);
-      toast.error(data.message);
+      toast(data.message);
     },
     role === "DRIVER",
+  );
+  useSubscription(
+    "/user/queue/update",
+    (data) => {
+      toast(data.message);
+      setShowDriverArrived(true);
+    },
+    role === "RIDER",
   );
 
   const { data: currentRide } = useQuery<Ride>({
@@ -250,6 +260,12 @@ const DashboardLayout = () => {
         open={showProceedToRiderLocation}
         onArrived={() => driverArrivedAtPickup(currentRide?.id)}
         isArriving={isPendingArivedAtPickup}
+      />
+
+      <DriverArrivedModal
+        open={showDriverArrived}
+        onClose={() => setShowDriverArrived(false)}
+        driverName={currentRide?.driverName}
       />
 
       {/* Onboarding Modal */}

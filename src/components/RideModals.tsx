@@ -424,3 +424,33 @@ export const ProceedToRiderDriverModal = ({
     </DialogContent>
   </Dialog>
 );
+
+export const DriverArrivedModal = ({
+  open,
+  onClose,
+  driverName,
+  carDetails,
+}: {
+  open: boolean;
+  onClose: () => void;
+  driverName?: string;
+  carDetails?: string;
+}) => (
+  <Dialog open={open} onOpenChange={onClose}>
+    <DialogContent className="sm:max-w-md text-center">
+      <div className="flex flex-col items-center py-6 gap-4">
+        <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center animate-bounce">
+          <Car className="h-10 w-10 text-success" />
+        </div>
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold text-success">
+            Driver is Here!
+          </DialogTitle>
+          <DialogDescription className="text-base">
+            {driverName || "Your driver"} has arrived in a
+          </DialogDescription>
+        </DialogHeader>
+      </div>
+    </DialogContent>
+  </Dialog>
+);
