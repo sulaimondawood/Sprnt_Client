@@ -6,12 +6,6 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ROUTES } from "@/constants/routes";
-import {
-  mockDriverStats,
-  mockDriverWallet,
-  mockRiderStats,
-  mockRiderWallet,
-} from "@/data/mockData";
 import { formatCurrency, profile } from "@/helpers";
 import { DriverAPI } from "@/services/api/driver";
 import { RiderAPI } from "@/services/api/rider";
@@ -30,7 +24,7 @@ import {
   TrendingUp,
   Wallet,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const DashboardHome = () => {
   const profileData = profile();
@@ -38,18 +32,6 @@ const DashboardHome = () => {
   const role = profileData?.role;
   const isDriver = profileData?.role === "DRIVER";
   const isRider = profileData?.role === "RIDER";
-  const navigate = useNavigate();
-
-  const stats = isDriver ? mockDriverStats : mockRiderStats;
-  const wallet = isDriver ? mockDriverWallet : mockRiderWallet;
-
-  //Driver API*********************
-  const { data: currentRide, isSuccess: isSuccessLoadingCurrentRide } =
-    useQuery<Ride>({
-      queryKey: ["rides", "current"],
-      queryFn: DriverAPI.currentRide,
-      enabled: isDriver,
-    });
 
   const {
     data: recentRides,
@@ -57,31 +39,14 @@ const DashboardHome = () => {
     isSuccess: isSuccessLoadingRecentRides,
   } = useQuery<Ride[]>({
     queryKey: ["rides", "recent"],
-    queryFn: DriverAPI.recentRides,
-    enabled: isDriver,
-  });
-  //Driver API*********************
-
-  // RIDER API****************
-  const {
-    data: recentRiderRides,
-    isLoading: isLoadingRecentRiderRides,
-    isSuccess: isSuccessLoadingRecentRiderRides,
-  } = useQuery<Ride[]>({
-    queryKey: ["rides", "rider", "recent"],
-    queryFn: RiderAPI.recentRides,
-    enabled: isRider,
+    queryFn: isDriver ? DriverAPI.recentRides : RiderAPI.recentRides,
   });
 
-  const {
-    data: riderCurrentRide,
-    isSuccess: isSuccessLoadingRiderCurrentRide,
-  } = useQuery<Ride>({
-    queryKey: ["rides", "current", "rider"],
-    queryFn: RiderAPI.currentRide,
-    enabled: isRider,
-  });
-  // RIDER API****************
+  const { data: currentRide, isSuccess: isSuccessLoadingCurrentRide } =
+    useQuery<Ride>({
+      queryKey: ["rides", "current"],
+      queryFn: isRider ? RiderAPI.currentRide : DriverAPI.currentRide,
+    });
 
   const {
     data: userProfile,
@@ -134,33 +99,6 @@ const DashboardHome = () => {
                 <p className="text-xl font-bold">{currentRide?.riderName}</p>
                 <p className="text-sm opacity-80">
                   {currentRide?.dropoffLocation?.address}
-                </p>
-              </div>
-            </div>
-            <Link to={ROUTES.dashboardCurrentRide}>
-              <Button variant="secondary" className="gap-2">
-                View Trip
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-        </Card>
-      )}
-      {/* Active Trip Banner (Rider) */}
-      {isSuccessLoadingRiderCurrentRide && riderCurrentRide && (
-        <Card className="p-6 gradient-driver text-driver-foreground">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-                <Navigation className="h-6 w-6" />
-              </div>
-              <div>
-                <p className="text-sm opacity-80">Active Trip</p>
-                <p className="text-xl font-bold">
-                  {riderCurrentRide?.driverName}
-                </p>
-                <p className="text-sm opacity-80">
-                  {riderCurrentRide?.dropoffLocation?.address}
                 </p>
               </div>
             </div>
@@ -234,7 +172,6 @@ const DashboardHome = () => {
 
       {/* Recent Trips & Quick Actions */}
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* {DRIVER}*********/}
         {/* Recent Trips */}
         <>
           {isLoadingRecentRides && <RecentTripsSkeleton />}
@@ -309,86 +246,6 @@ const DashboardHome = () => {
             />
           )}
         </>
-        {/* {DRIVER}*********/}
-
-        {/* {RIDER**********************} */}
-        <>
-          {isLoadingRecentRiderRides && <RecentTripsSkeleton />}
-          {isSuccessLoadingRecentRiderRides && recentRiderRides.length > 0 && (
-            <Card className="lg:col-span-2 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold">Recent Trips</h2>
-                <Link to={ROUTES.dashboardRides}>
-                  <Button variant="ghost" size="sm" className="gap-1">
-                    View All
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </Link>
-              </div>
-
-              <div className="space-y-4">
-                {recentRiderRides.map((trip) => (
-                  <div
-                    key={trip.id}
-                    className="flex items-center gap-4 p-4 bg-muted/50 rounded-xl hover:bg-muted transition-colors"
-                  >
-                    <div
-                      className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                        trip.rideStatus === "COMPLETED"
-                          ? "bg-success/10 text-success"
-                          : trip.rideStatus === "RIDER_CANCELLED" ||
-                              trip.rideStatus === "DRIVER_CANCELLED"
-                            ? "bg-destructive/10 text-destructive"
-                            : "bg-info/10 text-info"
-                      }`}
-                    >
-                      <Car className="h-5 w-5" />
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="font-medium truncate">
-                          {role === "DRIVER"
-                            ? trip.riderName
-                            : trip.dropoffLocation.address}
-                        </p>
-                        <StatusBadge status={trip.rideStatus} type="trip" />
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {trip.createdAt &&
-                          format(
-                            new Date(trip.createdAt),
-                            "MMM d, yyyy • h:mm a",
-                          )}
-                      </p>
-                    </div>
-
-                    <div className="text-right">
-                      <p className="font-semibold">
-                        {formatCurrency(trip.estimatedFare)}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {trip.estimatedDistance} km
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          )}
-          {isSuccessLoadingRecentRiderRides &&
-            recentRiderRides.length === 0 && (
-              <EmptyState
-                className="col-span-2"
-                title="No trips yet"
-                description="Trips you complete or cancelled will show up here."
-                icon={<Car className="h-6 w-6 text-muted-foreground" />}
-                actionLabel="Book a ride"
-                onAction={() => navigate(ROUTES.dashboardBookRide)}
-              />
-            )}
-        </>
-        {/* {RIDER**********************} */}
 
         {/* Quick Actions / Summary */}
         <Card className="p-6">

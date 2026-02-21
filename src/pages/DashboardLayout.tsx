@@ -100,7 +100,7 @@ const DashboardLayout = () => {
     role === "DRIVER",
   );
   useSubscription(
-    "/user/queue/update",
+    "/user/queue/ride/update",
     (data) => {
       toast(data.message);
       setShowDriverArrived(true);
@@ -166,6 +166,7 @@ const DashboardLayout = () => {
           queryKey: ["rides", "current"],
         });
         setShowRideRequest(false);
+        setShowDriverArrived(false);
       },
     });
   const { mutate: proceedToLocation, isPending: isPendingProceedToPickup } =

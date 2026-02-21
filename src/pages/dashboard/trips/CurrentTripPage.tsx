@@ -4,12 +4,12 @@ import {
   TripMapSkeleton,
 } from "@/components/dashboard/trips/skeleton/TripSkeleton";
 import Map from "@/components/Map";
-import { RoleBadge } from "@/components/RoleBadge";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { profile } from "@/helpers";
 import { DriverAPI } from "@/services/api/driver";
+import { RiderAPI } from "@/services/api/rider";
 import { Ride } from "@/types/rides/indes";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -23,14 +23,9 @@ import {
   Route,
   User,
 } from "lucide-react";
-import { useState } from "react";
 import { toast } from "sonner";
 
 const CurrentTripPage = () => {
-  const [driverCoords, setDriverCoords] = useState<[number, number]>([
-    3.3792, 6.5244,
-  ]);
-
   const handleReportIssue = () => {
     toast("Report Submitted", {
       description: "Our support team will review your report.",
@@ -47,17 +42,14 @@ const CurrentTripPage = () => {
     isError,
   } = useQuery<Ride>({
     queryKey: ["rides", "current"],
-    queryFn: DriverAPI.currentRide,
+    queryFn: role === "DRIVER" ? DriverAPI.currentRide : RiderAPI.currentRide,
   });
 
   if (isError) {
     return (
       <div className="space-y-6 animate-fade-in">
         <div>
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-3xl font-bold">Current Trip</h1>
-            <RoleBadge role={role} />
-          </div>
+          <h1 className="text-3xl font-bold mb-2">Current Trip</h1>
         </div>
         <Map className="h-[400px]" />
         <Card className="p-12 text-center">
@@ -104,7 +96,7 @@ const CurrentTripPage = () => {
                 currentRide?.dropoffLocation?.lng,
                 currentRide?.dropoffLocation?.lat,
               ]}
-              driverCoords={driverCoords}
+              // driverCoords={driverCoords}
               showRoute={true}
               className="h-[400px]"
             />
@@ -258,15 +250,16 @@ const CurrentTripPage = () => {
             )}
 
             {(currentRide?.rideStatus === "ON_TRIP" ||
-              currentRide?.rideStatus === "DRIVER_ARRIVED") && (
-              <Button
-                className="w-full gap-2 gradient-driver text-driver-foreground"
-                // onClick={handleCompleteTrip}
-              >
-                <CheckCircle className="h-4 w-4" />
-                Complete Trip
-              </Button>
-            )}
+              currentRide?.rideStatus === "DRIVER_ARRIVED") &&
+              role === "DRIVER" && (
+                <Button
+                  className="w-full gap-2 gradient-driver text-driver-foreground"
+                  // onClick={handleCompleteTrip}
+                >
+                  <CheckCircle className="h-4 w-4" />
+                  Complete Trip
+                </Button>
+              )}
 
             {currentRide?.rideStatus === "COMPLETED" && (
               <Card className="p-6 bg-success/10 border-success/20">
