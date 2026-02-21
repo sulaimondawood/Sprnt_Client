@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import {
   RiderCardSkeleton,
@@ -11,12 +12,13 @@ import { profile } from "@/helpers";
 import { DriverAPI } from "@/services/api/driver";
 import { RiderAPI } from "@/services/api/rider";
 import { Ride } from "@/types/rides/indes";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   AlertTriangle,
   CheckCircle,
   Clock,
   DollarSign,
+  Loader2,
   MessageSquare,
   Navigation,
   Phone,
@@ -34,6 +36,7 @@ const CurrentTripPage = () => {
 
   const profileData = profile();
   const role = profileData.role;
+  const queryClient = useQueryClient();
 
   const {
     data: currentRide,
@@ -44,6 +47,23 @@ const CurrentTripPage = () => {
     queryKey: ["rides", "current"],
     queryFn: role === "DRIVER" ? DriverAPI.currentRide : RiderAPI.currentRide,
   });
+
+  const { mutate: completeRide, isPending: isPendingCompleteRide } =
+    useMutation({
+      mutationFn: (payload: string) => DriverAPI.arrivedAtDestination(payload),
+      onError(error: any) {
+        toast.error(
+          error?.response?.data?.message ||
+            "Something went wrong! Try again later.",
+        );
+      },
+      onSuccess() {
+        toast("You've arrived");
+        queryClient.invalidateQueries({
+          queryKey: ["rides", "current"],
+        });
+      },
+    });
 
   if (isError) {
     return (
@@ -254,10 +274,17 @@ const CurrentTripPage = () => {
               role === "DRIVER" && (
                 <Button
                   className="w-full gap-2 gradient-driver text-driver-foreground"
-                  // onClick={handleCompleteTrip}
+                  onClick={() => completeRide(currentRide?.id)}
+                  disabled={!currentRide?.id || isPendingCompleteRide}
                 >
-                  <CheckCircle className="h-4 w-4" />
-                  Complete Trip
+                  {isPendingCompleteRide ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4" />
+                      <p>Complete Trip</p>
+                    </div>
+                  )}
                 </Button>
               )}
 
