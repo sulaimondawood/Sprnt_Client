@@ -17,6 +17,7 @@ import {
   MapPin,
   Phone,
   Star,
+  Navigation,
 } from "lucide-react";
 
 // === RIDER-SIDE MODALS ===
@@ -174,6 +175,10 @@ interface RideRequestModalProps {
   timeLeft?: string;
   isAccepting: boolean;
   isRejecting: boolean;
+  isProceeding: boolean;
+  hasProceeded: boolean;
+  hasAccepted: boolean;
+  onProceed: () => void;
 }
 
 export const RideRequestModal = ({
@@ -184,6 +189,10 @@ export const RideRequestModal = ({
   timeLeft,
   isAccepting,
   isRejecting,
+  isProceeding,
+  hasAccepted,
+  onProceed,
+  hasProceeded,
 }: RideRequestModalProps) => (
   <Dialog open={open}>
     <DialogContent
@@ -241,38 +250,55 @@ export const RideRequestModal = ({
         </div>
       )}
 
-      <DialogFooter className="flex-col gap-2 sm:flex-col">
-        <Button className="w-full" onClick={onAccept} disabled={isAccepting}>
-          {isAccepting ? (
-            <div className="flex items-center gap-2">
+      <DialogFooter className="flex flex-col gap-2 mt-4">
+        {!hasAccepted ? (
+          <>
+            <Button
+              className="w-full"
+              onClick={onAccept}
+              disabled={isAccepting}
+            >
+              {isAccepting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  <p>Accept Ride</p>
+                </div>
+              )}
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full text-destructive"
+              disabled={isRejecting}
+              onClick={onReject}
+            >
+              {isRejecting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <div className="flex items-center gap-2">
+                  <XCircle className="h-4 w-4 mr-2" />
+                  <p>Decline</p>
+                </div>
+              )}
+            </Button>
+          </>
+        ) : (
+          <Button
+            className="w-full gradient-success"
+            onClick={onProceed}
+            disabled={isProceeding || hasProceeded}
+          >
+            {isProceeding ? (
               <Loader2 className="h-4 w-4 animate-spin" />
-              <p>Please wait</p>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 mr-2" />
-              <p>Accept Ride</p>
-            </div>
-          )}
-        </Button>
-        <Button
-          variant="outline"
-          className="w-full text-destructive"
-          disabled={isRejecting}
-          onClick={onReject}
-        >
-          {isRejecting ? (
-            <div className="flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <p>Please wait</p>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <XCircle className="h-4 w-4 mr-2" />
-              <p>Decline</p>
-            </div>
-          )}
-        </Button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Navigation className="h-4 w-4 mr-2" />
+                <p>Proceed to Location</p>
+              </div>
+            )}
+          </Button>
+        )}
       </DialogFooter>
     </DialogContent>
   </Dialog>
@@ -352,8 +378,10 @@ export const NoDriverFoundModal = ({
 export const ProceedToRiderDriverModal = ({
   open,
   onArrived,
+  isArriving,
 }: {
   open: boolean;
+  isArriving: boolean;
   onArrived: () => void;
 }) => (
   <Dialog open={open}>
@@ -378,8 +406,19 @@ export const ProceedToRiderDriverModal = ({
           </DialogDescription>
         </DialogHeader>
 
-        <Button className="w-full mt-4 gradient-driver" onClick={onArrived}>
-          <CheckCircle className="h-4 w-4 mr-2" />I Have Arrived
+        <Button
+          className="w-full mt-4 gradient-driver"
+          onClick={onArrived}
+          disabled={isArriving}
+        >
+          {isArriving ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-4 w-4" />
+              <p>I Have Arrived</p>
+            </div>
+          )}
         </Button>
       </div>
     </DialogContent>

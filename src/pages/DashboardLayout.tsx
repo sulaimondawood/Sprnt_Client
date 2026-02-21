@@ -30,7 +30,7 @@ import { logout } from "@/helpers";
 import { useSubscription } from "@/hooks/useStompSubscription";
 import { DriverAPI } from "@/services/api/driver";
 import { RideOffer } from "@/types/riders";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 import { toast } from "sonner";
@@ -49,12 +49,15 @@ const handleLogout = () => {
 const DashboardLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showProceedToRiderLocation, setShowProceedToRiderLocation] =
     useState(false);
 
   const [showRideRequest, setShowRideRequest] = useState(false);
+  const [hasAccepted, setHasAccepted] = useState(false);
   const [showRiderCancelled, setShowRiderCancelled] = useState(false);
 
   const [rideRequestData, setRideRequestData] = useState<RideOffer | null>();
@@ -95,12 +98,7 @@ const DashboardLayout = () => {
     role === "DRIVER",
   );
 
-  const {
-    data: currentRide,
-    isLoading: isLoadingCurrentRide,
-    isSuccess: isSuccessLoadingCurrentRide,
-    isError,
-  } = useQuery<Ride>({
+  const { data: currentRide } = useQuery<Ride>({
     queryKey: ["rides", "current"],
     queryFn: DriverAPI.currentRide,
   });
@@ -115,7 +113,10 @@ const DashboardLayout = () => {
       },
       onSuccess() {
         setShowProceedToRiderLocation(true);
-        setShowRideRequest(false);
+        setHasAccepted(true);
+        queryClient.invalidateQueries({
+          queryKey: ["rides", "current"],
+        });
         toast("Ride Accepted", {
           description: "You accepted the ride request.",
         });
@@ -134,8 +135,44 @@ const DashboardLayout = () => {
         toast("Ride Declined", {
           description: "You declined the ride request.",
         });
-        // setDriverResponseType("rejected");
+        queryClient.invalidateQueries({
+          queryKey: ["rides", "current"],
+        });
         setShowRideRequest(false);
+      },
+    });
+  const { mutate: driverArrivedAtPickup, isPending: isPendingArivedAtPickup } =
+    useMutation({
+      mutationFn: (payload: string) => DriverAPI.arrivedAtPickup(payload),
+      onError(error: any) {
+        toast.error(
+          error?.response?.data?.message ||
+            "Something went wrong! Try again later.",
+        );
+      },
+      onSuccess() {
+        toast("You've arrived");
+        queryClient.invalidateQueries({
+          queryKey: ["rides", "current"],
+        });
+        setShowRideRequest(false);
+      },
+    });
+  const { mutate: proceedToLocation, isPending: isPendingProceedToPickup } =
+    useMutation({
+      mutationFn: (payload: string) =>
+        DriverAPI.proceedToPickupLocation(payload),
+      onError(error: any) {
+        toast.error(
+          error?.response?.data?.message ||
+            "Something went wrong! Try again later.",
+        );
+      },
+      onSuccess() {
+        toast("Safe travels! Navigating to rider...");
+        queryClient.invalidateQueries({
+          queryKey: ["rides", "current"],
+        });
       },
     });
 
@@ -149,10 +186,18 @@ const DashboardLayout = () => {
       setShowOnboarding(true);
     }
 
-    if (currentRide?.rideStatus === "DRIVER_ACCEPTED" && role === "DRIVER") {
-      setShowProceedToRiderLocation(true);
+    if (role === "DRIVER" && currentRide) {
+      const status = currentRide.rideStatus;
+
+      if (status === "DRIVER_ACCEPTED" || status === "DRIVER_EN_ROUTE") {
+        setShowProceedToRiderLocation(true);
+
+        if (status === "DRIVER_EN_ROUTE") {
+          setHasAccepted(true);
+        }
+      }
     }
-  }, [navigate, profile]);
+  }, [navigate, profile, currentRide, role]);
 
   if (!profile) {
     return null;
@@ -171,13 +216,17 @@ const DashboardLayout = () => {
         }}
         timeLeft={
           rideRequestData?.expiresAt
-            ? format(rideRequestData.expiresAt, "s")
+            ? format(rideRequestData?.expiresAt, "s")
             : "-"
         }
         onAccept={() => acceptRideRequest(rideRequestData?.rideId)}
         onReject={() => rejectRideRequest(rideRequestData.rideId)}
         isAccepting={isPendingAcceptRideRequest}
         isRejecting={isPendingRejectRideRequest}
+        hasAccepted={hasAccepted}
+        onProceed={() => proceedToLocation(rideRequestData?.rideId)}
+        isProceeding={isPendingProceedToPickup}
+        hasProceeded={currentRide?.rideStatus === "DRIVER_EN_ROUTE"}
       />
 
       <RiderCancelledModal
@@ -188,7 +237,8 @@ const DashboardLayout = () => {
 
       <ProceedToRiderDriverModal
         open={showProceedToRiderLocation}
-        onArrived={() => setShowProceedToRiderLocation(false)}
+        onArrived={() => driverArrivedAtPickup(rideRequestData?.rideId)}
+        isArriving={isPendingArivedAtPickup}
       />
 
       {/* Onboarding Modal */}

@@ -110,4 +110,19 @@ export const DriverAPI = {
     const res = await api.patch(`/driver/ride/${rideId}/reject`);
     return res.data.message;
   },
+
+  async arrivedAtPickup(rideId: string) {
+    const res = await api.patch(`/driver/ride/${rideId}/arrived`);
+    return res.data.message;
+  },
+
+  async arrivedAtDestination(rideId: string) {
+    const res = await api.patch(`/driver/ride/${rideId}/completed`);
+    return res.data.message;
+  },
+
+  async proceedToPickupLocation(rideId: string) {
+    const res = await api.patch(`/driver/ride/${rideId}/enroute`);
+    return res.data.message;
+  },
 };
