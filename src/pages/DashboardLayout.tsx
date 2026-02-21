@@ -19,17 +19,22 @@ import { Bell, LogOut, Menu, Settings, User, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 
-import { RiderCancelledModal, RideRequestModal } from "@/components/RideModals";
+import {
+  ProceedToRiderDriverModal,
+  RiderCancelledModal,
+  RideRequestModal,
+} from "@/components/RideModals";
 import { driverNavItems, riderNavItems, ROUTES } from "@/constants/routes";
 import { useDriver } from "@/contexts/DriverContext";
 import { logout } from "@/helpers";
 import { useSubscription } from "@/hooks/useStompSubscription";
 import { DriverAPI } from "@/services/api/driver";
 import { RideOffer } from "@/types/riders";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 import { toast } from "sonner";
+import { Ride } from "@/types/rides/indes";
 
 export interface CustomJwtPayload extends JwtPayload {
   role?: string;
@@ -46,6 +51,8 @@ const DashboardLayout = () => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showProceedToRiderLocation, setShowProceedToRiderLocation] =
+    useState(false);
 
   const [showRideRequest, setShowRideRequest] = useState(false);
   const [showRiderCancelled, setShowRiderCancelled] = useState(false);
@@ -69,18 +76,6 @@ const DashboardLayout = () => {
 
   const navItems = role === "RIDER" ? riderNavItems : driverNavItems;
 
-  useEffect(() => {
-    if (!profile) {
-      navigate(ROUTES.login);
-    }
-  }, [navigate, profile]);
-
-  useEffect(() => {
-    if (profile?.completedProfile === "false") {
-      setShowOnboarding(true);
-    }
-  }, [navigate, location, profile]);
-
   useSubscription(
     "/user/queue/ride-request",
     (data: RideOffer) => {
@@ -100,6 +95,16 @@ const DashboardLayout = () => {
     role === "DRIVER",
   );
 
+  const {
+    data: currentRide,
+    isLoading: isLoadingCurrentRide,
+    isSuccess: isSuccessLoadingCurrentRide,
+    isError,
+  } = useQuery<Ride>({
+    queryKey: ["rides", "current"],
+    queryFn: DriverAPI.currentRide,
+  });
+
   const { mutate: acceptRideRequest, isPending: isPendingAcceptRideRequest } =
     useMutation({
       mutationFn: (payload: string) => DriverAPI.acceptRide(payload),
@@ -109,7 +114,7 @@ const DashboardLayout = () => {
         );
       },
       onSuccess() {
-        // setDriverResponseType("accepted");
+        setShowProceedToRiderLocation(true);
         setShowRideRequest(false);
         toast("Ride Accepted", {
           description: "You accepted the ride request.",
@@ -133,6 +138,21 @@ const DashboardLayout = () => {
         setShowRideRequest(false);
       },
     });
+
+  useEffect(() => {
+    if (!profile) {
+      navigate(ROUTES.login);
+      return;
+    }
+
+    if (profile.completedProfile === "false") {
+      setShowOnboarding(true);
+    }
+
+    if (currentRide?.rideStatus === "DRIVER_ACCEPTED" && role === "DRIVER") {
+      setShowProceedToRiderLocation(true);
+    }
+  }, [navigate, profile]);
 
   if (!profile) {
     return null;
@@ -164,6 +184,11 @@ const DashboardLayout = () => {
         open={showRiderCancelled}
         riderName=""
         onClose={() => setShowRiderCancelled(false)}
+      />
+
+      <ProceedToRiderDriverModal
+        open={showProceedToRiderLocation}
+        onArrived={() => setShowProceedToRiderLocation(false)}
       />
 
       {/* Onboarding Modal */}

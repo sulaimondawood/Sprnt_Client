@@ -348,3 +348,40 @@ export const NoDriverFoundModal = ({
     </DialogContent>
   </Dialog>
 );
+
+export const ProceedToRiderDriverModal = ({
+  open,
+  onArrived,
+}: {
+  open: boolean;
+  onArrived: () => void;
+}) => (
+  <Dialog open={open}>
+    <DialogContent
+      className="sm:max-w-md"
+      onPointerDownOutside={(e) => e.preventDefault()}
+      hideClose
+    >
+      <div className="flex flex-col items-center py-6 gap-4">
+        <div className="relative">
+          <div className="w-20 h-20 rounded-full bg-primary/10 animate-pulse flex items-center justify-center">
+            <MapPin className="h-10 w-10 text-primary" />
+          </div>
+        </div>
+        <DialogHeader className="text-center">
+          <DialogTitle className="text-xl">
+            Proceed to Rider's location
+          </DialogTitle>
+          <DialogDescription>
+            Navigate to the pickup point. Once you arrive, click the button
+            below to notify the rider.
+          </DialogDescription>
+        </DialogHeader>
+
+        <Button className="w-full mt-4 gradient-driver" onClick={onArrived}>
+          <CheckCircle className="h-4 w-4 mr-2" />I Have Arrived
+        </Button>
+      </div>
+    </DialogContent>
+  </Dialog>
+);
