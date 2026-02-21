@@ -19,6 +19,8 @@ import {
   Star,
   Navigation,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import confetti from "canvas-confetti";
 
 // === RIDER-SIDE MODALS ===
 
@@ -454,3 +456,206 @@ export const DriverArrivedModal = ({
     </DialogContent>
   </Dialog>
 );
+
+interface RideCompletedModalProps {
+  open: boolean;
+  trip?: {
+    driverName: string;
+    pickup: string;
+    dropoff: string;
+    distance: number;
+    duration: number;
+    fare: number;
+  };
+  onRateDriver: () => void;
+  onClose: () => void;
+}
+
+export const RideCompletedModal = ({
+  open,
+  trip,
+  onRateDriver,
+  onClose,
+}: RideCompletedModalProps) => {
+  useEffect(() => {
+    if (open) {
+      const duration = 2000;
+      const end = Date.now() + duration;
+      const frame = () => {
+        confetti({
+          particleCount: 3,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0, y: 0.6 },
+          colors: ["#22c55e", "#3b82f6", "#f59e0b", "#ec4899"],
+        });
+        confetti({
+          particleCount: 3,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1, y: 0.6 },
+          colors: ["#22c55e", "#3b82f6", "#f59e0b", "#ec4899"],
+        });
+        if (Date.now() < end) requestAnimationFrame(frame);
+      };
+      frame();
+    }
+  }, [open]);
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-sm">
+        <div className="flex flex-col items-center py-6 gap-4">
+          {/* Animated check icon */}
+          <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center animate-scale-in">
+            <CheckCircle className="h-10 w-10 text-success" />
+          </div>
+
+          <DialogHeader className="text-center">
+            <DialogTitle className="text-2xl font-bold">
+              Ride Complete! 🎉
+            </DialogTitle>
+            <DialogDescription className="text-base">
+              You've arrived safely at your destination.
+            </DialogDescription>
+          </DialogHeader>
+
+          {trip && (
+            <div className="w-full space-y-3 mt-2">
+              {/* Fare highlight */}
+              <div className="text-center py-4 bg-primary/5 rounded-xl">
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                  Total Fare
+                </p>
+                <p className="text-3xl font-bold text-primary mt-1">
+                  ₦{trip.fare}
+                </p>
+              </div>
+
+              {/* Compact stats */}
+              <div className="flex justify-center gap-6 text-center text-sm">
+                <div>
+                  <p className="font-semibold">{trip.distance}km</p>
+                  <p className="text-xs text-muted-foreground">Distance</p>
+                </div>
+                <div className="w-px bg-border" />
+                <div>
+                  <p className="font-semibold">{trip.duration}</p>
+                  <p className="text-xs text-muted-foreground">Duration</p>
+                </div>
+                <div className="w-px bg-border" />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <DialogFooter className="flex-col gap-2 sm:flex-col">
+          <Button className="w-full" onClick={onRateDriver}>
+            <Star className="h-4 w-4 mr-2" />
+            Rate Your Driver
+          </Button>
+          <Button variant="ghost" className="w-full" onClick={onClose}>
+            Done
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+interface RateModalProps {
+  open: boolean;
+  driverOrRiderName?: string;
+  onSubmit: (rating: number, feedback: string) => void;
+  onClose: () => void;
+}
+
+export const RateModal = ({
+  open,
+  driverOrRiderName,
+  onSubmit,
+  onClose,
+}: RateModalProps) => {
+  const [rating, setRating] = useState(0);
+  const [hoveredStar, setHoveredStar] = useState(0);
+  const [feedback, setFeedback] = useState("");
+
+  const ratingLabels = ["", "Poor", "Fair", "Good", "Great", "Excellent"];
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <div className="flex flex-col items-center pt-4 pb-2 gap-3">
+          <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center">
+            <User className="h-8 w-8 text-accent-foreground" />
+          </div>
+          <DialogHeader className="text-center">
+            <DialogTitle className="text-xl">
+              Rate {driverOrRiderName}
+            </DialogTitle>
+            <DialogDescription>How was your experience?</DialogDescription>
+          </DialogHeader>
+        </div>
+
+        <div className="space-y-5">
+          {/* Star Rating */}
+          <div className="text-center space-y-2">
+            <div className="flex justify-center gap-3">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  className="transition-transform hover:scale-125 focus:outline-none"
+                  onMouseEnter={() => setHoveredStar(star)}
+                  onMouseLeave={() => setHoveredStar(0)}
+                  onClick={() => setRating(star)}
+                >
+                  <Star
+                    className={`h-10 w-10 transition-colors ${
+                      star <= (hoveredStar || rating)
+                        ? "text-warning fill-warning"
+                        : "text-muted-foreground/20"
+                    }`}
+                  />
+                </button>
+              ))}
+            </div>
+            {(hoveredStar || rating) > 0 && (
+              <p className="text-sm font-medium text-muted-foreground">
+                {ratingLabels[hoveredStar || rating]}
+              </p>
+            )}
+          </div>
+
+          {/* Feedback & Tip */}
+          {rating > 0 && (
+            <>
+              <textarea
+                className="w-full p-3 text-sm rounded-lg border border-input bg-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+                rows={3}
+                maxLength={500}
+                placeholder="Tell us about your ride experience (optional)"
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+              />
+            </>
+          )}
+        </div>
+
+        <DialogFooter className="flex-col gap-2 sm:flex-col">
+          <Button
+            className="w-full"
+            disabled={rating === 0}
+            onClick={() => onSubmit(rating, feedback.trim())}
+          >
+            <CheckCircle className="h-4 w-4 mr-2" />
+            Submit
+          </Button>
+          <Button variant="outline" className="w-full" onClick={onClose}>
+            Skip
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};

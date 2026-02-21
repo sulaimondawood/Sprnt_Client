@@ -103,7 +103,9 @@ const DashboardLayout = () => {
     "/user/queue/ride/update",
     (data) => {
       toast(data.message);
-      setShowDriverArrived(true);
+      if (data?.status === "DRIVER_ARRIVED") {
+        setShowDriverArrived(true);
+      }
     },
     role === "RIDER",
   );

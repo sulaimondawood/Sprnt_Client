@@ -7,6 +7,8 @@ import Map from "@/components/Map";
 import {
   DriverResponseModal,
   NoDriverFoundModal,
+  RateModal,
+  RideCompletedModal,
   RiderCancelledModal,
   SearchingDriverModal,
 } from "@/components/RideModals";
@@ -59,6 +61,8 @@ const BookRidePage = () => {
     "accepted" | "cancelled" | null
   >(null);
   const [showNoDriverFound, setShowNoDriverFound] = useState(false);
+  const [showRideCompleted, setShowRideCompleted] = useState(false);
+  const [showRateModal, setShowRateModal] = useState(false);
 
   const [driverSummary, setDriverSummary] = useState<DriverSummary>();
   const [bookingStep, setBookingStep] = useState<BookingStep>("location");
@@ -108,6 +112,31 @@ const BookRidePage = () => {
       toast("Driver Confirmed!", {
         description: `${message.driverName} is on the way in ${message.vehicleName}.`,
       });
+    },
+    !isDriver,
+  );
+
+  useSubscription(
+    "/user/queue/ride-accepted",
+    (message: DriverSummary) => {
+      console.log("Ride status changed:", message);
+      setShowSearchingModal(false);
+      setDriverResponseType("accepted");
+      setDriverSummary(message);
+      toast("Driver Confirmed!", {
+        description: `${message.driverName} is on the way in ${message.vehicleName}.`,
+      });
+    },
+    !isDriver,
+  );
+
+  useSubscription(
+    "/user/queue/ride/update",
+    (data) => {
+      toast(data.message);
+      if (data?.status === "COMPLETED") {
+        setShowRideCompleted(true);
+      }
     },
     !isDriver,
   );
@@ -496,6 +525,42 @@ const BookRidePage = () => {
         open={showNoDriverFound}
         onClose={() => {
           setShowNoDriverFound(false);
+          setBookingStep("location");
+        }}
+      />
+
+      <RideCompletedModal
+        open={showRideCompleted}
+        trip={{
+          driverName: currentRide?.driverName,
+          pickup: currentRide?.pickupLocation?.address,
+          dropoff: currentRide?.dropoffLocation?.address,
+          distance: currentRide?.estimatedDistance,
+          duration: currentRide?.estimatedDurationMins,
+          fare: currentRide?.estimatedFare,
+        }}
+        onRateDriver={() => {
+          setShowRideCompleted(false);
+          setShowRateModal(true);
+        }}
+        onClose={() => {
+          setShowRideCompleted(false);
+          setBookingStep("location");
+        }}
+      />
+
+      <RateModal
+        open={showRateModal}
+        driverOrRiderName={currentRide?.driverName}
+        onSubmit={(rating, feedback) => {
+          setShowRateModal(false);
+          setBookingStep("location");
+          toast("Thanks for your feedback!", {
+            description: `You rated ${rating} star${rating > 1 ? "s" : ""}`,
+          });
+        }}
+        onClose={() => {
+          setShowRateModal(false);
           setBookingStep("location");
         }}
       />
