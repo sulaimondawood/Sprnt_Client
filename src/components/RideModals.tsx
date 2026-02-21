@@ -139,24 +139,6 @@ export const DriverResponseModal = ({
         </>
       )}
 
-      {type === "rejected" && (
-        <div className="flex flex-col items-center py-6 gap-4">
-          <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center">
-            <XCircle className="h-10 w-10 text-destructive" />
-          </div>
-          <DialogHeader className="text-center">
-            <DialogTitle className="text-xl">Driver Declined</DialogTitle>
-            <DialogDescription>
-              The driver was unable to accept your request. We're searching for
-              another driver...
-            </DialogDescription>
-          </DialogHeader>
-          <Button onClick={onClose} className="mt-2">
-            Search Again
-          </Button>
-        </div>
-      )}
-
       {type === "cancelled" && (
         <div className="flex flex-col items-center py-6 gap-4">
           <div className="w-16 h-16 rounded-full bg-warning/10 flex items-center justify-center">

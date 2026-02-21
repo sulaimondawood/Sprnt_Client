@@ -19,7 +19,7 @@ import { Bell, LogOut, Menu, Settings, User, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 
-import { RideRequestModal } from "@/components/RideModals";
+import { RiderCancelledModal, RideRequestModal } from "@/components/RideModals";
 import { driverNavItems, riderNavItems, ROUTES } from "@/constants/routes";
 import { useDriver } from "@/contexts/DriverContext";
 import { logout } from "@/helpers";
@@ -48,6 +48,8 @@ const DashboardLayout = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   const [showRideRequest, setShowRideRequest] = useState(false);
+  const [showRiderCancelled, setShowRiderCancelled] = useState(false);
+
   const [rideRequestData, setRideRequestData] = useState<RideOffer | null>();
 
   const { isOnline, toggleAvailabilityStatus, isPendingAvailabiltyStatus } =
@@ -147,6 +149,12 @@ const DashboardLayout = () => {
         onReject={() => rejectRideRequest(rideRequestData.rideId)}
         isAccepting={isPendingAcceptRideRequest}
         isRejecting={isPendingRejectRideRequest}
+      />
+
+      <RiderCancelledModal
+        open={showRiderCancelled}
+        riderName=""
+        onClose={() => setShowRiderCancelled(false)}
       />
 
       {/* Onboarding Modal */}

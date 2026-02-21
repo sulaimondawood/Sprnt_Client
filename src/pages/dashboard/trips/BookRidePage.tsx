@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { profile } from "@/helpers";
 import { useSubscription } from "@/hooks/useStompSubscription";
@@ -55,12 +56,11 @@ const BookRidePage = () => {
   // Modal states
   const [showSearchingModal, setShowSearchingModal] = useState(false);
   const [driverResponseType, setDriverResponseType] = useState<
-    "accepted" | "rejected" | "cancelled" | null
+    "accepted" | "cancelled" | null
   >(null);
-  const [driverSummary, setDriverSummary] = useState<DriverSummary>();
-
-  const [showRiderCancelled, setShowRiderCancelled] = useState(false);
   const [showNoDriverFound, setShowNoDriverFound] = useState(false);
+
+  const [driverSummary, setDriverSummary] = useState<DriverSummary>();
   const [bookingStep, setBookingStep] = useState<BookingStep>("location");
 
   const user = profile();
@@ -68,17 +68,18 @@ const BookRidePage = () => {
 
   const handleDriverAcceptConfirm = () => {
     setDriverResponseType(null);
+    setShowSearchingModal(false);
     setBookingStep("arriving");
   };
 
   const handleDriverResponseClose = () => {
-    if (driverResponseType === "cancelled" || showNoDriverFound) {
+    if (showNoDriverFound) {
       setBookingStep("location");
     }
     setDriverResponseType(null);
   };
 
-  const handleCancelRide = () => {
+  const handleCancelNoDriverFound = () => {
     setShowSearchingModal(false);
     setDriverResponseType(null);
     setBookingStep("location");
@@ -90,9 +91,9 @@ const BookRidePage = () => {
   useSubscription(
     "/user/queue/no-driver-found",
     (message) => {
-      console.log("Ride status changed:", message);
+      setShowSearchingModal(false);
       setShowNoDriverFound(true);
-      toast(message);
+      toast(message.message);
     },
     !isDriver,
   );
@@ -101,6 +102,7 @@ const BookRidePage = () => {
     "/user/queue/ride-accepted",
     (message: DriverSummary) => {
       console.log("Ride status changed:", message);
+      setShowSearchingModal(false);
       setDriverResponseType("accepted");
       setDriverSummary(message);
       toast("Driver Confirmed!", {
@@ -110,7 +112,7 @@ const BookRidePage = () => {
     !isDriver,
   );
 
-  const { data: currentRide } = useQuery<Ride>({
+  const { data: currentRide, isLoading } = useQuery<Ride>({
     queryKey: ["rides", "rider", "current"],
     queryFn: RiderAPI.currentRide,
   });
@@ -145,10 +147,17 @@ const BookRidePage = () => {
       },
     });
 
+  const canBook =
+    !!pickup && !!dropoff && !!selectedRideType && !isPendingSendRideRequest;
+
+  const hasPickup = pickup ?? currentRide?.pickupLocation;
+  const hasDropoff = dropoff ?? currentRide?.dropoffLocation;
+
   useEffect(() => {
     if (currentRide) {
       if (bookingStep === "location") {
-        if (currentRide.rideStatus === "ACCEPTED") setBookingStep("arriving");
+        if (currentRide.rideStatus === "DRIVER_ACCEPTED")
+          setBookingStep("arriving");
         if (currentRide.rideStatus === "ONGOING") setBookingStep("inProgress");
       }
 
@@ -183,7 +192,7 @@ const BookRidePage = () => {
         {(bookingStep === "searching" ||
           bookingStep === "matched" ||
           bookingStep === "arriving") && (
-          <Button variant="outline" onClick={handleCancelRide}>
+          <Button variant="outline" onClick={handleCancelNoDriverFound}>
             <X className="h-4 w-4 mr-2" />
             Cancel
           </Button>
@@ -192,22 +201,38 @@ const BookRidePage = () => {
 
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <Map
-            pickupCoords={[
-              pickup?.lng || currentRide?.pickupLocation?.lng,
-              pickup?.lat || currentRide?.pickupLocation?.lat,
-            ]}
-            dropoffCoords={[
-              dropoff?.lng || currentRide?.dropoffLocation?.lng,
-              dropoff?.lat || currentRide?.dropoffLocation?.lat,
-            ]}
-            // driverCoords={driverCoords}
-            showRoute={
-              !!(pickup || currentRide?.pickupLocation) &&
-              !!(dropoff || currentRide?.dropoffLocation)
-            }
-            className="h-[70vh]"
-          />
+          {isLoading ? (
+            <Skeleton className="h-[70vh]" />
+          ) : (
+            <Map
+              pickupCoords={
+                // Check if we actually have values before creating the array
+                pickup?.lng && pickup?.lat
+                  ? [pickup.lng, pickup.lat]
+                  : currentRide?.pickupLocation?.lng &&
+                      currentRide?.pickupLocation?.lat
+                    ? [
+                        currentRide.pickupLocation.lng,
+                        currentRide.pickupLocation.lat,
+                      ]
+                    : undefined // Pass undefined for the WHOLE prop, not [undefined, undefined]
+              }
+              dropoffCoords={
+                dropoff?.lng && dropoff?.lat
+                  ? [dropoff.lng, dropoff.lat]
+                  : currentRide?.dropoffLocation?.lng &&
+                      currentRide?.dropoffLocation?.lat
+                    ? [
+                        currentRide.dropoffLocation.lng,
+                        currentRide.dropoffLocation.lat,
+                      ]
+                    : undefined
+              }
+              // driverCoords={driverCoords}
+              showRoute={!!hasPickup && !!hasDropoff}
+              className="h-[70vh]"
+            />
+          )}
 
           {bookingStep === "location" && (
             <>
@@ -289,7 +314,7 @@ const BookRidePage = () => {
               <Button
                 size="lg"
                 className="w-full h-14 text-lg gradient-rider text-rider-foreground"
-                disabled={isPendingSendRideRequest}
+                disabled={!canBook}
                 onClick={() =>
                   sendRideRequest({
                     pickupLocation: pickup,
@@ -300,7 +325,7 @@ const BookRidePage = () => {
               >
                 {isPendingSendRideRequest ? (
                   <div className="flex items-center gap-2">
-                    <p>Requesting yout ride</p>
+                    <p>Requesting your ride</p>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   </div>
                 ) : (
@@ -449,7 +474,7 @@ const BookRidePage = () => {
       {/* === MODALS === */}
       <SearchingDriverModal
         open={showSearchingModal}
-        onCancel={handleCancelRide}
+        onCancel={handleCancelNoDriverFound}
       />
 
       <DriverResponseModal
@@ -467,11 +492,6 @@ const BookRidePage = () => {
         onClose={handleDriverResponseClose}
       />
 
-      <RiderCancelledModal
-        open={showRiderCancelled}
-        riderName="Chioma Adeyemi"
-        onClose={() => setShowRiderCancelled(false)}
-      />
       <NoDriverFoundModal
         open={showNoDriverFound}
         onClose={() => {
