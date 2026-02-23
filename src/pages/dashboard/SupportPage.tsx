@@ -127,7 +127,6 @@ const SupportPage = () => {
         <div>
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-3xl font-bold">Support</h1>
-            <RoleBadge role={user?.role || "RIDER"} />
           </div>
           <p className="text-muted-foreground">
             Get help with your account, trips, and more

@@ -46,6 +46,16 @@ type BookingStep =
   | "arriving"
   | "inProgress";
 
+type DriverLocation = {
+  lng: number;
+
+  lat: number;
+
+  driverId: string;
+
+  activeRideId: string;
+};
+
 const vehicleTypes = [
   { id: "standard", name: "STANDARD", icon: Car, capacity: 4 },
   { id: "premium", name: "PREMIUM", icon: Car, capacity: 4 },
@@ -65,6 +75,10 @@ const BookRidePage = () => {
 
   const [driverSummary, setDriverSummary] = useState<DriverSummary>();
   const [bookingStep, setBookingStep] = useState<BookingStep>("location");
+
+  const [driverCoords, setDriverCoords] = useState<
+    [number, number] | undefined
+  >();
 
   const user = profile();
   const isDriver = user?.role === "DRIVER";
@@ -135,6 +149,15 @@ const BookRidePage = () => {
     queryKey: ["rides", "rider", "current"],
     queryFn: RiderAPI.currentRide,
   });
+
+  useSubscription(
+    `/queue/ride/${currentRide?.id}`,
+    (message: DriverLocation) => {
+      setDriverCoords([message.lng, message.lat]);
+      console.log(message.activeRideId);
+    },
+    !isDriver && !!currentRide?.id,
+  );
 
   const { mutate: sendRideRequest, isPending: isPendingSendRideRequest } =
     useMutation({
@@ -238,7 +261,7 @@ const BookRidePage = () => {
                       ]
                     : undefined
               }
-              // driverCoords={driverCoords}
+              driverCoords={driverCoords}
               showRoute={!!hasPickup && !!hasDropoff}
               className="h-[70vh]"
             />

@@ -1,11 +1,11 @@
-import { useAuth } from '@/contexts/AuthContext';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { RoleBadge } from '@/components/RoleBadge';
-import { Settings, Bell, Lock, Globe, Moon, Smartphone } from 'lucide-react';
+import { useAuth } from "@/contexts/AuthContext";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { RoleBadge } from "@/components/RoleBadge";
+import { Settings, Bell, Lock, Globe, Moon, Smartphone } from "lucide-react";
 
 const SettingsPage = () => {
   const { user } = useAuth();
@@ -15,7 +15,6 @@ const SettingsPage = () => {
       <div>
         <div className="flex items-center gap-3 mb-2">
           <h1 className="text-3xl font-bold">Settings</h1>
-          <RoleBadge role={user?.role || 'RIDER'} />
         </div>
         <p className="text-muted-foreground">Manage your account preferences</p>
       </div>
@@ -30,21 +29,27 @@ const SettingsPage = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Push Notifications</p>
-                <p className="text-sm text-muted-foreground">Receive push notifications</p>
+                <p className="text-sm text-muted-foreground">
+                  Receive push notifications
+                </p>
               </div>
               <Switch defaultChecked />
             </div>
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Email Updates</p>
-                <p className="text-sm text-muted-foreground">Receive trip receipts via email</p>
+                <p className="text-sm text-muted-foreground">
+                  Receive trip receipts via email
+                </p>
               </div>
               <Switch defaultChecked />
             </div>
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">SMS Alerts</p>
-                <p className="text-sm text-muted-foreground">Receive SMS for important updates</p>
+                <p className="text-sm text-muted-foreground">
+                  Receive SMS for important updates
+                </p>
               </div>
               <Switch />
             </div>
@@ -87,7 +92,9 @@ const SettingsPage = () => {
                 <p className="font-medium">Language</p>
                 <p className="text-sm text-muted-foreground">English</p>
               </div>
-              <Button variant="outline" size="sm">Change</Button>
+              <Button variant="outline" size="sm">
+                Change
+              </Button>
             </div>
           </div>
         </Card>

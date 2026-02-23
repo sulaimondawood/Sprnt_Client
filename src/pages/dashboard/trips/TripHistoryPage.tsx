@@ -75,7 +75,8 @@ const TripHistoryPage = () => {
     isSuccess: isSuccessLoadingRideOverview,
   } = useQuery<RideOverview>({
     queryKey: ["rides", "overview"],
-    queryFn: DriverAPI.ridesOverview,
+    queryFn:
+      role === "DIRVER" ? DriverAPI.ridesOverview : RiderAPI.ridesOverview,
   });
 
   const formatCurrency = (amount: number) => {
@@ -93,7 +94,6 @@ const TripHistoryPage = () => {
         <div>
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-3xl font-bold">Trip History</h1>
-            <RoleBadge role={role} />
           </div>
           <p className="text-muted-foreground">
             {role === "DRIVER"

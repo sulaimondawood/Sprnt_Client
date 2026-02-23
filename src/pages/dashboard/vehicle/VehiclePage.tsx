@@ -137,7 +137,6 @@ const VehiclePage = () => {
         <div>
           <div className="flex items-center gap-3 mb-1">
             <h1 className="text-3xl font-bold">My Vehicle</h1>
-            <RoleBadge role="DRIVER" />
           </div>
           <p className="text-muted-foreground">
             Manage your registered vehicle
