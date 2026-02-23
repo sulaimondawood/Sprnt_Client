@@ -194,6 +194,7 @@ export const RideRequestModal = ({
     <DialogContent
       className="sm:max-w-md"
       onPointerDownOutside={(e) => e.preventDefault()}
+      hideClose
     >
       <div className="flex flex-col items-center py-2 gap-3">
         <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center animate-pulse">
@@ -358,7 +359,7 @@ export const NoDriverFoundModal = ({
         <div className="flex flex-col gap-2 w-full">
           {onRetry && (
             <Button className="w-full" onClick={onRetry}>
-              <Loader2 className="h-4 w-4 mr-2" />
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               Try Again
             </Button>
           )}
@@ -543,7 +544,7 @@ export const RideCompletedModal = ({
           )}
         </div>
 
-        <DialogFooter className="flex-col gap-2 sm:flex-col">
+        <DialogFooter className="flex flex-col sm:flex-col items-center justify-center gap-2 sm:space-x-0 ">
           <Button className="w-full" onClick={onRateDriver}>
             <Star className="h-4 w-4 mr-2" />
             Rate Your Driver
@@ -559,6 +560,7 @@ export const RideCompletedModal = ({
 
 interface RateModalProps {
   open: boolean;
+  isRating: boolean;
   driverOrRiderName?: string;
   onSubmit: (rating: number, feedback: string) => void;
   onClose: () => void;
@@ -569,6 +571,7 @@ export const RateModal = ({
   driverOrRiderName,
   onSubmit,
   onClose,
+  isRating,
 }: RateModalProps) => {
   const [rating, setRating] = useState(0);
   const [hoveredStar, setHoveredStar] = useState(0);
@@ -639,11 +642,17 @@ export const RateModal = ({
         <DialogFooter className="flex-col gap-2 sm:flex-col">
           <Button
             className="w-full"
-            disabled={rating === 0}
+            disabled={rating === 0 || isRating}
             onClick={() => onSubmit(rating, feedback.trim())}
           >
-            <CheckCircle className="h-4 w-4 mr-2" />
-            Submit
+            {isRating ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-4 w-4 mr-2" />
+                <p>Submit</p>
+              </div>
+            )}
           </Button>
           <Button variant="outline" className="w-full" onClick={onClose}>
             Skip

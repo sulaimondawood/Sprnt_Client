@@ -111,16 +111,9 @@ const DashboardLayout = () => {
       if (data?.status === "DRIVER_ARRIVED") {
         setShowDriverArrived(true);
       }
-    },
-    role === "RIDER",
-  );
-
-  useSubscription(
-    "/user/queue/ride/update",
-    (data) => {
-      toast(data.message);
       if (data?.status === "COMPLETED") {
         setShowRideCompleted(true);
+        queryClient.invalidateQueries({ queryKey: ["rides", "current"] });
       }
     },
     role === "RIDER",
@@ -191,6 +184,7 @@ const DashboardLayout = () => {
         );
       },
       onSuccess() {
+        setShowRideRequest(false);
         setShowProceedToRiderLocation(true);
         toast("Safe travels! Navigating to rider...");
         queryClient.invalidateQueries({
@@ -208,7 +202,6 @@ const DashboardLayout = () => {
     },
     onSuccess() {
       setShowRateModal(false);
-
       toast("Thanks for your feedback!");
     },
   });
@@ -240,6 +233,8 @@ const DashboardLayout = () => {
           riderName: currentRide?.riderName,
         });
       }
+
+      if (status === "DRIVER_ARRIVED") setShowDriverArrived(false);
 
       if (status === "DRIVER_ACCEPTED" || status === "DRIVER_EN_ROUTE") {
         setShowProceedToRiderLocation(true);
@@ -285,6 +280,7 @@ const DashboardLayout = () => {
         onClose={() => {
           setShowRateModal(false);
         }}
+        isRating={isPendingRateDriver}
       />
       {/* Ride request modal for Driver */}
       <RideRequestModal
@@ -320,7 +316,15 @@ const DashboardLayout = () => {
 
       <DriverArrivedModal
         open={showDriverArrived}
-        onClose={() => setShowDriverArrived(false)}
+        onClose={() => {
+          setShowDriverArrived(false);
+          queryClient.invalidateQueries({
+            queryKey: ["rides", "current"],
+          });
+          queryClient.invalidateQueries({
+            queryKey: ["rides", "rider", "current"],
+          });
+        }}
         driverName={currentRide?.driverName}
       />
 

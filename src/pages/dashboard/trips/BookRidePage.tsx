@@ -72,11 +72,15 @@ const BookRidePage = () => {
 
   const handleDriverResponseClose = () => {
     if (showNoDriverFound) {
-      setBookingStep("arriving");
+      setBookingStep("location");
     }
     setDriverResponseType(null);
+    setBookingStep("arriving");
     queryClient.invalidateQueries({
       queryKey: ["rides", "rider", "current"],
+    });
+    queryClient.invalidateQueries({
+      queryKey: ["rides", "current"],
     });
   };
 
