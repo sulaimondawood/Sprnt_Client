@@ -1,5 +1,6 @@
 import { CreateRideRequest } from "@/types/riders";
 import { api } from "../config";
+import { TripParams } from "../driver";
 
 export const RiderAPI = {
   async recentRides() {
@@ -14,6 +15,13 @@ export const RiderAPI = {
 
   async createRideRequest(payload: CreateRideRequest) {
     const res = await api.post("/riders/create-ride-request", payload);
+    return res.data.data;
+  },
+
+  async allRides(params: TripParams) {
+    const res = await api.get("/riders/rides", {
+      params,
+    });
     return res.data.data;
   },
 };

@@ -26,7 +26,7 @@ export interface DriverRegistrationType {
   vehicle: VehicleDTO;
 }
 
-interface TripParams {
+export interface TripParams {
   status?: string;
   keyword?: string;
   from?: string;

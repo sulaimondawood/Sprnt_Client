@@ -19,6 +19,7 @@ import { ROUTES } from "@/constants/routes";
 import { profile } from "@/helpers";
 import { useDebounce } from "@/hooks/useDebounce";
 import { DriverAPI } from "@/services/api/driver";
+import { RiderAPI } from "@/services/api/rider";
 import { RideOverview, RideResponse } from "@/types/rides/indes";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -62,7 +63,10 @@ const TripHistoryPage = () => {
     isSuccess: isSuccessLoadingallRides,
   } = useQuery<RideResponse>({
     queryKey: ["rides", "all", filter],
-    queryFn: () => DriverAPI.allRides(filter),
+    queryFn:
+      role === "DRIVER"
+        ? () => DriverAPI.allRides(filter)
+        : () => RiderAPI.allRides(filter),
   });
 
   const {
