@@ -1,26 +1,25 @@
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import confetti from "canvas-confetti";
 import {
   Car,
-  User,
-  X,
   CheckCircle,
-  XCircle,
   Loader2,
   MapPin,
-  Phone,
-  Star,
   Navigation,
+  Star,
+  User,
+  X,
+  XCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import confetti from "canvas-confetti";
 
 // === RIDER-SIDE MODALS ===
 

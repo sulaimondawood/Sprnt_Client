@@ -1,4 +1,5 @@
 import { clearToken, getToken } from "@/services/api/config";
+import { Client } from "@stomp/stompjs";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 
 export interface CustomJwtPayload extends JwtPayload {
@@ -33,3 +34,43 @@ export const formatCurrency = (amount: number) =>
     currency: "NGN",
     minimumFractionDigits: 0,
   }).format(amount);
+
+// HAVERSINE HELPER FUNCTION
+export const distanceInMeters = (
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+) => {
+  const R = 6371000; // Earth radius (m)
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) ** 2;
+
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+};
+
+export const sendLocationUpdate = (
+  stompClient: Client,
+  lat: number,
+  lng: number,
+  rideId?: string,
+) => {
+  if (stompClient && stompClient.connected) {
+    const payload = {
+      lat: lat,
+      lng: lng,
+      activeRideId: rideId || null,
+    };
+
+    stompClient.publish({
+      destination: "/app/driver-location",
+      body: JSON.stringify(payload),
+    });
+  }
+};

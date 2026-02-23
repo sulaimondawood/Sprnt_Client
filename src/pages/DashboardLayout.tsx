@@ -39,6 +39,7 @@ import { jwtDecode, JwtPayload } from "jwt-decode";
 import { toast } from "sonner";
 import { Ride } from "@/types/rides/indes";
 import { RatingAPI, RatingPost } from "@/services/api/rating";
+import { useLocationTracker } from "@/hooks/useLocation";
 
 export interface CustomJwtPayload extends JwtPayload {
   role?: string;
@@ -123,6 +124,8 @@ const DashboardLayout = () => {
     queryKey: ["rides", "current"],
     queryFn: DriverAPI.currentRide,
   });
+
+  useLocationTracker({ isOnline, role, activeRideId: currentRide?.id });
 
   const { mutate: acceptRideRequest, isPending: isPendingAcceptRideRequest } =
     useMutation({
