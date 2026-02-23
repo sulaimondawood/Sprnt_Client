@@ -22,6 +22,8 @@ import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   DriverArrivedModal,
   ProceedToRiderDriverModal,
+  RateModal,
+  RideCompletedModal,
   RiderCancelledModal,
   RideRequestModal,
 } from "@/components/RideModals";
@@ -36,6 +38,7 @@ import { format } from "date-fns";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 import { toast } from "sonner";
 import { Ride } from "@/types/rides/indes";
+import { RatingAPI, RatingPost } from "@/services/api/rating";
 
 export interface CustomJwtPayload extends JwtPayload {
   role?: string;
@@ -61,6 +64,8 @@ const DashboardLayout = () => {
   const [hasAccepted, setHasAccepted] = useState(false);
   const [showRiderCancelled, setShowRiderCancelled] = useState(false);
   const [showDriverArrived, setShowDriverArrived] = useState(false);
+  const [showRideCompleted, setShowRideCompleted] = useState(false);
+  const [showRateModal, setShowRateModal] = useState(false);
 
   const [rideRequestData, setRideRequestData] = useState<RideOffer | null>();
 
@@ -110,6 +115,17 @@ const DashboardLayout = () => {
     role === "RIDER",
   );
 
+  useSubscription(
+    "/user/queue/ride/update",
+    (data) => {
+      toast(data.message);
+      if (data?.status === "COMPLETED") {
+        setShowRideCompleted(true);
+      }
+    },
+    role === "RIDER",
+  );
+
   const { data: currentRide } = useQuery<Ride>({
     queryKey: ["rides", "current"],
     queryFn: DriverAPI.currentRide,
@@ -119,22 +135,15 @@ const DashboardLayout = () => {
     useMutation({
       mutationFn: (payload: string) => DriverAPI.acceptRide(payload),
       onError(error: any) {
-        toast.error(
-          error?.response?.data?.message || "Unable to accept ride request",
-        );
+        toast.error("Unable to accept ride request");
       },
       onSuccess() {
-        setShowProceedToRiderLocation(true);
         setHasAccepted(true);
-        queryClient.invalidateQueries({
-          queryKey: ["rides", "current"],
-        });
         toast("Ride Accepted", {
           description: "You accepted the ride request.",
         });
       },
     });
-
   const { mutate: rejectRideRequest, isPending: isPendingRejectRideRequest } =
     useMutation({
       mutationFn: (payload: string) => DriverAPI.rejectRide(payload),
@@ -182,12 +191,27 @@ const DashboardLayout = () => {
         );
       },
       onSuccess() {
+        setShowProceedToRiderLocation(true);
         toast("Safe travels! Navigating to rider...");
         queryClient.invalidateQueries({
           queryKey: ["rides", "current"],
         });
       },
     });
+
+  const { mutate: rateDriver, isPending: isPendingRateDriver } = useMutation({
+    mutationFn: (payload: RatingPost) => RatingAPI.rate(payload),
+    onError(error: any) {
+      toast.error(
+        error?.response?.data?.message || "Unable to send ride request",
+      );
+    },
+    onSuccess() {
+      setShowRateModal(false);
+
+      toast("Thanks for your feedback!");
+    },
+  });
 
   useEffect(() => {
     if (!profile) {
@@ -233,6 +257,35 @@ const DashboardLayout = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <RideCompletedModal
+        open={showRideCompleted}
+        trip={{
+          driverName: currentRide?.driverName,
+          pickup: currentRide?.pickupLocation?.address,
+          dropoff: currentRide?.dropoffLocation?.address,
+          distance: currentRide?.estimatedDistance,
+          duration: currentRide?.estimatedDurationMins,
+          fare: currentRide?.estimatedFare,
+        }}
+        onRateDriver={() => {
+          setShowRideCompleted(false);
+          setShowRateModal(true);
+        }}
+        onClose={() => {
+          setShowRideCompleted(false);
+        }}
+      />
+
+      <RateModal
+        open={showRateModal}
+        driverOrRiderName={currentRide?.driverName}
+        onSubmit={(rating, comment) =>
+          rateDriver({ rating, comment, rideId: currentRide?.id })
+        }
+        onClose={() => {
+          setShowRateModal(false);
+        }}
+      />
       {/* Ride request modal for Driver */}
       <RideRequestModal
         open={showRideRequest}

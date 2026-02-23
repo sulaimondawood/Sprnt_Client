@@ -19,10 +19,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { profile } from "@/helpers";
 import { useSubscription } from "@/hooks/useStompSubscription";
+import { RatingAPI, RatingPost } from "@/services/api/rating";
 import { RiderAPI } from "@/services/api/rider";
 import { CreateRideRequest, DriverSummary } from "@/types/riders";
 import { Ride } from "@/types/rides/indes";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDate } from "date-fns";
 import {
   Car,
@@ -61,26 +62,22 @@ const BookRidePage = () => {
     "accepted" | "cancelled" | null
   >(null);
   const [showNoDriverFound, setShowNoDriverFound] = useState(false);
-  const [showRideCompleted, setShowRideCompleted] = useState(false);
-  const [showRateModal, setShowRateModal] = useState(false);
 
   const [driverSummary, setDriverSummary] = useState<DriverSummary>();
   const [bookingStep, setBookingStep] = useState<BookingStep>("location");
 
   const user = profile();
   const isDriver = user?.role === "DRIVER";
-
-  const handleDriverAcceptConfirm = () => {
-    setDriverResponseType(null);
-    setShowSearchingModal(false);
-    setBookingStep("arriving");
-  };
+  const queryClient = useQueryClient();
 
   const handleDriverResponseClose = () => {
     if (showNoDriverFound) {
-      setBookingStep("location");
+      setBookingStep("arriving");
     }
     setDriverResponseType(null);
+    queryClient.invalidateQueries({
+      queryKey: ["rides", "rider", "current"],
+    });
   };
 
   const handleCancelNoDriverFound = () => {
@@ -126,17 +123,6 @@ const BookRidePage = () => {
       toast("Driver Confirmed!", {
         description: `${message.driverName} is on the way in ${message.vehicleName}.`,
       });
-    },
-    !isDriver,
-  );
-
-  useSubscription(
-    "/user/queue/ride/update",
-    (data) => {
-      toast(data.message);
-      if (data?.status === "COMPLETED") {
-        setShowRideCompleted(true);
-      }
     },
     !isDriver,
   );
@@ -211,21 +197,12 @@ const BookRidePage = () => {
           <h1 className="text-3xl font-bold mb-2">Book a Ride</h1>
           <p className="text-muted-foreground">
             {bookingStep === "location" && "Where would you like to go?"}
-            {bookingStep === "searching" && "Finding you a driver..."}
             {bookingStep === "matched" && "Driver found!"}
             {bookingStep === "arriving" &&
               `Driver arriving in ${currentRide?.estimatedArrivalTime ? formatDate(currentRide?.estimatedArrivalTime, "m") : "N/A"} min`}
             {bookingStep === "inProgress" && "Trip in progress"}
           </p>
         </div>
-        {(bookingStep === "searching" ||
-          bookingStep === "matched" ||
-          bookingStep === "arriving") && (
-          <Button variant="outline" onClick={handleCancelNoDriverFound}>
-            <X className="h-4 w-4 mr-2" />
-            Cancel
-          </Button>
-        )}
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
@@ -517,7 +494,6 @@ const BookRidePage = () => {
           trips: driverSummary?.totalTrips,
           vehicle: driverSummary?.vehicleName,
         }}
-        onConfirm={handleDriverAcceptConfirm}
         onClose={handleDriverResponseClose}
       />
 
@@ -525,42 +501,6 @@ const BookRidePage = () => {
         open={showNoDriverFound}
         onClose={() => {
           setShowNoDriverFound(false);
-          setBookingStep("location");
-        }}
-      />
-
-      <RideCompletedModal
-        open={showRideCompleted}
-        trip={{
-          driverName: currentRide?.driverName,
-          pickup: currentRide?.pickupLocation?.address,
-          dropoff: currentRide?.dropoffLocation?.address,
-          distance: currentRide?.estimatedDistance,
-          duration: currentRide?.estimatedDurationMins,
-          fare: currentRide?.estimatedFare,
-        }}
-        onRateDriver={() => {
-          setShowRideCompleted(false);
-          setShowRateModal(true);
-        }}
-        onClose={() => {
-          setShowRideCompleted(false);
-          setBookingStep("location");
-        }}
-      />
-
-      <RateModal
-        open={showRateModal}
-        driverOrRiderName={currentRide?.driverName}
-        onSubmit={(rating, feedback) => {
-          setShowRateModal(false);
-          setBookingStep("location");
-          toast("Thanks for your feedback!", {
-            description: `You rated ${rating} star${rating > 1 ? "s" : ""}`,
-          });
-        }}
-        onClose={() => {
-          setShowRateModal(false);
           setBookingStep("location");
         }}
       />

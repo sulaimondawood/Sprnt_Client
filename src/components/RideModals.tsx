@@ -78,7 +78,6 @@ interface DriverResponseModalProps {
     phone: string;
     trips: number;
   };
-  onConfirm?: () => void;
   onClose: () => void;
 }
 
@@ -86,7 +85,6 @@ export const DriverResponseModal = ({
   open,
   type,
   driver,
-  onConfirm,
   onClose,
 }: DriverResponseModalProps) => (
   <Dialog open={open} onOpenChange={onClose}>
@@ -130,13 +128,9 @@ export const DriverResponseModal = ({
               </div>
             </div>
           </div>
-          <DialogFooter className="flex-col gap-2 sm:flex-col">
-            <Button className="w-full" onClick={onConfirm}>
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Confirm Ride
-            </Button>
-            <Button variant="outline" className="w-full" onClick={onClose}>
-              Decline
+          <DialogFooter>
+            <Button className="w-full" onClick={onClose}>
+              Close
             </Button>
           </DialogFooter>
         </>
@@ -243,7 +237,7 @@ export const RideRequestModal = ({
             </div>
           </div>
 
-          {timeLeft && (
+          {timeLeft && !hasAccepted && (
             <div className="text-center">
               <span className="text-sm text-muted-foreground">Expires in </span>
               <span className="font-bold text-primary">{timeLeft}s</span>
