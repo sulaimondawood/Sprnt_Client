@@ -9,6 +9,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { profile } from "@/helpers";
+import { useSubscription } from "@/hooks/useStompSubscription";
 import { DriverAPI } from "@/services/api/driver";
 import { RiderAPI } from "@/services/api/rider";
 import { Ride } from "@/types/rides/indes";
@@ -25,9 +26,15 @@ import {
   Route,
   User,
 } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
+import { DriverLocation } from "./BookRidePage";
 
 const CurrentTripPage = () => {
+  const [driverCoords, setDriverCoords] = useState<
+    [number, number] | undefined
+  >();
+
   const handleReportIssue = () => {
     toast("Report Submitted", {
       description: "Our support team will review your report.",
@@ -47,6 +54,17 @@ const CurrentTripPage = () => {
     queryKey: ["rides", "current"],
     queryFn: role === "DRIVER" ? DriverAPI.currentRide : RiderAPI.currentRide,
   });
+
+  useSubscription(
+    `/queue/ride/${currentRide?.id}`,
+    (message: DriverLocation) => {
+      setDriverCoords([message.lng, message.lat]);
+      console.log(message.activeRideId);
+    },
+    role !== "DRIVER" && !!currentRide?.id,
+  );
+
+  console.log(driverCoords);
 
   const { mutate: completeRide, isPending: isPendingCompleteRide } =
     useMutation({
@@ -116,7 +134,7 @@ const CurrentTripPage = () => {
                 currentRide?.dropoffLocation?.lng,
                 currentRide?.dropoffLocation?.lat,
               ]}
-              // driverCoords={driverCoords}
+              driverCoords={driverCoords}
               showRoute={true}
               className="h-[400px]"
             />

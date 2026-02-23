@@ -132,6 +132,7 @@ const DashboardLayout = () => {
       mutationFn: (payload: string) => DriverAPI.acceptRide(payload),
       onError(error: any) {
         toast.error("Unable to accept ride request");
+        setShowRideRequest(false);
       },
       onSuccess() {
         setHasAccepted(true);
@@ -147,6 +148,7 @@ const DashboardLayout = () => {
         toast.error(
           error?.response?.data?.message || "Unable to reject ride request",
         );
+        setShowRideRequest(false);
       },
       onSuccess() {
         toast("Ride Declined", {
@@ -172,6 +174,7 @@ const DashboardLayout = () => {
         queryClient.invalidateQueries({
           queryKey: ["rides", "current"],
         });
+        setShowProceedToRiderLocation(false);
         setShowRideRequest(false);
         setShowDriverArrived(false);
       },

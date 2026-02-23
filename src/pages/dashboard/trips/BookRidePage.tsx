@@ -46,7 +46,7 @@ type BookingStep =
   | "arriving"
   | "inProgress";
 
-type DriverLocation = {
+export type DriverLocation = {
   lng: number;
 
   lat: number;
