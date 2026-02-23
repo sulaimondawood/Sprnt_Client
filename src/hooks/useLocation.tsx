@@ -1,10 +1,7 @@
 import { distanceInMeters, sendLocationUpdate } from "@/helpers";
-import { DriverAPI } from "@/services/api/driver";
+import { useWebSocket } from "@/services/providers/stomp-provider";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { useSubscription } from "./useStompSubscription";
-import { useWebSocket } from "@/services/providers/stomp-provider";
-import { Client } from "@stomp/stompjs";
 
 export const useLocation = () => {
   const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(
@@ -112,8 +109,8 @@ export const useLocationTracker = ({
       },
       {
         enableHighAccuracy: true,
-        maximumAge: 10000, // reuse recent location (10s)
-        timeout: 20000,
+        maximumAge: 30000, // Accept a location up to 30 seconds old
+        timeout: 27000,
       },
     );
 

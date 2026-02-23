@@ -55,6 +55,7 @@ api.interceptors.response.use(
     }
 
     if (status === 403) {
+      window.history.back();
       return Promise.reject(
         new Error("Forbidden: You do not have access to this resource"),
       );

@@ -151,10 +151,11 @@ const BookRidePage = () => {
   });
 
   useSubscription(
-    `/queue/ride/${currentRide?.id}`,
+    `/topic/ride/${currentRide?.id}`,
     (message: DriverLocation) => {
       setDriverCoords([message.lng, message.lat]);
       console.log(message.activeRideId);
+      console.log("Hello");
     },
     !isDriver && !!currentRide?.id,
   );

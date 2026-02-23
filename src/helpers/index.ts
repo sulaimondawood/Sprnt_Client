@@ -1,4 +1,4 @@
-import { clearToken, getToken } from "@/services/api/config";
+import { clearToken, getToken, TOKEN } from "@/services/api/config";
 import { Client } from "@stomp/stompjs";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 
@@ -66,6 +66,7 @@ export const sendLocationUpdate = (
       lat: lat,
       lng: lng,
       activeRideId: rideId || null,
+      token: getToken(),
     };
 
     stompClient.publish({

@@ -56,7 +56,7 @@ const CurrentTripPage = () => {
   });
 
   useSubscription(
-    `/queue/ride/${currentRide?.id}`,
+    `/topic/ride/${currentRide?.id}`,
     (message: DriverLocation) => {
       setDriverCoords([message.lng, message.lat]);
       console.log(message.activeRideId);
@@ -277,16 +277,6 @@ const CurrentTripPage = () => {
               </Button>
             )}
 
-            {currentRide?.rideStatus === "DRIVER_EN_ROUTE" && (
-              <Button
-                className="w-full gap-2 gradient-driver text-driver-foreground"
-                // onClick={handleStartTrip}
-              >
-                <CheckCircle className="h-4 w-4" />
-                Rider Picked Up - Start Trip
-              </Button>
-            )}
-
             {(currentRide?.rideStatus === "ON_TRIP" ||
               currentRide?.rideStatus === "DRIVER_ARRIVED") &&
               role === "DRIVER" && (
@@ -306,7 +296,7 @@ const CurrentTripPage = () => {
                 </Button>
               )}
 
-            {currentRide?.rideStatus === "COMPLETED" && (
+            {currentRide?.rideStatus === "COMPLETED" && role === "DRIVER" && (
               <Card className="p-6 bg-success/10 border-success/20">
                 <div className="text-center">
                   <CheckCircle className="h-12 w-12 text-success mx-auto mb-3" />

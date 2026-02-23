@@ -40,6 +40,7 @@ import { toast } from "sonner";
 import { Ride } from "@/types/rides/indes";
 import { RatingAPI, RatingPost } from "@/services/api/rating";
 import { useLocationTracker } from "@/hooks/useLocation";
+import { RiderAPI } from "@/services/api/rider";
 
 export interface CustomJwtPayload extends JwtPayload {
   role?: string;
@@ -122,7 +123,7 @@ const DashboardLayout = () => {
 
   const { data: currentRide } = useQuery<Ride>({
     queryKey: ["rides", "current"],
-    queryFn: DriverAPI.currentRide,
+    queryFn: role === "DRIVER" ? DriverAPI.currentRide : RiderAPI.currentRide,
   });
 
   useLocationTracker({ isOnline, role, activeRideId: currentRide?.id });
