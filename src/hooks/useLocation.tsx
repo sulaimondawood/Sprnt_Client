@@ -85,7 +85,7 @@ export const useLocationTracker = ({
       }
     };
 
-    if (!isOnline && role !== "DRIVER") {
+    if (!isOnline && role !== "DRIVER" && !activeRideId) {
       clearExisting();
       return;
     }
@@ -124,5 +124,5 @@ export const useLocationTracker = ({
         watchIdRef.current = null;
       }
     };
-  }, [isOnline, role, stompClient]);
+  }, [isOnline, role, stompClient, activeRideId]);
 };
