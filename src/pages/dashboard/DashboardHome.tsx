@@ -57,11 +57,7 @@ const DashboardHome = () => {
     queryFn: UserAPI.profile,
   });
 
-  const {
-    data: overviewData,
-    isLoading: isLoadingOverviewData,
-    isSuccess: isSuccessLoadingOverviewData,
-  } = useQuery({
+  const { data: overviewData } = useQuery({
     queryKey: ["driver", "overview", "data"],
     queryFn: isDriver ? DriverAPI.driverOverview : RiderAPI.riderOverviewData,
   });
@@ -127,14 +123,14 @@ const DashboardHome = () => {
           <>
             <StatCard
               title="Today's Earnings"
-              value={"N/A"}
+              value={"-"}
               subtitle={`${overviewData?.completedRideToday} trips completed`}
               icon={Wallet}
               variant="driver"
             />
             <StatCard
               title="Weekly Earnings"
-              value={"N/A"}
+              value={"-"}
               subtitle={`${overviewData?.ridesOfTheWeek} trips this week`}
               icon={TrendingUp}
               trend={{ value: 12, isPositive: true }}
@@ -174,7 +170,11 @@ const DashboardHome = () => {
               subtitle="Your rider rating"
               icon={Star}
             />
-            <StatCard title="Wallet Balance" value={"N/A"} icon={Wallet} />
+            <StatCard
+              title="Wallet Balance"
+              value={formatCurrency(25000)}
+              icon={Wallet}
+            />
           </>
         )}
       </div>

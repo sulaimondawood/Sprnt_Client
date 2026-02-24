@@ -30,17 +30,16 @@ import {
 import { driverNavItems, riderNavItems, ROUTES } from "@/constants/routes";
 import { useDriver } from "@/contexts/DriverContext";
 import { logout } from "@/helpers";
+import { useLocationTracker } from "@/hooks/useLocation";
 import { useSubscription } from "@/hooks/useStompSubscription";
 import { DriverAPI } from "@/services/api/driver";
+import { RatingAPI, RatingPost } from "@/services/api/rating";
+import { RiderAPI } from "@/services/api/rider";
 import { RideOffer } from "@/types/riders";
+import { Ride } from "@/types/rides/indes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { format } from "date-fns";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 import { toast } from "sonner";
-import { Ride } from "@/types/rides/indes";
-import { RatingAPI, RatingPost } from "@/services/api/rating";
-import { useLocationTracker } from "@/hooks/useLocation";
-import { RiderAPI } from "@/services/api/rider";
 
 export interface CustomJwtPayload extends JwtPayload {
   role?: string;
