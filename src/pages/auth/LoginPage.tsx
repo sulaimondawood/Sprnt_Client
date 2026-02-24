@@ -52,12 +52,6 @@ const LoginPage = () => {
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-md space-y-8">
           <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-6">
-              <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center">
-                <Car className="h-7 w-7 text-primary-foreground" />
-              </div>
-              <span className="text-2xl font-bold">Sprnt</span>
-            </div>
             <h1 className="text-3xl font-bold mb-2">Welcome back</h1>
             <p className="text-muted-foreground">
               Sign in to access your dashboard
@@ -114,7 +108,11 @@ const LoginPage = () => {
                   <input type="checkbox" className="rounded border-border" />
                   <span className="text-muted-foreground">Remember me</span>
                 </label>
-                <button type="button" className="text-primary hover:underline">
+                <button
+                  type="button"
+                  className="text-primary hover:underline"
+                  onClick={() => navigate("/auth/forgot-password")}
+                >
                   Forgot password?
                 </button>
               </div>

@@ -25,6 +25,7 @@ import LandingPage from "./pages/LandingPage";
 import NotFound from "./pages/NotFound";
 import { StompProvider } from "./services/providers/stomp-provider";
 import { TanstackProvider } from "./services/providers/tanstack-provider";
+import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 
 const App = () => (
   <TanstackProvider>
@@ -45,6 +46,10 @@ const App = () => (
                 <Route
                   path="/auth/verify-email"
                   element={<EmailVerificationPage />}
+                />
+                <Route
+                  path="/auth/reset-password"
+                  element={<ResetPasswordPage />}
                 />
 
                 <Route path="/dashboard" element={<DashboardLayout />}>

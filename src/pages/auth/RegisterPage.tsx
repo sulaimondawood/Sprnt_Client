@@ -74,12 +74,6 @@ const RegisterPage = () => {
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-md space-y-8">
           <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-6">
-              <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center">
-                <Car className="h-7 w-7 text-primary-foreground" />
-              </div>
-              <span className="text-2xl font-bold">Sprnt</span>
-            </div>
             <h1 className="text-3xl font-bold mb-2">Create account</h1>
             <p className="text-muted-foreground">
               Sign up to start your journey

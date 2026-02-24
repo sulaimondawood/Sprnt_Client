@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Car, Mail, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { ROUTES } from "@/constants/routes";
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
@@ -104,7 +105,7 @@ const ForgotPasswordPage = () => {
 
           <div className="text-center">
             <Link
-              to="/auth"
+              to={ROUTES.login}
               className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />

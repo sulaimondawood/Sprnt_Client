@@ -1,5 +1,3 @@
-import { useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -8,7 +6,9 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { useToast } from "@/hooks/use-toast";
-import { Car, Mail, CheckCircle2, RefreshCw } from "lucide-react";
+import { CheckCircle2, Mail, RefreshCw } from "lucide-react";
+import { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const EmailVerificationPage = () => {
   const [searchParams] = useSearchParams();
