@@ -62,7 +62,7 @@ const RatingsPage = () => {
       )}
       <Card className="p-8 gradient-driver text-driver-foreground text-center">
         <p className="text-6xl font-bold mb-2 flex items-center justify-center gap-2">
-          <span>{ratingData?.averageRating}</span>
+          <span>{ratingData?.averageRating?.toFixed(1)}</span>
           <span>
             <Star className="h-12 w-12 mx-auto fill-current" />
           </span>

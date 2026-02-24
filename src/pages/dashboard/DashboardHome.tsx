@@ -57,6 +57,15 @@ const DashboardHome = () => {
     queryFn: UserAPI.profile,
   });
 
+  const {
+    data: overviewData,
+    isLoading: isLoadingOverviewData,
+    isSuccess: isSuccessLoadingOverviewData,
+  } = useQuery({
+    queryKey: ["driver", "overview", "data"],
+    queryFn: isDriver ? DriverAPI.driverOverview : RiderAPI.riderOverviewData,
+  });
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Welcome Header */}
@@ -119,26 +128,26 @@ const DashboardHome = () => {
             <StatCard
               title="Today's Earnings"
               value={"N/A"}
-              subtitle={`N/A trips completed`}
+              subtitle={`${overviewData?.completedRideToday} trips completed`}
               icon={Wallet}
               variant="driver"
             />
             <StatCard
               title="Weekly Earnings"
               value={"N/A"}
-              subtitle={`N/A trips this week`}
+              subtitle={`${overviewData?.ridesOfTheWeek} trips this week`}
               icon={TrendingUp}
               trend={{ value: 12, isPositive: true }}
             />
             <StatCard
               title="Rating"
-              value={"N/A"}
+              value={overviewData?.rating?.toFixed(1)}
               subtitle="Based on recent trips"
               icon={Star}
             />
             <StatCard
               title="Completion Rate"
-              value={"N/A"}
+              value={overviewData?.completionRate?.toFixed(1)}
               subtitle="Trip completion"
               icon={CheckCircle}
             />
@@ -147,21 +156,21 @@ const DashboardHome = () => {
           <>
             <StatCard
               title="Total Rides"
-              value={"N/A"}
+              value={overviewData?.totalRides}
               subtitle="Lifetime rides"
               icon={Car}
               variant="rider"
             />
             <StatCard
               title="This Week"
-              value={"N/A"}
+              value={overviewData?.ridesOfTheWeek}
               subtitle="Rides taken"
               icon={Clock}
               trend={{ value: 8, isPositive: true }}
             />
             <StatCard
               title="Rating"
-              value={"N/A"}
+              value={overviewData?.rating?.toFixed(1)}
               subtitle="Your rider rating"
               icon={Star}
             />
@@ -298,7 +307,7 @@ const DashboardHome = () => {
                     </div>
                     <div className="flex items-baseline gap-2">
                       <span className="font-bold text-3xl">
-                        {userProfile?.driver?.rating}
+                        {userProfile?.driver?.rating?.toFixed(1)}
                       </span>
                       <span className="text-muted-foreground">/ 5.0</span>
                     </div>

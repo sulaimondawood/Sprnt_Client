@@ -76,7 +76,7 @@ const TripHistoryPage = () => {
   } = useQuery<RideOverview>({
     queryKey: ["rides", "overview"],
     queryFn:
-      role === "DIRVER" ? DriverAPI.ridesOverview : RiderAPI.ridesOverview,
+      role === "DRIVER" ? DriverAPI.ridesOverview : RiderAPI.ridesOverview,
   });
 
   const formatCurrency = (amount: number) => {

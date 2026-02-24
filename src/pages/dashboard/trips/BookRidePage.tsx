@@ -120,7 +120,6 @@ const BookRidePage = () => {
   useSubscription(
     "/user/queue/ride-accepted",
     (message: DriverSummary) => {
-      console.log("Ride status changed:", message);
       setShowSearchingModal(false);
       setDriverResponseType("accepted");
       setDriverSummary(message);
@@ -134,7 +133,6 @@ const BookRidePage = () => {
   useSubscription(
     "/user/queue/ride-accepted",
     (message: DriverSummary) => {
-      console.log("Ride status changed:", message);
       setShowSearchingModal(false);
       setDriverResponseType("accepted");
       setDriverSummary(message);
@@ -154,8 +152,6 @@ const BookRidePage = () => {
     `/topic/ride/${currentRide?.id}`,
     (message: DriverLocation) => {
       setDriverCoords([message.lng, message.lat]);
-      console.log(message.activeRideId);
-      console.log("Hello");
     },
     !isDriver && !!currentRide?.id,
   );

@@ -534,7 +534,7 @@ export const RideCompletedModal = ({
                 </div>
                 <div className="w-px bg-border" />
                 <div>
-                  <p className="font-semibold">{trip.duration}</p>
+                  <p className="font-semibold">{trip.duration}mins</p>
                   <p className="text-xs text-muted-foreground">Duration</p>
                 </div>
                 <div className="w-px bg-border" />

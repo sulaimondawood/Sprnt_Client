@@ -29,4 +29,9 @@ export const RiderAPI = {
     const res = await api.get("/riders/rides/overview");
     return res.data.data;
   },
+
+  async riderOverviewData() {
+    const res = await api.get(`/riders/overview`);
+    return res.data.data;
+  },
 };

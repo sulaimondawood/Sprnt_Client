@@ -125,4 +125,9 @@ export const DriverAPI = {
     const res = await api.patch(`/driver/ride/${rideId}/enroute`);
     return res.data.message;
   },
+
+  async driverOverview() {
+    const res = await api.get(`/driver/overview`);
+    return res.data.data;
+  },
 };

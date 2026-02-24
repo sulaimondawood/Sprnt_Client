@@ -59,12 +59,9 @@ const CurrentTripPage = () => {
     `/topic/ride/${currentRide?.id}`,
     (message: DriverLocation) => {
       setDriverCoords([message.lng, message.lat]);
-      console.log(message.activeRideId);
     },
     role !== "DRIVER" && !!currentRide?.id,
   );
-
-  console.log(driverCoords);
 
   const { mutate: completeRide, isPending: isPendingCompleteRide } =
     useMutation({

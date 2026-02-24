@@ -126,7 +126,11 @@ const DashboardLayout = () => {
     queryFn: role === "DRIVER" ? DriverAPI.currentRide : RiderAPI.currentRide,
   });
 
-  useLocationTracker({ isOnline, role, activeRideId: currentRide?.id });
+  useLocationTracker({
+    isOnline,
+    role,
+    activeRideId: currentRide?.id ? currentRide.id : null,
+  });
 
   const { mutate: acceptRideRequest, isPending: isPendingAcceptRideRequest } =
     useMutation({
