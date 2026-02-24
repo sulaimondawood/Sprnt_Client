@@ -1,31 +1,30 @@
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
-import LandingPage from "./pages/LandingPage";
-import AuthPage from "./pages/RegisterPage";
-import DashboardLayout from "./pages/DashboardLayout";
-import DashboardHome from "./pages/dashboard/DashboardHome";
-import BookRidePage from "./pages/dashboard/trips/BookRidePage";
-import TripHistoryPage from "./pages/dashboard/trips/TripHistoryPage";
-import WalletPage from "./pages/dashboard/WalletPage";
-import SupportPage from "./pages/dashboard/SupportPage";
-import SettingsPage from "./pages/dashboard/SettingsPage";
-import VehiclePage from "./pages/dashboard/vehicle/VehiclePage";
-import DocumentsPage from "./pages/dashboard/document/DocumentsPage";
-import RatingsPage from "./pages/dashboard/rating/RatingsPage";
-import CurrentTripPage from "./pages/dashboard/trips/CurrentTripPage";
-import ProfilePage from "./pages/dashboard/profile/ProfilePage";
-import OnboardingPage from "./pages/OnboardingPage";
-import NotFound from "./pages/NotFound";
-import { TanstackProvider } from "./services/providers/tanstack-provider";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
-import TripDetailsPage from "./pages/dashboard/trips/TripDetailsPage";
-import AddVehiclePage from "./pages/dashboard/vehicle/AddVehiclePage";
 import { DriverProvider } from "./contexts/DriverContext";
+import EmailVerificationPage from "./pages/auth/EmailVerificationPage";
+import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
+import LoginPage from "./pages/auth/LoginPage";
+import RegisterPage from "./pages/auth/RegisterPage";
+import DashboardHome from "./pages/dashboard/DashboardHome";
+import DocumentsPage from "./pages/dashboard/document/DocumentsPage";
+import ProfilePage from "./pages/dashboard/profile/ProfilePage";
+import RatingsPage from "./pages/dashboard/rating/RatingsPage";
+import SettingsPage from "./pages/dashboard/SettingsPage";
+import SupportPage from "./pages/dashboard/SupportPage";
+import BookRidePage from "./pages/dashboard/trips/BookRidePage";
+import CurrentTripPage from "./pages/dashboard/trips/CurrentTripPage";
+import TripDetailsPage from "./pages/dashboard/trips/TripDetailsPage";
+import TripHistoryPage from "./pages/dashboard/trips/TripHistoryPage";
+import AddVehiclePage from "./pages/dashboard/vehicle/AddVehiclePage";
+import VehiclePage from "./pages/dashboard/vehicle/VehiclePage";
+import WalletPage from "./pages/dashboard/WalletPage";
+import DashboardLayout from "./pages/DashboardLayout";
+import LandingPage from "./pages/LandingPage";
+import NotFound from "./pages/NotFound";
 import { StompProvider } from "./services/providers/stomp-provider";
+import { TanstackProvider } from "./services/providers/tanstack-provider";
 
 const App = () => (
   <TanstackProvider>
@@ -39,7 +38,15 @@ const App = () => (
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/auth/register" element={<RegisterPage />} />
                 <Route path="/auth/login" element={<LoginPage />} />
-                <Route path="/onboarding" element={<OnboardingPage />} />
+                <Route
+                  path="/auth/forgot-password"
+                  element={<ForgotPasswordPage />}
+                />
+                <Route
+                  path="/auth/verify-email"
+                  element={<EmailVerificationPage />}
+                />
+
                 <Route path="/dashboard" element={<DashboardLayout />}>
                   <Route index element={<DashboardHome />} />
                   <Route path="book-ride" element={<BookRidePage />} />
