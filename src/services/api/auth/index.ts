@@ -25,4 +25,9 @@ export const AuthAPI = {
     const res = await request.post("/auth/login", payload);
     return res.data;
   },
+
+  async forgotPassword(payload: Record<string, string>) {
+    const res = await request.post("/auth/forgot-password", payload);
+    return res.data;
+  },
 };

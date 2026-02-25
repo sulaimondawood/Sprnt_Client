@@ -7,32 +7,43 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Car, Mail, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { ROUTES } from "@/constants/routes";
+import { useMutation } from "@tanstack/react-query";
+import { AuthAPI } from "@/services/api/auth";
+import { toast } from "sonner";
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const { toast } = useToast();
+
+  const {
+    mutate: forgotPassword,
+    isPending,
+    isSuccess,
+  } = useMutation({
+    mutationFn: (payload: Record<string, string>) =>
+      AuthAPI.forgotPassword(payload),
+    onSuccess(data) {
+      toast("Reset link sent", {
+        description: "Check your email for the password reset link.",
+      });
+
+      // navigate(ROUTES.dashboard);
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError(error: any) {
+      toast.error(error?.response?.data?.message);
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    toast({
-      title: "Reset link sent",
-      description: "Check your email for the password reset link.",
-    });
+    forgotPassword({ email });
   };
 
   return (
     <div className="min-h-screen bg-background flex">
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-md space-y-8">
-          {!isSubmitted ? (
+          {!isSuccess ? (
             <>
               <div className="text-center space-y-2">
                 <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
@@ -65,9 +76,9 @@ const ForgotPasswordPage = () => {
                   <Button
                     type="submit"
                     className="w-full h-12 text-lg gradient-primary"
-                    disabled={isSubmitting}
+                    disabled={isPending}
                   >
-                    {isSubmitting ? "Sending..." : "Send Reset Link"}
+                    {isPending ? "Sending..." : "Send Reset Link"}
                   </Button>
                 </form>
               </Card>
@@ -89,15 +100,9 @@ const ForgotPasswordPage = () => {
                 <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() => {
-                    setIsSubmitted(false);
-                    toast({
-                      title: "Resending...",
-                      description: "A new link will be sent shortly.",
-                    });
-                  }}
+                  onClick={() => forgotPassword({ email })}
                 >
-                  Resend reset link
+                  {isPending ? "Sending..." : "Resend reset link"}
                 </Button>
               </Card>
             </div>
