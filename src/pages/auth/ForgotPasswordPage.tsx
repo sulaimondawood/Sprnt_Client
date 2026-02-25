@@ -1,14 +1,13 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
-import { Car, Mail, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { ROUTES } from "@/constants/routes";
-import { useMutation } from "@tanstack/react-query";
 import { AuthAPI } from "@/services/api/auth";
+import { useMutation } from "@tanstack/react-query";
+import { ArrowLeft, CheckCircle2, Mail } from "lucide-react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
 const ForgotPasswordPage = () => {
@@ -25,8 +24,6 @@ const ForgotPasswordPage = () => {
       toast("Reset link sent", {
         description: "Check your email for the password reset link.",
       });
-
-      // navigate(ROUTES.dashboard);
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError(error: any) {
@@ -36,6 +33,7 @@ const ForgotPasswordPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isPending) return;
     forgotPassword({ email });
   };
 
@@ -43,7 +41,7 @@ const ForgotPasswordPage = () => {
     <div className="min-h-screen bg-background flex">
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-md space-y-8">
-          {!isSuccess ? (
+          {!isSuccess && (
             <>
               <div className="text-center space-y-2">
                 <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
@@ -83,7 +81,9 @@ const ForgotPasswordPage = () => {
                 </form>
               </Card>
             </>
-          ) : (
+          )}
+
+          {isSuccess && (
             <div className="text-center space-y-4">
               <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center mx-auto">
                 <CheckCircle2 className="h-10 w-10 text-success" />
