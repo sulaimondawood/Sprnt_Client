@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Car, Eye, EyeOff, Lock, Mail, User } from "lucide-react";
+import { Car, Eye, EyeOff, Loader2, Lock, Mail, User } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
@@ -77,7 +77,7 @@ const RegisterPage = () => {
   return (
     <div className="min-h-screen bg-background flex">
       {/* Left Side - Form */}
-      <div className="flex-1 flex items-center justify-center p-8">
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-8">
         <div className="w-full max-w-md space-y-8">
           <div className="text-center">
             <h1 className="text-3xl font-bold mb-2">Create account</h1>
@@ -110,19 +110,19 @@ const RegisterPage = () => {
             </TabsList>
           </Tabs>
 
-          <Card className="p-6">
+          <Card className="p-3">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                   <Input
                     id="email"
                     type="email"
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
+                    className="pl-8 text-sm"
                     required
                   />
                 </div>
@@ -131,14 +131,14 @@ const RegisterPage = () => {
               <div className="space-y-2">
                 <Label htmlFor="fullname">Fullname</Label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                   <Input
                     id="fullname"
                     type="text"
                     placeholder="Dawood Adekunle"
                     value={fullname}
                     onChange={(e) => setFullname(e.target.value)}
-                    className="pl-10"
+                    className="pl-8 text-sm"
                     required
                   />
                 </div>
@@ -147,14 +147,14 @@ const RegisterPage = () => {
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10"
+                    className="px-8 text-sm"
                     required
                   />
                   <button
@@ -163,9 +163,9 @@ const RegisterPage = () => {
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
                     {showPassword ? (
-                      <EyeOff className="h-5 w-5" />
+                      <EyeOff className="size-4" />
                     ) : (
-                      <Eye className="h-5 w-5" />
+                      <Eye className="size-4" />
                     )}
                   </button>
                 </div>
@@ -173,17 +173,19 @@ const RegisterPage = () => {
 
               <Button
                 type="submit"
-                className={`w-full h-12 text-lg ${role === "rider" ? "gradient-rider" : "gradient-driver"}`}
+                className={`w-full h-12 text-sm ${role === "rider" ? "gradient-rider" : "gradient-driver"}`}
                 disabled={role === "rider" ? isPending : isPendingDriver}
               >
-                {isPending || isPendingDriver
-                  ? "Please wait..."
-                  : "Create Account"}
+                {isPending || isPendingDriver ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  "Create Account"
+                )}
               </Button>
             </form>
           </Card>
 
-          <p className="text-center text-muted-foreground">
+          <p className="text-center text-muted-foreground text-sm">
             Already have an account?
             <button
               onClick={() => navigate("/auth/login")}

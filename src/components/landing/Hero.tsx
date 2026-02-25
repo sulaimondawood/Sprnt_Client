@@ -61,7 +61,7 @@ export const Hero = () => {
                   <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
-              <Link to="/auth?role=driver">
+              <Link to={ROUTES.register}>
                 <Button
                   size="lg"
                   variant="outline"

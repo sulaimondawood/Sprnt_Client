@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Car, Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { Car, Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
@@ -63,14 +63,14 @@ const LoginPage = () => {
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                   <Input
                     id="email"
                     type="email"
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
+                    className="pl-8 text-sm"
                     required
                   />
                 </div>
@@ -79,14 +79,14 @@ const LoginPage = () => {
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10"
+                    className="px-8 text-sm"
                     required
                   />
                   <button
@@ -95,19 +95,15 @@ const LoginPage = () => {
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
                     {showPassword ? (
-                      <EyeOff className="h-5 w-5" />
+                      <EyeOff className="size-4" />
                     ) : (
-                      <Eye className="h-5 w-5" />
+                      <Eye className="size-4" />
                     )}
                   </button>
                 </div>
               </div>
 
               <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" className="rounded border-border" />
-                  <span className="text-muted-foreground">Remember me</span>
-                </label>
                 <button
                   type="button"
                   className="text-primary hover:underline"
@@ -122,12 +118,16 @@ const LoginPage = () => {
                 className={`w-full h-12 text-lg`}
                 disabled={isPending}
               >
-                {isPending ? "Please wait..." : "Sign In"}
+                {isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  "Sign In"
+                )}
               </Button>
             </form>
           </Card>
 
-          <p className="text-center text-muted-foreground">
+          <p className="text-center text-muted-foreground text-sm">
             Don't have an account?
             <button
               onClick={() => navigate(ROUTES.register)}
