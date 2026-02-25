@@ -162,7 +162,6 @@ const DashboardHome = () => {
               value={overviewData?.ridesOfTheWeek}
               subtitle="Rides taken"
               icon={Clock}
-              trend={{ value: 8, isPositive: true }}
             />
             <StatCard
               title="Rating"
@@ -340,10 +339,10 @@ const DashboardHome = () => {
                   <Link to={ROUTES.dashboardWallet} className="block">
                     <Button
                       variant="outline"
-                      className="w-full justify-start gap-3 h-14"
+                      className="w-full justify-start gap-3 h-14 group"
                     >
-                      <div className="w-10 h-10 rounded-lg bg-warning/10 flex items-center justify-center">
-                        <Wallet className="h-5 w-5 text-warning" />
+                      <div className="w-10 h-10 rounded-lg bg-warning/10 group-hover:bg-white  flex items-center justify-center">
+                        <Wallet className="h-5 w-5 text-warning " />
                       </div>
                       <div className="text-left">
                         <p className="font-medium">Top Up Wallet</p>
