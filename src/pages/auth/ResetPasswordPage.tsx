@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,20 +13,24 @@ import {
   CheckCircle2,
   ShieldCheck,
 } from "lucide-react";
+import { AuthAPI } from "@/services/api/auth";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { ROUTES } from "@/constants/routes";
 
 const ResetPasswordPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token");
+
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const passwordChecks = [
     { label: "At least 8 characters", met: password.length >= 8 },
-    { label: "Contains a number", met: /\d/.test(password) },
     { label: "Contains uppercase letter", met: /[A-Z]/.test(password) },
     {
       label: "Passwords match",
@@ -36,17 +40,32 @@ const ResetPasswordPage = () => {
 
   const allChecksMet = passwordChecks.every((c) => c.met);
 
+  const {
+    mutate: resetPassword,
+    isPending,
+    isSuccess,
+  } = useMutation({
+    mutationFn: (payload: Record<string, string>) =>
+      AuthAPI.resetPassword(payload),
+    onSuccess(data) {
+      toast("Password updated!", {
+        description: "Your password has been reset successfully.",
+      });
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError(error: any) {
+      toast.error(error?.response?.data?.message);
+    },
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!allChecksMet) return;
-    setIsSubmitting(true);
+    if (!allChecksMet && !token) return;
 
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsSubmitting(false);
-    setIsSuccess(true);
-    toast({
-      title: "Password updated!",
-      description: "Your password has been reset successfully.",
+    resetPassword({
+      token,
+      password,
+      confirmPassword,
     });
   };
 
@@ -54,16 +73,6 @@ const ResetPasswordPage = () => {
     <div className="min-h-screen bg-background flex">
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-md space-y-8">
-          {/* Logo */}
-          <div className="text-center">
-            <Link to="/" className="inline-flex items-center gap-2 mb-8">
-              <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center">
-                <Car className="h-7 w-7 text-primary-foreground" />
-              </div>
-              <span className="text-2xl font-bold">RideFlow</span>
-            </Link>
-          </div>
-
           {!isSuccess ? (
             <>
               <div className="text-center space-y-2">
@@ -155,9 +164,9 @@ const ResetPasswordPage = () => {
                   <Button
                     type="submit"
                     className="w-full h-12 text-lg gradient-primary"
-                    disabled={isSubmitting || !allChecksMet}
+                    disabled={!allChecksMet || isPending}
                   >
-                    {isSubmitting ? "Resetting..." : "Reset Password"}
+                    {isPending ? "Resetting..." : "Reset Password"}
                   </Button>
                 </form>
               </Card>
@@ -174,7 +183,7 @@ const ResetPasswordPage = () => {
               </p>
               <Button
                 className="w-full h-12 text-lg gradient-primary"
-                onClick={() => navigate("/auth")}
+                onClick={() => navigate(ROUTES.login)}
               >
                 Back to Sign In
               </Button>

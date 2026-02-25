@@ -30,4 +30,9 @@ export const AuthAPI = {
     const res = await request.post("/auth/forgot-password", payload);
     return res.data;
   },
+
+  async resetPassword(payload: Record<string, string>) {
+    const res = await request.post("/auth/reset-password", payload);
+    return res.data;
+  },
 };
