@@ -9,6 +9,7 @@ import { Testimonials } from "@/components/landing/Testimonial";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { features, howItWorks, stats } from "@/constants";
+import { ROUTES } from "@/constants/routes";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -273,10 +274,10 @@ const LandingPage = () => {
                 ))}
               </div>
 
-              <div className="flex gap-4 mt-10">
+              <div className="flex flex-wrap gap-4 mt-10">
                 <Button
                   size="lg"
-                  className="gap-2 h-14 px-8 bg-primary text-primary-foreground hover:bg-primary/90"
+                  className="w-full min-[450px]:w-fit gap-2 h-14 px-8 bg-primary text-primary-foreground hover:bg-primary/90"
                 >
                   <Play className="h-5 w-5" />
                   Watch Demo
@@ -284,7 +285,7 @@ const LandingPage = () => {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="gap-2 h-14 px-8 bg-white/5 border-white/20 text-white hover:bg-white/10"
+                  className="gap-2 w-full min-[450px]:w-fit h-14 px-8 bg-white/5 border-white/20 text-white hover:bg-white/10"
                 >
                   Learn More
                 </Button>
@@ -452,12 +453,11 @@ const LandingPage = () => {
               whileInView="visible"
               viewport={{ once: true }}
             >
-              <Link to="/auth?role=driver">
+              <Link to={ROUTES.register}>
                 <Button
                   size="lg"
-                  className="gap-3 h-16 px-10 text-lg shadow-xl hover:shadow-2xl transition-all bg-foreground text-background hover:bg-foreground/90"
+                  className="gap-3 h-16 px-4 sm:px-10 text-lg shadow-xl hover:shadow-2xl transition-all bg-foreground text-background hover:bg-foreground/90"
                 >
-                  <Car className="h-6 w-6" />
                   Become a Driver Today
                   <ArrowRight className="h-5 w-5" />
                 </Button>
