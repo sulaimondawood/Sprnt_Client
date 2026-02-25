@@ -1,49 +1,47 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import {
-  Car,
-  User,
-  Shield,
-  MapPin,
-  Clock,
-  CreditCard,
-  Star,
-  ChevronRight,
-  ArrowRight,
-  Menu,
-  X,
-  Zap,
-  Globe,
-  Users,
-  Headphones,
-  CheckCircle2,
-  Play,
-  Quote,
-} from "lucide-react";
-import rideAnimation from "@/assets/ride-animation.gif";
+/* eslint-disable react-refresh/only-export-components */
 import cityDrive from "@/assets/city-drive.gif";
 import phoneApp from "@/assets/phone-app.gif";
-import { ROUTES } from "@/constants/routes";
+import rideAnimation from "@/assets/ride-animation.gif";
+import { Footer } from "@/components/global/Footer";
+import { Navigation } from "@/components/global/Navigation";
+import { Hero } from "@/components/landing/Hero";
+import { Testimonials } from "@/components/landing/Testimonial";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { features, howItWorks, stats } from "@/constants";
+import { motion } from "framer-motion";
+import {
+  ArrowRight,
+  Car,
+  CheckCircle2,
+  ChevronRight,
+  Clock,
+  CreditCard,
+  Globe,
+  Headphones,
+  Play,
+  Shield,
+  Star,
+  User,
+} from "lucide-react";
+import { Link } from "react-router-dom";
 
-const fadeInUp = {
+export const fadeInUp = {
   hidden: { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
 };
 
-const fadeInLeft = {
+export const fadeInLeft = {
   hidden: { opacity: 0, x: -40 },
   visible: { opacity: 1, x: 0, transition: { duration: 0.6 } },
 };
 
-const fadeInRight = {
+export const fadeInRight = {
   hidden: { opacity: 0, x: 40 },
   visible: { opacity: 1, x: 0, transition: { duration: 0.6 } },
 };
 
-const staggerContainer = {
+export const staggerContainer = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -51,393 +49,18 @@ const staggerContainer = {
   },
 };
 
-const scaleIn = {
+export const scaleIn = {
   hidden: { opacity: 0, scale: 0.8 },
   visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
 };
 
 const LandingPage = () => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const features = [
-    {
-      icon: MapPin,
-      title: "Real-time Tracking",
-      description:
-        "Track your ride in real-time with our advanced GPS system and live ETA updates.",
-    },
-    {
-      icon: Shield,
-      title: "Safe & Secure",
-      description:
-        "Verified drivers, secure payments, emergency SOS, and 24/7 support.",
-    },
-    {
-      icon: Zap,
-      title: "Instant Matching",
-      description:
-        "Get matched with nearby drivers in seconds with our smart algorithm.",
-    },
-    {
-      icon: CreditCard,
-      title: "Flexible Payments",
-      description:
-        "Pay with cards, wallets, or cash. Split fares with friends easily.",
-    },
-  ];
-
-  const stats = [
-    { value: "10M+", label: "Rides Completed", icon: Car },
-    { value: "50K+", label: "Active Drivers", icon: Users },
-    { value: "4.9★", label: "Average Rating", icon: Star },
-    { value: "100+", label: "Cities Worldwide", icon: Globe },
-  ];
-
-  const testimonials = [
-    {
-      quote:
-        "SPRNT has completely transformed my daily commute. It's reliable, affordable, and the drivers are always professional.",
-      author: "Sarah Chen",
-      role: "Marketing Executive",
-      rating: 5,
-    },
-    {
-      quote:
-        "As a driver, I love the flexibility. I can work whenever I want and the earnings are great. Best decision I've made!",
-      author: "Michael Okonkwo",
-      role: "SPRNT Driver",
-      rating: 5,
-    },
-    {
-      quote:
-        "The safety features give me peace of mind, especially for late-night rides. The SOS button is a game-changer.",
-      author: "Emily Rodriguez",
-      role: "Frequent Rider",
-      rating: 5,
-    },
-  ];
-
-  const howItWorks = [
-    {
-      step: 1,
-      title: "Set Your Destination",
-      description:
-        "Enter where you want to go and see fare estimates instantly",
-    },
-    {
-      step: 2,
-      title: "Get Matched",
-      description: "Our algorithm finds the best driver near you in seconds",
-    },
-    {
-      step: 3,
-      title: "Enjoy Your Ride",
-      description: "Track your ride in real-time and arrive safely",
-    },
-  ];
-
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Navigation */}
-      <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.6 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled
-            ? "bg-background/95 backdrop-blur-xl border-b border-border shadow-lg"
-            : "bg-transparent"
-        }`}
-      >
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16 lg:h-20">
-            <Link to="/" className="flex items-center gap-3 group">
-              <img src="/sprnt-logo.png" alt="logo" className="w-16" />
-            </Link>
-
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-10">
-              {["Features", "How It Works", "Safety", "Drive with us"].map(
-                (item) => (
-                  <Link
-                    key={item}
-                    to={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
-                    className="text-muted-foreground hover:text-foreground transition-colors font-medium relative group"
-                  >
-                    {item}
-                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
-                  </Link>
-                ),
-              )}
-            </div>
-
-            <div className="hidden lg:flex items-center gap-4">
-              <Link to={ROUTES.login}>
-                <Button variant="ghost" size="lg" className="font-medium">
-                  Sign In
-                </Button>
-              </Link>
-              <Link to={ROUTES.register}>
-                <Button
-                  size="lg"
-                  className="font-medium shadow-lg hover:shadow-xl transition-shadow bg-foreground text-background hover:bg-foreground/90"
-                >
-                  Get Started
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
-
-            {/* Mobile menu button */}
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              className="lg:hidden p-2 hover:bg-muted rounded-lg transition-colors"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
-            </motion.button>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden bg-background border-b border-border"
-          >
-            <div className="container mx-auto px-4 py-6 space-y-4">
-              {["Features", "How It Works", "Safety", "Drive with us"].map(
-                (item) => (
-                  <Link
-                    key={item}
-                    to={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
-                    className="block text-muted-foreground hover:text-foreground font-medium py-2"
-                  >
-                    {item}
-                  </Link>
-                ),
-              )}
-              <div className="flex gap-3 pt-4 border-t border-border">
-                <Link to="/auth" className="flex-1">
-                  <Button variant="outline" className="w-full">
-                    Sign In
-                  </Button>
-                </Link>
-                <Link to="/auth?signup=true" className="flex-1">
-                  <Button className="w-full bg-foreground text-background hover:bg-foreground/90">
-                    Get Started
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </motion.nav>
-
+      <Navigation />
       {/* Hero Section */}
-      <section className="pt-24 lg:pt-32 pb-20 relative overflow-hidden min-h-screen flex items-center">
-        {/* Animated Background */}
-        <div className="absolute inset-0 gradient-hero" />
-        <div className="absolute inset-0">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        </div>
-
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            <motion.div
-              variants={staggerContainer}
-              initial="hidden"
-              animate="visible"
-              className="space-y-8 text-center lg:text-left"
-            >
-              <motion.div
-                variants={fadeInUp}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 backdrop-blur-sm rounded-full text-white/90 text-sm font-medium border border-white/20"
-              >
-                <Star className="h-4 w-4 fill-primary text-primary" />
-                <span>Premium Ride-hailing Service</span>
-                <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-              </motion.div>
-
-              <motion.h1
-                variants={fadeInUp}
-                className="text-5xl sm:text-6xl lg:text-8xl font-display font-semibold leading-tight text-white tracking-tight"
-              >
-                Arrive in <br />
-                <span className="text-gradient">Style</span>
-              </motion.h1>
-
-              <motion.p
-                variants={fadeInUp}
-                className="text-lg lg:text-xl text-white/60 max-w-lg mx-auto lg:mx-0 font-light"
-              >
-                Experience premium urban transportation. Luxury vehicles,
-                professional drivers, impeccable service—anytime, anywhere.
-              </motion.p>
-
-              <motion.div
-                variants={fadeInUp}
-                className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
-              >
-                <Link to="/auth?role=rider">
-                  <Button
-                    size="lg"
-                    className="w-full sm:w-auto text-lg px-8 gap-3 h-14 shadow-2xl transition-all bg-primary text-primary-foreground hover:bg-primary/90"
-                  >
-                    <User className="h-5 w-5" />
-                    Book a Ride
-                    <ArrowRight className="h-5 w-5" />
-                  </Button>
-                </Link>
-                <Link to="/auth?role=driver">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="w-full sm:w-auto text-lg px-8 gap-3 h-14 bg-white/5 border-white/20 text-white hover:bg-white/10 hover:text-white"
-                  >
-                    <Car className="h-5 w-5" />
-                    Become a Driver
-                  </Button>
-                </Link>
-              </motion.div>
-
-              <motion.div
-                variants={fadeInUp}
-                className="flex items-center gap-6 pt-4 justify-center lg:justify-start"
-              >
-                <div className="flex -space-x-3">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.8 + i * 0.1 }}
-                      className="w-10 h-10 rounded-full border-2 border-background overflow-hidden bg-gradient-to-br from-primary to-primary/60"
-                    />
-                  ))}
-                </div>
-                <p className="text-white/50 text-sm">
-                  <span className="text-white font-medium">10,000+</span> happy
-                  riders this week
-                </p>
-              </motion.div>
-            </motion.div>
-
-            <motion.div
-              variants={fadeInRight}
-              initial="hidden"
-              animate="visible"
-              className="relative hidden lg:block"
-            >
-              <div className="absolute inset-0 gradient-primary rounded-3xl opacity-20 blur-3xl" />
-              <Card className="relative overflow-hidden bg-white/5 backdrop-blur-xl border-white/10 shadow-2xl">
-                <div className="absolute inset-0 shimmer" />
-                <div className="relative p-8 space-y-6">
-                  <div className="flex items-center gap-4 p-4 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
-                    <div className="w-3 h-3 rounded-full bg-success animate-pulse" />
-                    <div className="flex-1">
-                      <p className="text-xs text-white/40 uppercase tracking-wide">
-                        Pickup
-                      </p>
-                      <p className="font-medium text-white">
-                        Victoria Island, Lagos
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4 p-4 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
-                    <div className="w-3 h-3 rounded-full bg-primary" />
-                    <div className="flex-1">
-                      <p className="text-xs text-white/40 uppercase tracking-wide">
-                        Drop-off
-                      </p>
-                      <p className="font-medium text-white">Lekki Phase 1</p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-3">
-                    {["Economy", "Comfort", "Premium"].map((type, i) => (
-                      <motion.div
-                        key={type}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className={`p-4 rounded-xl text-center cursor-pointer transition-all ${
-                          i === 2
-                            ? "gradient-primary text-primary-foreground shadow-lg"
-                            : "bg-white/5 hover:bg-white/10 text-white/70"
-                        }`}
-                      >
-                        <Car className="h-6 w-6 mx-auto mb-2" />
-                        <p className="text-sm font-medium">{type}</p>
-                        <p className="text-xs opacity-70 mt-1">
-                          {i === 0 ? "₦1,500" : i === 1 ? "₦2,200" : "₦3,500"}
-                        </p>
-                      </motion.div>
-                    ))}
-                  </div>
-
-                  <Button
-                    size="lg"
-                    className="w-full h-14 text-lg shadow-lg bg-foreground text-background hover:bg-foreground/90"
-                  >
-                    Book Now
-                    <ChevronRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </div>
-              </Card>
-
-              {/* Floating Elements */}
-              <motion.div
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 3, repeat: Infinity }}
-                className="absolute -top-6 -right-6 bg-primary text-primary-foreground px-4 py-2 rounded-xl shadow-lg font-medium"
-              >
-                <Clock className="inline h-4 w-4 mr-2" />3 min away
-              </motion.div>
-
-              <motion.div
-                animate={{ y: [0, 10, 0] }}
-                transition={{ duration: 4, repeat: Infinity, delay: 0.5 }}
-                className="absolute -bottom-4 -left-4 bg-success text-success-foreground px-4 py-2 rounded-xl shadow-lg font-medium"
-              >
-                <CheckCircle2 className="inline h-4 w-4 mr-2" />
-                Verified Driver
-              </motion.div>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* Scroll Indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-        >
-          <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="w-6 h-10 border-2 border-white/20 rounded-full flex justify-center pt-2"
-          >
-            <div className="w-1.5 h-3 bg-primary/50 rounded-full" />
-          </motion.div>
-        </motion.div>
-      </section>
-
+      <Hero />
       {/* Stats Section */}
       <section className="py-20 bg-background relative">
         <div className="container mx-auto px-4">
@@ -689,71 +312,7 @@ const LandingPage = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-24 bg-background relative">
-        <div className="container mx-auto px-4">
-          <motion.div
-            variants={fadeInUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="text-center max-w-2xl mx-auto mb-16"
-          >
-            <span className="text-primary font-semibold text-sm uppercase tracking-widest">
-              Testimonials
-            </span>
-            <h2 className="text-3xl lg:text-5xl font-display font-semibold mt-4 mb-6">
-              What Our Clients Say
-            </h2>
-            <p className="text-muted-foreground text-lg">
-              Join thousands of satisfied riders and drivers who trust SPRNT
-              every day.
-            </p>
-          </motion.div>
-
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid md:grid-cols-3 gap-8"
-          >
-            {testimonials.map((testimonial, i) => (
-              <motion.div key={i} variants={scaleIn}>
-                <Card className="p-8 h-full hover:shadow-xl transition-all duration-300 border-border/50 relative overflow-hidden group">
-                  <div className="absolute top-4 right-4 text-primary/10 group-hover:text-primary/20 transition-colors">
-                    <Quote className="h-16 w-16" />
-                  </div>
-                  <div className="relative">
-                    <div className="flex gap-1 mb-4">
-                      {Array(testimonial.rating)
-                        .fill(0)
-                        .map((_, i) => (
-                          <Star
-                            key={i}
-                            className="h-5 w-5 fill-primary text-primary"
-                          />
-                        ))}
-                    </div>
-                    <p className="text-foreground/80 mb-6 leading-relaxed italic font-light">
-                      "{testimonial.quote}"
-                    </p>
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full gradient-primary" />
-                      <div>
-                        <p className="font-semibold">{testimonial.author}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {testimonial.role}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
+      <Testimonials />
       {/* City Coverage Section */}
       <section className="py-24 bg-muted relative overflow-hidden">
         <div className="container mx-auto px-4">
@@ -970,90 +529,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-16 bg-card border-t border-border">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
-            <div>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center shadow-lg">
-                  <Car className="h-5 w-5 text-primary-foreground" />
-                </div>
-                <span className="text-2xl font-display font-semibold">
-                  SPRNT
-                </span>
-              </div>
-              <p className="text-muted-foreground mb-6">
-                Premium urban transportation. Experience luxury on every ride.
-              </p>
-              <div className="flex gap-4">
-                {["twitter", "facebook", "instagram", "linkedin"].map(
-                  (social) => (
-                    <a
-                      key={social}
-                      href="#"
-                      className="w-10 h-10 rounded-full bg-muted flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
-                    >
-                      <span className="sr-only">{social}</span>
-                      <div className="w-5 h-5" />
-                    </a>
-                  ),
-                )}
-              </div>
-            </div>
-
-            {[
-              {
-                title: "Company",
-                links: ["About Us", "Careers", "Press", "Blog"],
-              },
-              {
-                title: "Products",
-                links: ["Ride", "Drive", "Business", "Delivery"],
-              },
-              {
-                title: "Support",
-                links: ["Help Center", "Safety", "Contact", "FAQs"],
-              },
-            ].map((section) => (
-              <div key={section.title}>
-                <h4 className="font-display font-semibold mb-6">
-                  {section.title}
-                </h4>
-                <ul className="space-y-3">
-                  {section.links.map((link) => (
-                    <li key={link}>
-                      <a
-                        href="#"
-                        className="text-muted-foreground hover:text-primary transition-colors"
-                      >
-                        {link}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-
-          <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-muted-foreground text-sm">
-              © 2024 SPRNT. All rights reserved.
-            </p>
-            <div className="flex gap-6">
-              {["Privacy Policy", "Terms of Service", "Cookies"].map((link) => (
-                <a
-                  key={link}
-                  href="#"
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                >
-                  {link}
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
