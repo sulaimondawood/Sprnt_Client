@@ -49,7 +49,7 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen bg-background flex">
-      <div className="flex-1 flex items-center justify-center p-8">
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-8">
         <div className="w-full max-w-md space-y-8">
           <div className="text-center">
             <h1 className="text-3xl font-bold mb-2">Welcome back</h1>
@@ -58,7 +58,7 @@ const LoginPage = () => {
             </p>
           </div>
 
-          <Card className="p-6">
+          <Card className="p-3 md:px-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>

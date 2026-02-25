@@ -110,7 +110,7 @@ const RegisterPage = () => {
             </TabsList>
           </Tabs>
 
-          <Card className="p-3">
+          <Card className="p-3 md:px-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
