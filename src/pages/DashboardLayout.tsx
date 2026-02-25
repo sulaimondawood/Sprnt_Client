@@ -364,14 +364,14 @@ const DashboardLayout = () => {
               )}
             </button>
 
-            <Link to="/" className="flex items-center gap-2">
-              <span className="text-xl font-bold hidden sm:block">Sprnt</span>
+            <Link to="/" className="hidden lg:flex">
+              <img src="/sprnt-logo.png" alt="logo" className="w-20 xl:w-24" />
             </Link>
           </div>
 
           <div className="flex items-center gap-4">
             {role === "DRIVER" && (
-              <div className="hidden sm:flex items-center gap-3 px-4 py-2 bg-muted rounded-full">
+              <div className="flex items-center gap-3 px-4 py-2 bg-muted rounded-full">
                 <span
                   className={cn(
                     "text-sm font-medium",

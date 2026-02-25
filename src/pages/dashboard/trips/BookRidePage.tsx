@@ -7,9 +7,6 @@ import Map from "@/components/Map";
 import {
   DriverResponseModal,
   NoDriverFoundModal,
-  RateModal,
-  RideCompletedModal,
-  RiderCancelledModal,
   SearchingDriverModal,
 } from "@/components/RideModals";
 import { Button } from "@/components/ui/button";
@@ -19,7 +16,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { profile } from "@/helpers";
 import { useSubscription } from "@/hooks/useStompSubscription";
-import { RatingAPI, RatingPost } from "@/services/api/rating";
 import { RiderAPI } from "@/services/api/rider";
 import { CreateRideRequest, DriverSummary } from "@/types/riders";
 import { Ride } from "@/types/rides/indes";
@@ -33,7 +29,6 @@ import {
   Phone,
   User,
   Wallet,
-  X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -437,26 +432,6 @@ const BookRidePage = () => {
         {/* Right Sidebar */}
         {bookingStep === "location" && (
           <div className="space-y-6">
-            {/* Default Location */}
-            <Card className="p-6">
-              <h2 className="text-lg font-semibold mb-4">Default Location</h2>
-              <button
-                onClick={() => {
-                  // setPickup("123 Victoria Island, Lagos");
-                }}
-                className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors text-left"
-              >
-                <span className="text-2xl">🏠</span>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium">Home</p>
-                  <p className="text-sm text-muted-foreground truncate">
-                    123 Victoria Island, Lagos
-                  </p>
-                </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </button>
-            </Card>
-
             {/* Payment Method */}
             <Card className="p-6">
               <h2 className="text-lg font-semibold mb-4">Payment Method</h2>
