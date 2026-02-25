@@ -159,16 +159,7 @@ const LandingPage = () => {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16 lg:h-20">
             <Link to="/" className="flex items-center gap-3 group">
-              <motion.div
-                whileHover={{ rotate: 360 }}
-                transition={{ duration: 0.5 }}
-                className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl gradient-primary flex items-center justify-center shadow-lg pulse-glow"
-              >
-                <Car className="h-5 w-5 lg:h-6 lg:w-6 text-primary-foreground" />
-              </motion.div>
-              <span className="text-2xl lg:text-3xl font-display font-semibold tracking-tight">
-                SPRNT
-              </span>
+              <img src="/sprnt-logo.png" alt="logo" className="w-16" />
             </Link>
 
             {/* Desktop Navigation */}

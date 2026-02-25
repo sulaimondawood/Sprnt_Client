@@ -35,4 +35,9 @@ export const AuthAPI = {
     const res = await request.post("/auth/reset-password", payload);
     return res.data;
   },
+
+  async validateEmail(token: string) {
+    const res = await request.post("/auth/activate/" + token);
+    return res.data;
+  },
 };
