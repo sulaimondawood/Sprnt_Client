@@ -1,9 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { ROUTES } from "@/constants/routes";
 import { AuthAPI } from "@/services/api/auth";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Loader2, ShieldCheck, XCircle } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -19,6 +18,21 @@ const EmailVerificationPage = () => {
     queryFn: () => AuthAPI.validateEmail(token),
     enabled: !!token,
   });
+
+  const { mutate: resendActivationEmail, isPending: isResendingEmail } =
+    useMutation({
+      mutationFn: () => AuthAPI.resendActivationEmail({ token }),
+      onSuccess(data) {
+        toast(
+          "A verification email has been sent to your inbox. Check your spam if not found",
+        );
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      onError(error: any) {
+        toast.error(error?.response?.data?.message);
+      },
+    });
+
   return (
     <div className="min-h-screen bg-background flex">
       <div className="flex-1 flex items-center justify-center p-8">
@@ -54,7 +68,7 @@ const EmailVerificationPage = () => {
                 </div>
                 <Button
                   className="w-full h-12 text-lg gradient-primary"
-                  onClick={() => navigate("/auth")}
+                  onClick={() => navigate(ROUTES.login)}
                 >
                   Continue to Sign In
                 </Button>
@@ -83,7 +97,12 @@ const EmailVerificationPage = () => {
                   >
                     Back to Sign In
                   </Button>
-                  <Button variant="ghost" className="w-full">
+                  <Button
+                    variant="ghost"
+                    className="w-full"
+                    disabled={isResendingEmail}
+                    onClick={() => resendActivationEmail()}
+                  >
                     Resend verification email
                   </Button>
                 </div>

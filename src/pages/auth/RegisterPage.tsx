@@ -30,7 +30,10 @@ const RegisterPage = () => {
   const { mutate: registerRider, isPending } = useMutation({
     mutationFn: (payload: RegisterPayload) => AuthAPI.registerRider(payload),
     onSuccess(data) {
-      toast("Account created!");
+      toast("Account created!", {
+        description:
+          "A verification email has been sent to your inbox. Check your spam if not found",
+      });
       navigate(ROUTES.login);
     },
     onError(error: any) {
@@ -41,7 +44,10 @@ const RegisterPage = () => {
   const { mutate: registerDriver, isPending: isPendingDriver } = useMutation({
     mutationFn: (payload: RegisterPayload) => AuthAPI.registerDriver(payload),
     onSuccess(data) {
-      toast("Account created!");
+      toast("Account created!", {
+        description:
+          "A verification email has been sent to your inbox. Check your spam if not found",
+      });
       navigate(ROUTES.login);
     },
     onError(error: any) {

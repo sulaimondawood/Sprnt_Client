@@ -40,4 +40,9 @@ export const AuthAPI = {
     const res = await request.post("/auth/activate/" + token);
     return res.data;
   },
+
+  async resendActivationEmail(payload: Record<string, string>) {
+    const res = await request.post("/auth/resend-verfication-link/", payload);
+    return res.data;
+  },
 };
