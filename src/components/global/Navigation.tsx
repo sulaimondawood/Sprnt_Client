@@ -1,6 +1,6 @@
 import { ArrowRight, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence, easeInOut, motion } from "framer-motion";
 import { ROUTES } from "@/constants/routes";
 import { Button } from "../ui/button";
 import { Link } from "react-router-dom";
@@ -14,6 +14,22 @@ export const Navigation = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+      document.body.style.paddingRight = "var(--scrollbar-width, 0px)";
+    } else {
+      document.body.style.overflow = "unset";
+      document.body.style.paddingRight = "0px";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+      document.body.style.paddingRight = "0px";
+    };
+  }, [mobileMenuOpen]);
+
   return (
     <motion.nav
       initial={{ y: -100 }}
@@ -75,49 +91,61 @@ export const Navigation = () => {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? (
-              <X className="h-6 w-6" />
+              <X className="h-6 w-6 text-muted-foreground" />
             ) : (
-              <Menu className="h-6 w-6" />
+              <Menu className="h-6 w-6 text-muted-foreground" />
             )}
           </motion.button>
         </div>
       </div>
 
       {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          exit={{ opacity: 0, height: 0 }}
-          className="lg:hidden bg-background border-b border-border"
-        >
-          <div className="container mx-auto px-4 py-6 space-y-4">
-            {["Features", "How It Works", "Safety", "Drive with us"].map(
-              (item) => (
-                <Link
-                  key={item}
-                  to={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
-                  className="block text-muted-foreground hover:text-foreground font-medium py-2"
-                >
-                  {item}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "100dvh" }}
+            exit={{
+              opacity: 0,
+              height: 0,
+              transition: {
+                ease: easeInOut,
+                duration: 0.3,
+              },
+            }}
+            transition={{ ease: "easeInOut" }}
+            className="fixed inset-x-0 top-[64px] z-50 lg:hidden bg-background border-b border-border"
+          >
+            <div className="flex flex-col">
+              <div className="container mx-auto px-4 py-6 space-y-4">
+                {["Features", "How It Works", "Safety", "Drive with us"].map(
+                  (item) => (
+                    <Link
+                      key={item}
+                      to={`#`}
+                      className="block text-muted-foreground hover:text-foreground font-medium py-2"
+                    >
+                      {item}
+                    </Link>
+                  ),
+                )}
+              </div>
+              <div className="justify-self-end px-5 flex gap-3 pt-4 border-t border-border">
+                <Link to={ROUTES.login} className="flex-1">
+                  <Button variant="outline" className="w-full">
+                    Sign In
+                  </Button>
                 </Link>
-              ),
-            )}
-            <div className="flex gap-3 pt-4 border-t border-border">
-              <Link to={ROUTES.login} className="flex-1">
-                <Button variant="outline" className="w-full">
-                  Sign In
-                </Button>
-              </Link>
-              <Link to={ROUTES.register} className="flex-1">
-                <Button className="w-full bg-foreground text-background hover:bg-foreground/90">
-                  Get Started
-                </Button>
-              </Link>
+                <Link to={ROUTES.register} className="flex-1">
+                  <Button className="w-full bg-foreground text-background hover:bg-foreground/90">
+                    Get Started
+                  </Button>
+                </Link>
+              </div>
             </div>
-          </div>
-        </motion.div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.nav>
   );
 };
