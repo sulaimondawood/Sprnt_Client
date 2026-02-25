@@ -56,7 +56,7 @@ const SettingsPage = () => {
           </div>
         </Card>
 
-        <Card className="p-6">
+        {/* <Card className="p-6">
           <div className="flex items-center gap-3 mb-6">
             <Lock className="h-5 w-5 text-primary" />
             <h2 className="text-lg font-semibold">Security</h2>
@@ -72,7 +72,7 @@ const SettingsPage = () => {
             </div>
             <Button>Update Password</Button>
           </div>
-        </Card>
+        </Card> */}
 
         <Card className="p-6">
           <div className="flex items-center gap-3 mb-6">

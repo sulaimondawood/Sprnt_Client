@@ -3,6 +3,7 @@ import {
   TripCardSkeleton,
   TripStatsSkeleton,
 } from "@/components/dashboard/trips/skeleton/TripSkeleton";
+import { PaginationComponent } from "@/components/global/pagination";
 import { RoleBadge } from "@/components/RoleBadge";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
@@ -33,7 +34,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const TripHistoryPage = () => {
   const [activeTab, setActiveTab] = useState("all");
@@ -43,9 +44,17 @@ const TripHistoryPage = () => {
   });
   const [searchQuery, setSearchQuery] = useState<string | null>();
 
+  const navigate = useNavigate();
   const debouncedValue = useDebounce(searchQuery);
 
-  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const pageFromUrl = parseInt(searchParams.get("page") || "1");
+  const pageSizeFromUrl = parseInt(searchParams.get("pageSize") || "25");
+
+  const [pagination] = useState({
+    pageNo: pageFromUrl - 1,
+    pageSize: pageSizeFromUrl,
+  });
 
   const profileData = profile();
   const role = profileData.role;
@@ -55,6 +64,8 @@ const TripHistoryPage = () => {
     status: activeTab === "all" ? null : activeTab,
     from: date?.from && date?.from.toISOString(),
     to: date?.to && date?.to.toISOString(),
+    pageNo: pagination?.pageNo,
+    pageSize: pagination?.pageSize,
   };
 
   const {
@@ -62,7 +73,7 @@ const TripHistoryPage = () => {
     isLoading: isLoadingallRides,
     isSuccess: isSuccessLoadingallRides,
   } = useQuery<RideResponse>({
-    queryKey: ["rides", "all", filter],
+    queryKey: ["rides", "all", filter, pageFromUrl, pageSizeFromUrl],
     queryFn:
       role === "DRIVER"
         ? () => DriverAPI.allRides(filter)
@@ -316,6 +327,10 @@ const TripHistoryPage = () => {
                 </div>
               </Card>
             ))}
+
+          {isSuccessLoadingallRides && allRides.data?.length > 0 && (
+            <PaginationComponent totalPages={allRides?.meta?.totalPages} />
+          )}
         </TabsContent>
       </Tabs>
     </div>
