@@ -35,10 +35,10 @@ const EmailVerificationPage = () => {
 
   return (
     <div className="min-h-screen bg-background flex">
-      <div className="flex-1 flex items-center justify-center p-8">
+      <div className="flex-1 flex items-center justify-center p-4 md:p-8">
         <div className="w-full max-w-md space-y-8">
           {isFetching && (
-            <Card className="p-10">
+            <Card className="p-4 sm:p-10">
               <div className="text-center space-y-6">
                 <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
                   <Loader2 className="h-8 w-8 text-primary animate-spin" />
@@ -54,7 +54,7 @@ const EmailVerificationPage = () => {
           )}
 
           {isSuccess && (
-            <Card className="p-10">
+            <Card className="p-4 sm:p-10">
               <div className="text-center space-y-6">
                 <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center mx-auto animate-in zoom-in-50 duration-300">
                   <ShieldCheck className="h-10 w-10 text-success" />
@@ -67,7 +67,7 @@ const EmailVerificationPage = () => {
                   </p>
                 </div>
                 <Button
-                  className="w-full h-12 text-lg gradient-primary"
+                  className="w-full h-12 gradient-primary text-sm"
                   onClick={() => navigate(ROUTES.login)}
                 >
                   Continue to Sign In
@@ -77,7 +77,7 @@ const EmailVerificationPage = () => {
           )}
 
           {isError && (
-            <Card className="p-10">
+            <Card className="p-4 sm:p-10">
               <div className="text-center space-y-6">
                 <div className="w-20 h-20 rounded-full bg-destructive/10 flex items-center justify-center mx-auto animate-in zoom-in-50 duration-300">
                   <XCircle className="h-10 w-10 text-destructive" />
@@ -92,14 +92,14 @@ const EmailVerificationPage = () => {
                 </div>
                 <div className="space-y-3">
                   <Button
-                    className="w-full h-12 gradient-primary"
+                    className="w-full h-12 gradient-primary text-sm"
                     onClick={() => navigate(ROUTES.login)}
                   >
                     Back to Sign In
                   </Button>
                   <Button
                     variant="ghost"
-                    className="w-full"
+                    className="w-full text-sm"
                     disabled={isResendingEmail}
                     onClick={() => resendActivationEmail()}
                   >

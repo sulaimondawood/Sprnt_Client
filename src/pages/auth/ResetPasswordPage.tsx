@@ -12,6 +12,7 @@ import {
   EyeOff,
   CheckCircle2,
   ShieldCheck,
+  Loader2,
 } from "lucide-react";
 import { AuthAPI } from "@/services/api/auth";
 import { useMutation } from "@tanstack/react-query";
@@ -71,7 +72,7 @@ const ResetPasswordPage = () => {
 
   return (
     <div className="min-h-screen bg-background flex">
-      <div className="flex-1 flex items-center justify-center p-8">
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-8">
         <div className="w-full max-w-md space-y-8">
           {!isSuccess ? (
             <>
@@ -85,19 +86,19 @@ const ResetPasswordPage = () => {
                 </p>
               </div>
 
-              <Card className="p-6">
+              <Card className="p-3 sm:p-6">
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="space-y-2">
                     <Label htmlFor="password">New password</Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                       <Input
                         id="password"
                         type={showPassword ? "text" : "password"}
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="pl-10 pr-10"
+                        className="px-8 text-sm"
                         required
                       />
                       <button
@@ -106,9 +107,9 @@ const ResetPasswordPage = () => {
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                       >
                         {showPassword ? (
-                          <EyeOff className="h-5 w-5" />
+                          <EyeOff className="size-4" />
                         ) : (
-                          <Eye className="h-5 w-5" />
+                          <Eye className="size-4" />
                         )}
                       </button>
                     </div>
@@ -117,14 +118,14 @@ const ResetPasswordPage = () => {
                   <div className="space-y-2">
                     <Label htmlFor="confirm">Confirm password</Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                       <Input
                         id="confirm"
                         type={showConfirm ? "text" : "password"}
                         placeholder="••••••••"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="pl-10 pr-10"
+                        className="px-8 text-sm"
                         required
                       />
                       <button
@@ -132,10 +133,10 @@ const ResetPasswordPage = () => {
                         onClick={() => setShowConfirm(!showConfirm)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                       >
-                        {showConfirm ? (
-                          <EyeOff className="h-5 w-5" />
+                        {showPassword ? (
+                          <EyeOff className="size-4" />
                         ) : (
-                          <Eye className="h-5 w-5" />
+                          <Eye className="size-4" />
                         )}
                       </button>
                     </div>
@@ -144,7 +145,7 @@ const ResetPasswordPage = () => {
                   {/* Password strength indicators */}
                   <div className="space-y-2">
                     {passwordChecks.map((check, i) => (
-                      <div key={i} className="flex items-center gap-2 text-sm">
+                      <div key={i} className="flex items-center gap-2 text-xs">
                         <CheckCircle2
                           className={`h-4 w-4 ${check.met ? "text-success" : "text-muted-foreground/40"}`}
                         />
@@ -163,10 +164,14 @@ const ResetPasswordPage = () => {
 
                   <Button
                     type="submit"
-                    className="w-full h-12 text-lg gradient-primary"
+                    className="w-full h-12 text-sm gradient-primary"
                     disabled={!allChecksMet || isPending}
                   >
-                    {isPending ? "Resetting..." : "Reset Password"}
+                    {isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      "Reset Password"
+                    )}
                   </Button>
                 </form>
               </Card>

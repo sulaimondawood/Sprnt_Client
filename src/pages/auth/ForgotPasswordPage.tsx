@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { ROUTES } from "@/constants/routes";
 import { AuthAPI } from "@/services/api/auth";
 import { useMutation } from "@tanstack/react-query";
-import { ArrowLeft, CheckCircle2, Mail } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Loader2, Mail } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
@@ -39,7 +39,7 @@ const ForgotPasswordPage = () => {
 
   return (
     <div className="min-h-screen bg-background flex">
-      <div className="flex-1 flex items-center justify-center p-8">
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-8">
         <div className="w-full max-w-md space-y-8">
           {!isSuccess && (
             <>
@@ -53,19 +53,19 @@ const ForgotPasswordPage = () => {
                 </p>
               </div>
 
-              <Card className="p-6">
+              <Card className="p-3 md:p-6">
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="space-y-2">
                     <Label htmlFor="email">Email address</Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                       <Input
                         id="email"
                         type="email"
                         placeholder="you@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="pl-10"
+                        className="pl-8 text-sm"
                         required
                       />
                     </div>
@@ -73,10 +73,14 @@ const ForgotPasswordPage = () => {
 
                   <Button
                     type="submit"
-                    className="w-full h-12 text-lg gradient-primary"
+                    className="w-full h-12 gradient-primary text-sm"
                     disabled={isPending}
                   >
-                    {isPending ? "Sending..." : "Send Reset Link"}
+                    {isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      "Send Reset Link"
+                    )}
                   </Button>
                 </form>
               </Card>
@@ -93,16 +97,20 @@ const ForgotPasswordPage = () => {
                 We've sent a password reset link to{" "}
                 <span className="font-medium text-foreground">{email}</span>
               </p>
-              <Card className="p-6 space-y-4">
+              <Card className="p-3 md:p-6 space-y-4">
                 <p className="text-sm text-muted-foreground">
                   Didn't receive the email? Check your spam folder or
                 </p>
                 <Button
                   variant="outline"
-                  className="w-full"
+                  className="w-full text-sm"
                   onClick={() => forgotPassword({ email })}
                 >
-                  {isPending ? "Sending..." : "Resend reset link"}
+                  {isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Resend reset link"
+                  )}
                 </Button>
               </Card>
             </div>
