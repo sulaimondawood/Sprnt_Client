@@ -1,14 +1,10 @@
 import {
-  UserAccount,
-  RiderProfile,
   DriverProfile,
-  Vehicle,
-  VehicleDocument,
-  Trip,
+  RiderProfile,
+  SupportTicket,
+  UserAccount,
   Wallet,
   WalletTransaction,
-  SupportTicket,
-  DashboardStats,
 } from "@/types";
 
 // Mock User Accounts
@@ -160,30 +156,5 @@ export const mockWalletTransactions: WalletTransaction[] = [
     newBalance: 197050,
     createdAt: new Date("2024-12-07T12:00:00"),
     description: "Weekly performance bonus",
-  },
-];
-
-// Mock Support Tickets
-export const mockSupportTickets: SupportTicket[] = [
-  {
-    id: "st-001",
-    userId: "rider-001",
-    tripId: "trip-002",
-    title: "Driver took a longer route",
-    description:
-      "The driver took a longer route than necessary which increased my fare.",
-    status: "IN_PROGRESS",
-    createdAt: new Date("2024-12-06T15:00:00"),
-    updatedAt: new Date("2024-12-07T10:00:00"),
-  },
-  {
-    id: "st-002",
-    userId: "rider-001",
-    title: "Unable to add payment method",
-    description:
-      "I am trying to add my debit card but the app keeps showing an error.",
-    status: "RESOLVED",
-    createdAt: new Date("2024-12-01T09:00:00"),
-    updatedAt: new Date("2024-12-02T14:00:00"),
   },
 ];

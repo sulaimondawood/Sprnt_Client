@@ -1,4 +1,3 @@
-import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -19,9 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { mockSupportTickets } from "@/data/mockData";
 import { useToast } from "@/hooks/use-toast";
-import { format } from "date-fns";
 import {
   AlertCircle,
   CheckCircle,
@@ -90,7 +87,7 @@ const SupportPage = () => {
       icon: Phone,
       title: "Call Support",
       description: "Available 24/7",
-      action: "+234 800 123 4567",
+      action: "+234 800 999 4000",
     },
     {
       icon: Mail,
@@ -109,11 +106,15 @@ const SupportPage = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "RESOLVED":
-        return <CheckCircle className="h-5 w-5 text-success" />;
+        return (
+          <CheckCircle className="hidden min-[400px]:flex h-5 w-5 text-success" />
+        );
       case "IN_PROGRESS":
-        return <Clock className="h-5 w-5 text-info" />;
+        return <Clock className="hidden min-[400px]:flex h-5 w-5 text-info" />;
       default:
-        return <AlertCircle className="h-5 w-5 text-warning" />;
+        return (
+          <AlertCircle className="hidden min-[400px]:flex h-5 w-5 text-warning" />
+        );
     }
   };
 
@@ -193,7 +194,7 @@ const SupportPage = () => {
       </div>
 
       {/* Contact Options */}
-      <div className="grid sm:grid-cols-3 gap-4">
+      <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
         {contactOptions.map((option) => (
           <Card
             key={option.title}
@@ -215,9 +216,9 @@ const SupportPage = () => {
         ))}
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* My Tickets */}
-        <Card className="p-6">
+        <Card className="p-3 sm:p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold">My Tickets</h2>
             <Button variant="ghost" size="sm" className="gap-1">
@@ -226,41 +227,14 @@ const SupportPage = () => {
             </Button>
           </div>
 
-          {mockSupportTickets.length === 0 ? (
-            <div className="text-center py-8">
-              <HelpCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">No support tickets yet</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {mockSupportTickets.map((ticket) => (
-                <div
-                  key={ticket.id}
-                  className="p-4 border border-border rounded-xl hover:bg-muted/50 transition-colors cursor-pointer"
-                >
-                  <div className="flex items-start gap-3">
-                    {getStatusIcon(ticket.status)}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-2 mb-1">
-                        <p className="font-medium truncate">{ticket.title}</p>
-                        <StatusBadge status={ticket.status} type="ticket" />
-                      </div>
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {ticket.description}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-2">
-                        {format(new Date(ticket.createdAt), "MMM d, yyyy")}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          <div className="text-center py-8">
+            <HelpCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">No support tickets yet</p>
+          </div>
         </Card>
 
         {/* FAQs */}
-        <Card className="p-6">
+        <Card className="p-3 sm:p-6">
           <h2 className="text-xl font-semibold mb-6">
             Frequently Asked Questions
           </h2>
