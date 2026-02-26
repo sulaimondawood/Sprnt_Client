@@ -1,5 +1,4 @@
 import vehicleHero from "@/assets/vehicle-hero.jpg";
-import { RoleBadge } from "@/components/RoleBadge";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -133,7 +132,7 @@ const VehiclePage = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex gap-4 flex-wrap items-center justify-between">
         <div>
           <div className="flex items-center gap-3 mb-1">
             <h1 className="text-3xl font-bold">My Vehicle</h1>
@@ -142,13 +141,7 @@ const VehiclePage = () => {
             Manage your registered vehicle
           </p>
         </div>
-        {isLoadingVehicles && (
-          <div className="flex items-center gap-2">
-            <Skeleton className="h-9 w-20 rounded-md" />
 
-            <Skeleton className="h-9 w-24 rounded-md" />
-          </div>
-        )}
         {isSuccessLoadingVehicles && (
           <div className="flex items-center gap-2">
             {isEditing ? (
@@ -195,59 +188,61 @@ const VehiclePage = () => {
       </div>
 
       {/* Hero Card with Vehicle Image */}
-      {isLoadingVehicles && <Skeleton className="h-48 sm:h-56 lg:h-64" />}
-      <Card className="overflow-hidden">
-        <div className="relative h-48 sm:h-56 lg:h-[400px]">
-          <img
-            src={vehicleHero}
-            alt={`${vehicleData?.brand} ${vehicleData?.model}`}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-card via-card/40 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-6 flex items-end justify-between">
-            <div>
-              {isEditing ? (
-                <div className="flex gap-2 mb-1">
+      {isLoadingVehicles && <Skeleton className="h-64" />}
+      {isSuccessLoadingVehicles && (
+        <Card className="overflow-hidden">
+          <div className="relative h-[400px]">
+            <img
+              src={vehicleHero}
+              alt={`${vehicleData?.brand} ${vehicleData?.model}`}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-card via-card/40 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 p-6 flex items-end justify-between">
+              <div>
+                {isEditing ? (
+                  <div className="flex gap-2 mb-1">
+                    <Input
+                      value={editForm?.brand}
+                      onChange={(e) => updateField("brand", e.target.value)}
+                      placeholder="Brand"
+                      className="h-9 w-32 bg-background/80 backdrop-blur-sm"
+                    />
+                    <Input
+                      value={editForm?.model}
+                      onChange={(e) => updateField("model", e.target.value)}
+                      placeholder="Model"
+                      className="h-9 w-32 bg-background/80 backdrop-blur-sm"
+                    />
+                  </div>
+                ) : (
+                  <h2 className="text-2xl sm:text-3xl font-bold">
+                    {vehicleData?.brand} {vehicleData?.model}
+                  </h2>
+                )}
+                {isEditing ? (
                   <Input
-                    value={editForm?.brand}
-                    onChange={(e) => updateField("brand", e.target.value)}
-                    placeholder="Brand"
-                    className="h-9 w-32 bg-background/80 backdrop-blur-sm"
+                    value={editForm?.plateNumber}
+                    onChange={(e) => updateField("plateNumber", e.target.value)}
+                    placeholder="Plate Number"
+                    className="h-8 w-40 mt-1 text-sm bg-background/80 backdrop-blur-sm"
                   />
-                  <Input
-                    value={editForm?.model}
-                    onChange={(e) => updateField("model", e.target.value)}
-                    placeholder="Model"
-                    className="h-9 w-32 bg-background/80 backdrop-blur-sm"
-                  />
-                </div>
-              ) : (
-                <h2 className="text-2xl sm:text-3xl font-bold">
-                  {vehicleData?.brand} {vehicleData?.model}
-                </h2>
-              )}
-              {isEditing ? (
-                <Input
-                  value={editForm?.plateNumber}
-                  onChange={(e) => updateField("plateNumber", e.target.value)}
-                  placeholder="Plate Number"
-                  className="h-8 w-40 mt-1 text-sm bg-background/80 backdrop-blur-sm"
-                />
-              ) : (
-                <p className="text-muted-foreground font-medium tracking-wide">
-                  {vehicleData?.plateNumber}
-                </p>
-              )}
+                ) : (
+                  <p className="text-muted-foreground font-medium tracking-wide">
+                    {vehicleData?.plateNumber}
+                  </p>
+                )}
+              </div>
+              <StatusBadge status={"APPROVED"} type="document" />
             </div>
-            <StatusBadge status={"APPROVED"} type="document" />
           </div>
-        </div>
-      </Card>
+        </Card>
+      )}
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 2xl:grid-cols-3 gap-6">
         {/* Left Column - Specs & Stats */}
         <div className="lg:col-span-2 space-y-6">
-          <Card className="p-6">
+          <Card className="p-3 sm:p-6">
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <Car className="h-5 w-5 text-primary" />
               Specifications
@@ -351,7 +346,7 @@ const VehiclePage = () => {
         {/* Right Column - Documents & Quick Info */}
         <div className="space-y-6">
           {/* Documents Card */}
-          <Card className="p-6">
+          <Card className="p-3 sm:p-6">
             <h3 className="mb-4 text-lg font-semibold flex items-center gap-2">
               <FileText className="h-5 w-5 text-primary" />
               Documents
@@ -382,15 +377,21 @@ const VehiclePage = () => {
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className={`w-8 h-8 rounded-lg flex items-center justify-center bg-emerald-500/10`}
+                      className={`w-8 h-8 rounded-lg hidden min-[400px]:flex items-center justify-center bg-emerald-500/10`}
                     >
                       <Shield className="h-4 w-4 text-emerald-500" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium">{doc?.documentType}</p>
+                      <p className="text-xs sm:text-sm font-medium">
+                        {doc?.documentType}
+                      </p>
                     </div>
                   </div>
-                  <StatusBadge status={"APPROVED"} type="document" />
+                  <StatusBadge
+                    status={"APPROVED"}
+                    type="document"
+                    className="text-[10px] sm:text-xs"
+                  />
                 </div>
               ))}
             </div>
