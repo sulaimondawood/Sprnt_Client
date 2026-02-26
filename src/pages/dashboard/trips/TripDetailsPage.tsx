@@ -79,7 +79,7 @@ const TripDetailsPage = () => {
         </Button>
         <div className="flex-1">
           <h1 className="text-2xl font-bold font-display">
-            Trip #{rideDetails?.id}
+            Trip #{rideDetails?.id.slice(-4)}
           </h1>
           <p className="text-sm text-muted-foreground">
             {rideDetails?.createdAt &&
@@ -94,7 +94,7 @@ const TripDetailsPage = () => {
           {/* Route Card */}
           {isLoadingRideDetails && <TripRouteSkeleton />}
           {isSuccessLoadingRideDetails && (
-            <Card className="p-6">
+            <Card className="p-3 sm:p-6">
               <h3 className="font-semibold mb-4 flex items-center gap-2">
                 <Route className="h-4 w-4 text-primary" /> Trip Route
               </h3>
@@ -108,7 +108,7 @@ const TripDetailsPage = () => {
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Pickup
                     </p>
-                    <p className="font-semibold text-lg">
+                    <p className="font-semibold text-base sm:text-lg">
                       {rideDetails?.pickupLocation?.address}
                     </p>
                     {rideDetails?.arrivalTime && (
@@ -126,7 +126,7 @@ const TripDetailsPage = () => {
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Drop-off
                     </p>
-                    <p className="font-semibold text-lg">
+                    <p className="font-semibold text-base sm:text-lg">
                       {rideDetails?.dropoffLocation?.address}
                     </p>
                     {rideDetails?.dropOffTime && (
@@ -151,16 +151,14 @@ const TripDetailsPage = () => {
           )}
 
           {isSuccessLoadingRideDetails && (
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 min-[400px]:grid-cols-2 sm:grid-cols-4 gap-4">
               <Card className="p-4 text-center">
-                <Route className="h-5 w-5 text-primary mx-auto mb-2" />
                 <p className="text-xl font-bold">
                   {rideDetails?.estimatedDistance} km
                 </p>
                 <p className="text-xs text-muted-foreground">Distance</p>
               </Card>
               <Card className="p-4 text-center">
-                <Clock className="h-5 w-5 text-primary mx-auto mb-2" />
                 <p className="text-xl font-bold">
                   {rideDetails?.estimatedDurationMins
                     ? `${rideDetails?.estimatedDurationMins} min`
@@ -169,14 +167,12 @@ const TripDetailsPage = () => {
                 <p className="text-xs text-muted-foreground">Duration</p>
               </Card>
               <Card className="p-4 text-center">
-                <DollarSign className="h-5 w-5 text-primary mx-auto mb-2" />
                 <p className="text-xl font-bold">
                   {formatCurrency(rideDetails?.estimatedFare)}
                 </p>
                 <p className="text-xs text-muted-foreground">Est. Fare</p>
               </Card>
               <Card className="p-4 text-center">
-                <Calendar className="h-5 w-5 text-primary mx-auto mb-2" />
                 <p className="text-xl font-bold">
                   {rideDetails?.createdAt &&
                     format(new Date(rideDetails?.createdAt), "h:mm a")}
@@ -198,7 +194,7 @@ const TripDetailsPage = () => {
           )}
 
           {isSuccessLoadingRideDetails && (
-            <Card className="p-6">
+            <Card className="p-3 sm:p-6">
               <h3 className="font-semibold mb-4 flex items-center gap-2">
                 <Clock className="h-4 w-4 text-primary" /> Trip Timeline
               </h3>
@@ -233,7 +229,7 @@ const TripDetailsPage = () => {
           {isLoadingRideDetails && <RideInfoSkeleton />}
 
           {isSuccessLoadingRideDetails && (
-            <Card className="p-6">
+            <Card className="p-3 sm:p-6">
               <h3 className="font-semibold mb-4">
                 {role === "DRIVER" ? "Rider Info" : "Driver Info"}
               </h3>
@@ -257,9 +253,6 @@ const TripDetailsPage = () => {
               ) && (
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" className="flex-1 gap-1">
-                    <Phone className="h-3.5 w-3.5" /> Call (NULL)
-                  </Button>
-                  <Button variant="outline" size="sm" className="flex-1 gap-1">
                     <MessageSquare className="h-3.5 w-3.5" /> Chat
                   </Button>
                 </div>
@@ -282,18 +275,12 @@ const TripDetailsPage = () => {
 
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Service fee</span>
-                  <span>NULL</span>
+                  <span>{formatCurrency(0)}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total</span>
                   <span>{formatCurrency(rideDetails?.estimatedFare)}</span>
-                </div>
-                <div className="flex items-center justify-between pt-2">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <CreditCard className="h-4 w-4" /> Wallet
-                  </div>
-                  <StatusBadge status={"NULL"} type="payment" />
                 </div>
               </div>
             </Card>
