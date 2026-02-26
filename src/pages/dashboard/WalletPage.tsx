@@ -1,9 +1,5 @@
-import { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -12,28 +8,30 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { RoleBadge } from "@/components/RoleBadge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
-  mockRiderWallet,
   mockDriverWallet,
+  mockRiderWallet,
   mockWalletTransactions,
 } from "@/data/mockData";
-import {
-  Wallet,
-  ArrowUpRight,
-  ArrowDownLeft,
-  Plus,
-  CreditCard,
-  TrendingUp,
-  Clock,
-  ChevronRight,
-  Gift,
-  ArrowRight,
-} from "lucide-react";
+import { profile } from "@/helpers";
 import { format } from "date-fns";
+import {
+  ArrowDownLeft,
+  ArrowUpRight,
+  ChevronRight,
+  Clock,
+  CreditCard,
+  Gift,
+  Plus,
+  TrendingUp,
+  Wallet,
+} from "lucide-react";
+import { useState } from "react";
 
 const WalletPage = () => {
-  const { user } = useAuth();
+  const user = profile();
   const isDriver = user?.role === "DRIVER";
   const wallet = isDriver ? mockDriverWallet : mockRiderWallet;
   const [topUpAmount, setTopUpAmount] = useState("");
@@ -77,7 +75,7 @@ const WalletPage = () => {
 
       {/* Balance Card */}
       <Card
-        className={`p-8 ${isDriver ? "gradient-driver" : "gradient-rider"} text-white relative overflow-hidden`}
+        className={`p-3 sm:p-8 ${isDriver ? "gradient-driver" : "gradient-rider"} text-white relative overflow-hidden`}
       >
         <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white/10" />
         <div className="absolute -right-5 -bottom-10 w-32 h-32 rounded-full bg-white/10" />
@@ -89,11 +87,9 @@ const WalletPage = () => {
               {isDriver ? "Total Balance" : "Wallet Balance"}
             </span>
           </div>
-
-          <p className="text-5xl font-bold mb-6">
+          <p className="text-3xl sm:text-5xl font-bold mb-6">
             {formatCurrency(wallet.balance)}
           </p>
-
           <div className="flex flex-wrap gap-3">
             {isDriver ? (
               <>
@@ -218,7 +214,7 @@ const WalletPage = () => {
       {/* Quick Stats for Driver */}
       {isDriver && (
         <div className="grid sm:grid-cols-3 gap-4">
-          <Card className="p-6">
+          <Card className="p-3 sm:p-6">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
                 <TrendingUp className="h-5 w-5 text-success" />
@@ -254,7 +250,7 @@ const WalletPage = () => {
       )}
 
       {/* Transaction History */}
-      <Card className="p-6">
+      <Card className="p-3 sm:p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold">Transaction History</h2>
           <Button variant="ghost" size="sm" className="gap-1">
@@ -267,7 +263,7 @@ const WalletPage = () => {
           {mockWalletTransactions.map((transaction) => (
             <div
               key={transaction.id}
-              className="flex items-center gap-4 p-4 bg-muted/50 rounded-xl"
+              className="w-full flex flex-wrap items-center gap-4 p-4 bg-muted/50 rounded-xl"
             >
               <div
                 className={`w-10 h-10 rounded-lg flex items-center justify-center ${
@@ -297,7 +293,7 @@ const WalletPage = () => {
                 </p>
               </div>
 
-              <div className="text-right">
+              <div className=" self-end justify-self-end">
                 <p
                   className={`text-lg font-bold ${
                     transaction.type === "CREDIT"

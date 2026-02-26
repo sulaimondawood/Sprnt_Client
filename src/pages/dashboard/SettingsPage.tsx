@@ -1,15 +1,9 @@
-import { useAuth } from "@/contexts/AuthContext";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { RoleBadge } from "@/components/RoleBadge";
-import { Settings, Bell, Lock, Globe, Moon, Smartphone } from "lucide-react";
+import { Bell, Globe } from "lucide-react";
 
 const SettingsPage = () => {
-  const { user } = useAuth();
-
   return (
     <div className="space-y-6 animate-fade-in">
       <div>

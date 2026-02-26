@@ -1,33 +1,3 @@
-import { useParams, useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { StatusBadge } from "@/components/StatusBadge";
-import { Separator } from "@/components/ui/separator";
-import { mockRiderTrips, mockDriverTrips } from "@/data/mockData";
-import {
-  ArrowLeft,
-  MapPin,
-  Clock,
-  Route,
-  DollarSign,
-  User,
-  Car,
-  Star,
-  Phone,
-  MessageSquare,
-  Receipt,
-  Navigation,
-  Calendar,
-  CreditCard,
-  CheckCircle,
-  XCircle,
-  IconNode,
-} from "lucide-react";
-import { format } from "date-fns";
-import { Ride } from "@/types/rides/indes";
-import { useQuery } from "@tanstack/react-query";
-import { RideAPI } from "@/services/api/rides";
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import {
   PaymentCardSkeleton,
@@ -35,9 +5,31 @@ import {
   TripRouteSkeleton,
   TripSingleStatSkeleton,
 } from "@/components/dashboard/trips/skeleton/TripSkeleton";
-import { formatCurrency, profile } from "@/helpers";
-import { ElementType } from "react";
+import { StatusBadge } from "@/components/StatusBadge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { formatCurrency, profile } from "@/helpers";
+import { RideAPI } from "@/services/api/rides";
+import { Ride } from "@/types/rides/indes";
+import { useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
+import {
+  ArrowLeft,
+  CheckCircle,
+  Clock,
+  MapPin,
+  MessageSquare,
+  Navigation,
+  Receipt,
+  Route,
+  Star,
+  User,
+  XCircle,
+} from "lucide-react";
+import { ElementType } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 const TripDetailsPage = () => {
   const { tripId } = useParams();
   const navigate = useNavigate();

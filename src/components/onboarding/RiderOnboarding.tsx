@@ -1,30 +1,28 @@
-import { useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { Card } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useAuth } from "@/contexts/AuthContext";
 import {
-  User,
-  MapPin,
-  CreditCard,
-  CheckCircle2,
-  Camera,
-  Home,
   Briefcase,
-  ChevronRight,
+  Camera,
+  CheckCircle2,
   ChevronLeft,
+  ChevronRight,
+  CreditCard,
+  Home,
+  MapPin,
   Sparkles,
+  User,
 } from "lucide-react";
+import { useState } from "react";
 
 interface RiderOnboardingProps {
   setShowOnboarding: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export function RiderOnboarding({ setShowOnboarding }: RiderOnboardingProps) {
-  const { updateRiderProfile } = useAuth();
   const [step, setStep] = useState(1);
   const totalSteps = 4;
   const progress = (step / totalSteps) * 100;
@@ -60,10 +58,6 @@ export function RiderOnboarding({ setShowOnboarding }: RiderOnboardingProps) {
   };
 
   const handleComplete = () => {
-    updateRiderProfile({
-      fullName: formData.fullName,
-      isProfileComplete: true,
-    });
     onComplete();
   };
 
