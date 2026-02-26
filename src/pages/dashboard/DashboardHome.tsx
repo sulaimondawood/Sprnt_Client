@@ -178,9 +178,9 @@ const DashboardHome = () => {
       </div>
 
       {/* Recent Trips & Quick Actions */}
-      <div className="grid xl:grid-cols-2 gap-6">
+      <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Trips */}
-        <div>
+        <>
           {isLoadingRecentRides && <RecentTripsSkeleton />}
           {isSuccessLoadingRecentRides && recentRides.length > 0 && (
             <Card className="lg:col-span-2 p-3 sm:p-6">
@@ -246,13 +246,13 @@ const DashboardHome = () => {
           )}
           {isSuccessLoadingRecentRides && recentRides.length === 0 && (
             <EmptyState
-              className="col-span-2"
+              className="lg:col-span-2"
               title="No trips yet"
               description="Trips you complete or cancelled will show up here."
               icon={<Car className="h-6 w-6 text-muted-foreground" />}
             />
           )}
-        </div>
+        </>
 
         {/* Quick Actions / Summary */}
         <Card className="p-3 sm:p-6">

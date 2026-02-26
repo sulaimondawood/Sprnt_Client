@@ -190,9 +190,11 @@ const BookRidePage = () => {
   useEffect(() => {
     if (currentRide) {
       if (bookingStep === "location") {
-        if (currentRide.rideStatus === "DRIVER_ACCEPTED")
+        if (
+          currentRide.rideStatus === "DRIVER_ACCEPTED" ||
+          currentRide.rideStatus === "DRIVER_EN_ROUTE"
+        )
           setBookingStep("arriving");
-        if (currentRide.rideStatus === "ONGOING") setBookingStep("inProgress");
       }
 
       if (currentRide.driverName) {
@@ -224,7 +226,7 @@ const BookRidePage = () => {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           {isLoading ? (
             <Skeleton className="h-[70vh]" />
@@ -261,16 +263,17 @@ const BookRidePage = () => {
 
           {bookingStep === "location" && (
             <>
-              <Card className="p-6">
+              <Card className="p-3 sm:p-6">
                 <div className="space-y-4">
-                  {/* Pickup with autocomplete */}
                   <div className="space-y-2">
                     <Label htmlFor="pickup" className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-success" />
                       Pickup Location
                     </Label>
                     <LocationSearch
-                      placeholder="Where are you going?"
+                      placeholder={
+                        pickup?.address || "Enter your pickup location?"
+                      }
                       onLocationSelect={(val) => {
                         setPickup(val);
                       }}
@@ -288,16 +291,16 @@ const BookRidePage = () => {
                       Drop-off Location
                     </Label>
                     <LocationSearch
-                      placeholder="Where are you going?"
+                      placeholder={dropoff?.address || "Where are you going?"}
                       onLocationSelect={(val) => setDropoff(val)}
                     />
                   </div>
                 </div>
               </Card>
 
-              <Card className="p-6">
+              <Card className="p-3 sm:p-6">
                 <h2 className="text-lg font-semibold mb-4">Select Ride Type</h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 min-[450px]:grid-cols-2 sm:grid-cols-3 gap-3">
                   {vehicleTypes.map((vehicle) => (
                     <button
                       key={vehicle.id}
@@ -325,7 +328,9 @@ const BookRidePage = () => {
                           />
                         </div>
                         <div>
-                          <p className="font-semibold">{vehicle.name}</p>
+                          <p className="font-semibold text-sm sm:text-base">
+                            {vehicle.name}
+                          </p>
                           <p className="text-sm text-muted-foreground flex items-center gap-1">
                             {vehicle.capacity} seats
                           </p>
@@ -338,7 +343,7 @@ const BookRidePage = () => {
 
               <Button
                 size="lg"
-                className="w-full h-14 text-lg gradient-rider text-rider-foreground"
+                className="w-full h-14 text-base sm:text-lg gradient-rider text-rider-foreground"
                 disabled={!canBook}
                 onClick={() =>
                   sendRideRequest({
@@ -365,36 +370,32 @@ const BookRidePage = () => {
 
           {/* Arriving / In Progress State */}
           {(bookingStep === "arriving" || bookingStep === "inProgress") && (
-            <Card className="p-6">
+            <Card className="p-3 sm:p-6">
               <div className="flex items-center gap-4 mb-6">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                  <User className="h-8 w-8 text-primary" />
+                <div className="size-12 sm:size-16 rounded-full bg-primary/10 flex items-center justify-center">
+                  <User className="size-5 sm:size-8 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-xl font-bold">
+                  <h2 className="text-lg sm:text-xl font-bold">
                     {currentRide?.driverName}
                   </h2>
-                  <p className="text-muted-foreground">
+                  <p className="text-sm sm:text-base text-muted-foreground">
                     {bookingStep === "arriving"
                       ? `Arriving in ${currentRide?.estimatedArrivalTime ? formatDate(currentRide?.estimatedArrivalTime, "m") : "N/A"} minutes`
                       : "Trip in progress"}
                   </p>
                 </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="icon">
-                    <Phone className="h-4 w-4" />
-                  </Button>
-                  <Button variant="outline" size="icon">
-                    <MessageSquare className="h-4 w-4" />
-                  </Button>
-                </div>
+
+                <Button variant="outline" size="icon">
+                  <MessageSquare className="h-4 w-4" />
+                </Button>
               </div>
               <div className="space-y-4 mb-6">
                 <div className="flex items-start gap-3">
                   <div className="w-3 h-3 rounded-full bg-success mt-1.5" />
                   <div>
                     <p className="text-sm text-muted-foreground">Pickup</p>
-                    <p className="font-medium">
+                    <p className="text-sm sm:text-base font-medium">
                       {currentRide?.pickupLocation?.address}
                     </p>
                   </div>
@@ -403,7 +404,7 @@ const BookRidePage = () => {
                   <div className="w-3 h-3 rounded-full bg-destructive mt-1.5" />
                   <div>
                     <p className="text-sm text-muted-foreground">Drop-off</p>
-                    <p className="font-medium">
+                    <p className="text-sm sm:text-base font-medium">
                       {currentRide?.dropoffLocation?.address}
                     </p>
                   </div>
@@ -419,7 +420,7 @@ const BookRidePage = () => {
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-muted-foreground">Plate</p>
-                    <p className="font-bold text-lg">
+                    <p className="font-bold sm:text-lg">
                       {driverSummary?.vehiclePlate}
                     </p>
                   </div>
@@ -433,7 +434,7 @@ const BookRidePage = () => {
         {bookingStep === "location" && (
           <div className="space-y-6">
             {/* Payment Method */}
-            <Card className="p-6">
+            <Card className="p-3 sm:p-6">
               <h2 className="text-lg font-semibold mb-4">Payment Method</h2>
               <Tabs defaultValue="wallet">
                 <TabsList className="w-full">
