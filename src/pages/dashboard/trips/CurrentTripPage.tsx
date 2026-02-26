@@ -8,7 +8,7 @@ import Map from "@/components/Map";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { profile } from "@/helpers";
+import { formatCurrency, profile } from "@/helpers";
 import { useSubscription } from "@/hooks/useStompSubscription";
 import { DriverAPI } from "@/services/api/driver";
 import { RiderAPI } from "@/services/api/rider";
@@ -93,9 +93,6 @@ const CurrentTripPage = () => {
           <p className="text-muted-foreground mb-4">
             Go online to start receiving ride requests.
           </p>
-          <Button className="gradient-driver text-driver-foreground">
-            Go Online
-          </Button>
         </Card>
       </div>
     );
@@ -103,7 +100,7 @@ const CurrentTripPage = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap gap-4 items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold mb-2">Current Trip</h1>
           <StatusBadge status={currentRide?.rideStatus || ""} type="trip" />
@@ -116,12 +113,12 @@ const CurrentTripPage = () => {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* Left: Map */}
         {isLoadingCurrentRide && <TripMapSkeleton />}
 
         {isSuccessLoadingCurrentRide && (
-          <div className="lg:col-span-2 space-y-6">
+          <div className="xl:col-span-2 space-y-6">
             <Map
               pickupCoords={[
                 currentRide?.pickupLocation?.lng,
@@ -133,29 +130,26 @@ const CurrentTripPage = () => {
               ]}
               driverCoords={driverCoords}
               showRoute={true}
-              className="h-[400px]"
+              className="h-[80vh]"
             />
 
             {/* Trip Stats */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <Card className="p-4 text-center">
-                <Clock className="h-6 w-6 text-driver mx-auto mb-2" />
                 <p className="text-2xl font-bold">
                   {currentRide?.estimatedDurationMins}mins
                 </p>
                 <p className="text-sm text-muted-foreground">Duration</p>
               </Card>
               <Card className="p-4 text-center">
-                <Route className="h-6 w-6 text-driver mx-auto mb-2" />
                 <p className="text-2xl font-bold">
                   {currentRide?.estimatedDistance} km
                 </p>
                 <p className="text-sm text-muted-foreground">Distance</p>
               </Card>
               <Card className="p-4 text-center">
-                <DollarSign className="h-6 w-6 text-driver mx-auto mb-2" />
                 <p className="text-2xl font-bold">
-                  ₦{currentRide?.estimatedFare}
+                  {formatCurrency(currentRide?.estimatedFare)}
                 </p>
                 <p className="text-sm text-muted-foreground">Est. Fare</p>
               </Card>
@@ -168,40 +162,40 @@ const CurrentTripPage = () => {
           {/* Rider Info */}
           {isLoadingCurrentRide && <RiderCardSkeleton />}
           {isSuccessLoadingCurrentRide && (
-            <Card className="p-6">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-16 h-16 rounded-full bg-rider flex items-center justify-center">
-                  <User className="h-8 w-8 text-rider-foreground" />
+            <Card className="p-3 sm:p-6">
+              <div className="flex items-center gap-4">
+                <div className="size-12 sm:size-16 rounded-full bg-rider flex items-center justify-center">
+                  <User className="size-6 sm:size-8 text-rider-foreground" />
                 </div>
                 <div className="flex-1">
                   <h2 className="text-xl font-bold">
                     {currentRide?.riderName}
                   </h2>
-                  <p className="text-muted-foreground">Rider</p>
+                  <p className="text-sm sm:text-base text-muted-foreground">
+                    Rider
+                  </p>
                 </div>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" className="flex-1">
-                  <Phone className="h-4 w-4 mr-2" />
-                  Call(NULL)
-                </Button>
-
-                <a
-                  href={`mailto:${currentRide.riderInfo.email}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button variant="outline" className="flex-1">
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                    Chat
-                  </Button>
-                </a>
+                <div>
+                  <a
+                    href={`mailto:${currentRide.riderInfo.email}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Button
+                      variant="outline"
+                      className="flex-1 flex items-center gap-2"
+                    >
+                      <MessageSquare className="h-4 w-4" />
+                      <p className="hidden sm:block">Chat</p>
+                    </Button>
+                  </a>
+                </div>
               </div>
             </Card>
           )}
 
           {/* Trip Route */}
-          <Card className="p-6">
+          <Card className="p-3 sm:p-6">
             <h3 className="font-semibold mb-4">Trip Route</h3>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
@@ -294,7 +288,7 @@ const CurrentTripPage = () => {
               )}
 
             {currentRide?.rideStatus === "COMPLETED" && role === "DRIVER" && (
-              <Card className="p-6 bg-success/10 border-success/20">
+              <Card className="p-3 sm:p-6 bg-success/10 border-success/20">
                 <div className="text-center">
                   <CheckCircle className="h-12 w-12 text-success mx-auto mb-3" />
                   <h3 className="text-lg font-bold text-success">

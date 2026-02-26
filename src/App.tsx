@@ -55,6 +55,7 @@ const App = () => (
                 <Route path="/dashboard" element={<DashboardLayout />}>
                   <Route index element={<DashboardHome />} />
                   <Route path="book-ride" element={<BookRidePage />} />
+                  <Route path="current-trip" element={<CurrentTripPage />} />
                   <Route path="trips" element={<TripHistoryPage />} />
                   <Route path="trips/:tripId" element={<TripDetailsPage />} />
                   <Route path="wallet" element={<WalletPage />} />
@@ -65,7 +66,6 @@ const App = () => (
                   <Route path="vehicle/add" element={<AddVehiclePage />} />
                   <Route path="documents" element={<DocumentsPage />} />
                   <Route path="ratings" element={<RatingsPage />} />
-                  <Route path="current-trip" element={<CurrentTripPage />} />
                   <Route path="profile" element={<ProfilePage />} />
                 </Route>
                 <Route path="*" element={<NotFound />} />

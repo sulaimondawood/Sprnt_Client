@@ -107,7 +107,7 @@ export function TripMapSkeleton() {
   return (
     <div className="lg:col-span-2 space-y-6">
       {/* Map Skeleton */}
-      <Skeleton className="h-[400px] w-full rounded-md" />
+      <Skeleton className="h-[80vh] w-full rounded-md" />
 
       {/* Trip Stats Skeleton */}
       <div className="grid grid-cols-3 gap-4">
