@@ -3,8 +3,8 @@ import {
   TripCardSkeleton,
   TripStatsSkeleton,
 } from "@/components/dashboard/trips/skeleton/TripSkeleton";
-import { PaginationComponent } from "@/components/global/pagination";
-import { RoleBadge } from "@/components/RoleBadge";
+import { PaginationComponent } from "@/components/global/Pagination";
+
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -23,7 +23,7 @@ import { DriverAPI } from "@/services/api/driver";
 import { RiderAPI } from "@/services/api/rider";
 import { RideOverview, RideResponse } from "@/types/rides/indes";
 import { useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
+import { format, formatDate } from "date-fns";
 import {
   Calendar as CalendarIcon,
   Car,
@@ -144,7 +144,7 @@ const TripHistoryPage = () => {
       )}
 
       {/* Filters */}
-      <Card className="p-4">
+      <Card className="p-3 sm:p-4">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -152,14 +152,25 @@ const TripHistoryPage = () => {
               placeholder="Search by location or name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 text-sm sm:text-base"
             />
           </div>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className="gap-2">
                 <CalendarIcon className="h-4 w-4" />
-                Date Range
+                {date?.from ? (
+                  date.to ? (
+                    <>
+                      {format(date.from, "LLL dd, y")} -{" "}
+                      {format(date.to, "LLL dd, y")}
+                    </>
+                  ) : (
+                    format(date.from, "LLL dd, y")
+                  )
+                ) : (
+                  <span>Pick a date range</span>
+                )}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -175,8 +186,8 @@ const TripHistoryPage = () => {
       </Card>
 
       {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="flex w-full justify-start overflow-x-auto whitespace-nowrap">
           <TabsTrigger value="all">All</TabsTrigger>
           <TabsTrigger value="ON_TRIP">Ongoing</TabsTrigger>
           <TabsTrigger value="COMPLETED">Completed</TabsTrigger>
@@ -184,7 +195,7 @@ const TripHistoryPage = () => {
           <TabsTrigger value="RIDER_CANCELLED">Rider Cancelled</TabsTrigger>
         </TabsList>
 
-        <TabsContent value={activeTab} className="mt-6">
+        <TabsContent value={activeTab} className="mt-6 space-y-4">
           {isLoadingallRides && (
             <div className="space-y-4">
               {Array.from({ length: 5 }).map((_, i) => (
@@ -212,30 +223,18 @@ const TripHistoryPage = () => {
             allRides?.data?.map((trip) => (
               <Card
                 key={trip.id}
-                className="p-6 hover:shadow-lg transition-shadow"
+                className="p-3 sm:p-6 hover:shadow-lg transition-shadow"
               >
                 <div className="flex flex-col md:flex-row gap-6">
                   {/* Trip Info */}
                   <div className="flex-1 space-y-4">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div
-                          className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                            trip.rideStatus === "COMPLETED"
-                              ? "bg-success/10 text-success"
-                              : trip.rideStatus === "CANCELLED"
-                                ? "bg-destructive/10 text-destructive"
-                                : "bg-info/10 text-info"
-                          }`}
-                        >
-                          <Car className="h-5 w-5" />
-                        </div>
                         <div>
                           <p className="font-semibold">
                             Trip #{trip.id.slice(-4).toUpperCase()}
                           </p>
-                          <p className="text-sm text-muted-foreground flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
+                          <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1">
                             {trip.createdAt &&
                               format(
                                 new Date(trip.createdAt),
@@ -244,7 +243,11 @@ const TripHistoryPage = () => {
                           </p>
                         </div>
                       </div>
-                      <StatusBadge status={trip.rideStatus} type="trip" />
+                      <StatusBadge
+                        status={trip.rideStatus}
+                        type="trip"
+                        className="text-[10px] min-[400px]:text-xs"
+                      />
                     </div>
 
                     {/* Locations */}
@@ -258,7 +261,7 @@ const TripHistoryPage = () => {
                           <p className="text-sm text-muted-foreground">
                             Pickup
                           </p>
-                          <p className="font-medium">
+                          <p className="text-sm sm:text-base font-medium">
                             {trip.pickupLocation.address}
                           </p>
                         </div>
@@ -269,7 +272,7 @@ const TripHistoryPage = () => {
                           <p className="text-sm text-muted-foreground">
                             Drop-off
                           </p>
-                          <p className="font-medium">
+                          <p className="text-sm sm:text-base font-medium">
                             {trip.dropoffLocation.address}
                           </p>
                         </div>
@@ -297,21 +300,12 @@ const TripHistoryPage = () => {
                   </div>
 
                   {/* Trip Summary */}
-                  <div className="md:w-48 flex md:flex-col gap-4 md:gap-2 md:text-right md:border-l md:border-border md:pl-6">
+                  <div className="md:w-48 flex items-center md:flex-col gap-4 md:gap-2 md:text-right md:border-l md:border-border md:pl-6">
                     <div className="flex-1 md:flex-initial">
                       <p className="text-sm text-muted-foreground">Fare</p>
                       <p className="text-xl font-bold">
                         {formatCurrency(trip.estimatedFare)}
                       </p>
-                    </div>
-                    <div className="flex-1 md:flex-initial">
-                      <p className="text-sm text-muted-foreground">Distance</p>
-                      <p className="font-medium">{trip.estimatedDistance} km</p>
-                    </div>
-                    <div className="flex-1 md:flex-initial">
-                      <p className="text-sm text-muted-foreground">Payment</p>
-                      <StatusBadge status={"NULL"} type="payment" />
-                      {/* <StatusBadge status={trip.paymentStatus} type="payment" /> */}
                     </div>
                     <Button
                       onClick={() =>

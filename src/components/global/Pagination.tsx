@@ -51,9 +51,9 @@ export const PaginationComponent = ({ totalPages }: Props) => {
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   return (
-    <div className="border-t border-t-border px-10 flex items-center justify-between">
-      <Pagination className="my-10 justify-start">
-        <PaginationContent className="text-body">
+    <div className="border-t border-t-border lg:px-10 flex flex-wrap items-center justify-between">
+      <Pagination className="my-5 lg:my-10 justify-start">
+        <PaginationContent className="text-body flex-wrap gap-0">
           {/* PREVIOUS BUTTON */}
           <PaginationItem>
             <PaginationPrevious
