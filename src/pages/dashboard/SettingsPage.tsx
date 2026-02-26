@@ -14,7 +14,7 @@ const SettingsPage = () => {
       </div>
 
       <div className="grid gap-6">
-        <Card className="p-6">
+        <Card className="p-3 sm:p-6">
           <div className="flex items-center gap-3 mb-6">
             <Bell className="h-5 w-5 text-primary" />
             <h2 className="text-lg font-semibold">Notifications</h2>
@@ -68,7 +68,7 @@ const SettingsPage = () => {
           </div>
         </Card> */}
 
-        <Card className="p-6">
+        <Card className="p-3 sm:p-6">
           <div className="flex items-center gap-3 mb-6">
             <Globe className="h-5 w-5 text-primary" />
             <h2 className="text-lg font-semibold">Preferences</h2>
