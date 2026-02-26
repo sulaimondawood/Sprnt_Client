@@ -118,7 +118,7 @@ const DashboardHome = () => {
       )}
 
       {/* Stats Grid */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {isDriver ? (
           <>
             <StatCard
@@ -133,7 +133,6 @@ const DashboardHome = () => {
               value={"-"}
               subtitle={`${overviewData?.ridesOfTheWeek} trips this week`}
               icon={TrendingUp}
-              trend={{ value: 12, isPositive: true }}
             />
             <StatCard
               title="Rating"
@@ -179,12 +178,12 @@ const DashboardHome = () => {
       </div>
 
       {/* Recent Trips & Quick Actions */}
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid xl:grid-cols-2 gap-6">
         {/* Recent Trips */}
-        <>
+        <div>
           {isLoadingRecentRides && <RecentTripsSkeleton />}
           {isSuccessLoadingRecentRides && recentRides.length > 0 && (
-            <Card className="lg:col-span-2 p-6">
+            <Card className="lg:col-span-2 p-3 sm:p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold">Recent Trips</h2>
                 <Link to={ROUTES.dashboardRides}>
@@ -202,7 +201,7 @@ const DashboardHome = () => {
                     className="flex items-center gap-4 p-4 bg-muted/50 rounded-xl hover:bg-muted transition-colors"
                   >
                     <div
-                      className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                      className={`hidden size-8 sm:w-10 sm:h-10 rounded-lg sm:flex items-center justify-center ${
                         trip.rideStatus === "COMPLETED"
                           ? "bg-success/10 text-success"
                           : trip.rideStatus === "RIDER_CANCELLED" ||
@@ -211,10 +210,10 @@ const DashboardHome = () => {
                             : "bg-info/10 text-info"
                       }`}
                     >
-                      <Car className="h-5 w-5" />
+                      <Car className="size-4 sm:h-5 sm:w-5" />
                     </div>
 
-                    <div className="flex-1 min-w-0">
+                    <div className="text-sm sm:text-base flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <p className="font-medium truncate">
                           {role === "DRIVER"
@@ -223,7 +222,7 @@ const DashboardHome = () => {
                         </p>
                         <StatusBadge status={trip.rideStatus} type="trip" />
                       </div>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-xs sm:text-sm text-muted-foreground">
                         {trip.createdAt &&
                           format(
                             new Date(trip.createdAt),
@@ -233,7 +232,7 @@ const DashboardHome = () => {
                     </div>
 
                     <div className="text-right">
-                      <p className="font-semibold">
+                      <p className="text-sm sm:text-base font-semibold">
                         {formatCurrency(trip.estimatedFare)}
                       </p>
                       <p className="text-sm text-muted-foreground">
@@ -253,10 +252,10 @@ const DashboardHome = () => {
               icon={<Car className="h-6 w-6 text-muted-foreground" />}
             />
           )}
-        </>
+        </div>
 
         {/* Quick Actions / Summary */}
-        <Card className="p-6">
+        <Card className="p-3 sm:p-6">
           <h2 className="text-xl font-semibold mb-6">
             {role === "DRIVER" ? "Quick Stats" : "Quick Actions"}
           </h2>
@@ -268,7 +267,7 @@ const DashboardHome = () => {
                 <div className="space-y-4">
                   <div className="p-4 bg-muted rounded-xl">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-muted-foreground">
+                      <span className="text-sm sm:text-base text-muted-foreground">
                         Total Completed Trips
                       </span>
                       <span className="font-bold text-2xl">
@@ -290,17 +289,17 @@ const DashboardHome = () => {
 
                   <div className="p-4 bg-muted rounded-xl">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-muted-foreground">
+                      <span className="text-sm sm:text-base text-muted-foreground">
                         Total Earnings
                       </span>
-                      <span className="font-bold">{formatCurrency(0)}</span>
+                      <span className="font-bold">{formatCurrency(25000)}</span>
                     </div>
                   </div>
 
                   <div className="p-4 bg-muted rounded-xl">
                     <div className="flex items-center gap-2 mb-2">
                       <Star className="h-5 w-5 text-warning fill-warning" />
-                      <span className="text-muted-foreground">
+                      <span className="text-sm sm:text-base text-muted-foreground">
                         Driver Rating
                       </span>
                     </div>

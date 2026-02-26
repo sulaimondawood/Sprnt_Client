@@ -351,7 +351,7 @@ const DashboardLayout = () => {
 
       {/* Top Navigation */}
       <header className="fixed top-0 left-0 right-0 z-50 h-16 bg-card border-b border-border">
-        <div className="flex items-center justify-between h-full px-4 lg:px-6">
+        <div className="flex items-center justify-between h-full px-3 sm:px-4 lg:px-6">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -369,7 +369,7 @@ const DashboardLayout = () => {
             </Link>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             {role === "DRIVER" && (
               <div className="flex items-center gap-3 px-4 py-2 bg-muted rounded-full">
                 <span
@@ -388,13 +388,6 @@ const DashboardLayout = () => {
                 />
               </div>
             )}
-
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground text-xs rounded-full flex items-center justify-center">
-                3
-              </span>
-            </Button>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -528,7 +521,7 @@ const DashboardLayout = () => {
 
       {/* Main Content */}
       <main className="lg:ml-64 pt-16 min-h-screen">
-        <div className="p-4 lg:p-8">
+        <div className="p-3 lg:p-8">
           <Outlet />
         </div>
       </main>
