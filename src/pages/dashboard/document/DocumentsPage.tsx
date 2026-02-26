@@ -43,7 +43,7 @@ const DocumentsPage = () => {
         </Button> */}
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 min-[400px]:grid-cols-2 sm:grid-cols-4 gap-4">
         {isLoadingVehicle &&
           Array.from({ length: 4 }).map((_, i) => {
             return (
@@ -95,7 +95,7 @@ const DocumentsPage = () => {
           ))}
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
           {isLoadingVehicle &&
             Array.from({ length: 4 }).map((_, idx) => {
@@ -106,11 +106,11 @@ const DocumentsPage = () => {
               return (
                 <Card
                   key={idx + doc?.documentType}
-                  className="p-6 hover:shadow-md transition-shadow"
+                  className="p-3 sm:p-6 hover:shadow-md transition-shadow"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-success/10">
+                      <div className=" w-12 h-12 rounded-xl hidden min-[400px]:flex items-center justify-center shrink-0 bg-success/10">
                         <Shield className="h-6 w-6 text-success" />
                       </div>
                       <div>
@@ -129,7 +129,7 @@ const DocumentsPage = () => {
                     <StatusBadge status={"APPROVED"} type="document" />
                   </div>
 
-                  <div className="flex gap-2 mt-4 pt-4 border-t border-border">
+                  <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-border">
                     <a
                       href={doc?.documentUrl}
                       target="_blank"
