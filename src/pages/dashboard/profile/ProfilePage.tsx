@@ -139,7 +139,7 @@ const ProfilePage = () => {
         </Card>
       )}
       {isSuccessLoadingUserProfile && (
-        <Card className="p-6">
+        <Card className="p-3 sm:p-6">
           <div className="flex flex-col sm:flex-row items-center gap-6 mb-8">
             <div className="relative">
               <Avatar className="h-24 w-24">
@@ -185,7 +185,8 @@ const ProfilePage = () => {
               <h2 className="text-2xl font-bold">{userProfile?.fullname}</h2>
               <div className="flex items-center gap-1 justify-center sm:justify-start text-muted-foreground">
                 <p className="flex items-center">
-                  {userProfile?.driver?.rating || userProfile?.rider?.rating}{" "}
+                  {userProfile?.driver?.rating?.toFixed(1) ||
+                    userProfile?.rider?.rating?.toFixed(1)}{" "}
                   <Star className="h-4 w-4 text-warning fill-warning" />
                 </p>
                 <span>rating</span>
