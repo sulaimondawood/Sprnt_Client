@@ -10,6 +10,8 @@ import {
 } from "react";
 import SockJS from "sockjs-client";
 
+const baseUrl = import.meta.env.VITE_API_BASE_URL;
+
 interface WebSocketContextType {
   stompClient: Client | null;
   isConnected: boolean;
@@ -31,8 +33,7 @@ export const StompProvider = ({ children }: { children: ReactNode }) => {
 
     // 1. Initialize the Client
     const client = new Client({
-      webSocketFactory: () =>
-        new SockJS(`http://localhost:8080/api/v1/ws?token=${sessionToken}`),
+      webSocketFactory: () => new SockJS(`${baseUrl}/ws?token=${sessionToken}`),
 
       debug: (str) => console.log("STOMP: " + str),
       reconnectDelay: 5000,
