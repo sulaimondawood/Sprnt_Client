@@ -58,12 +58,12 @@ export const useLocationTracker = ({
     if (now - lastSentAtRef.current < THROTTLE_MS) return false;
 
     // Distance gate
-    if (lastLocationRef.current) {
-      const { lat: lastLat, lng: lastLng } = lastLocationRef.current;
-      const distance = distanceInMeters(lastLat, lastLng, lat, lng);
+    // if (lastLocationRef.current) {
+    //   const { lat: lastLat, lng: lastLng } = lastLocationRef.current;
+    //   const distance = distanceInMeters(lastLat, lastLng, lat, lng);
 
-      if (distance < MIN_DISTANCE_METERS) return false;
-    }
+    //   if (distance < MIN_DISTANCE_METERS) return false;
+    // }
 
     lastSentAtRef.current = now;
     lastLocationRef.current = { lat, lng };
@@ -96,7 +96,11 @@ export const useLocationTracker = ({
       (position) => {
         const { latitude, longitude } = position.coords;
 
+        console.log("Testing if its sends BEFORE");
+
         if (!shouldSendLocation(latitude, longitude)) return;
+
+        console.log("Testing if its sends");
 
         sendLocationUpdate(stompClient, latitude, longitude, activeRideId);
       },
