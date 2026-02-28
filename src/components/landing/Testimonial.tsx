@@ -54,14 +54,12 @@ export const Testimonials = () => {
                   <p className="text-foreground/80 mb-6 leading-relaxed italic font-light">
                     "{testimonial.quote}"
                   </p>
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full gradient-primary" />
-                    <div>
-                      <p className="font-semibold">{testimonial.author}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {testimonial.role}
-                      </p>
-                    </div>
+
+                  <div>
+                    <p className="font-semibold">{testimonial.author}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {testimonial.role}
+                    </p>
                   </div>
                 </div>
               </Card>

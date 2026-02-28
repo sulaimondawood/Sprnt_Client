@@ -33,7 +33,7 @@ export const Hero = () => {
           >
             <motion.h1
               variants={fadeInUp}
-              className="text-5xl sm:text-6xl lg:text-8xl font-display font-semibold leading-tight text-white tracking-tight"
+              className="text-7xl  md:text-8xl font-display font-bold leading-tight text-white tracking-tight"
             >
               Arrive in <br />
               <span className="text-gradient">Style</span>

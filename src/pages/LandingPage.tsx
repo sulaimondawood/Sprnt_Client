@@ -78,9 +78,6 @@ const LandingPage = () => {
                 variants={scaleIn}
                 className="text-center group"
               >
-                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl gradient-primary flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <stat.icon className="h-7 w-7 text-primary-foreground" />
-                </div>
                 <p className="text-4xl lg:text-5xl font-display font-semibold text-foreground">
                   {stat.value}
                 </p>
@@ -206,9 +203,6 @@ const LandingPage = () => {
                 <Card className="p-8 h-full hover:shadow-xl transition-all duration-300 group border-border/50 hover:border-primary/30 bg-card relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-32 h-32 gradient-primary opacity-5 rounded-full blur-2xl group-hover:opacity-10 transition-opacity" />
                   <div className="relative">
-                    <div className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                      <feature.icon className="h-7 w-7 text-primary-foreground" />
-                    </div>
                     <h3 className="text-xl font-display font-semibold mb-3">
                       {feature.title}
                     </h3>

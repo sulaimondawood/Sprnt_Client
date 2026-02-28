@@ -26,6 +26,7 @@ import NotFound from "./pages/NotFound";
 import { StompProvider } from "./services/providers/stomp-provider";
 import { TanstackProvider } from "./services/providers/tanstack-provider";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
+import { GuestRoute } from "./pages/GuestRoutes";
 
 const App = () => (
   <TanstackProvider>
@@ -37,20 +38,22 @@ const App = () => (
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<LandingPage />} />
-                <Route path="/auth/register" element={<RegisterPage />} />
-                <Route path="/auth/login" element={<LoginPage />} />
-                <Route
-                  path="/auth/forgot-password"
-                  element={<ForgotPasswordPage />}
-                />
-                <Route
-                  path="/auth/verify-email"
-                  element={<EmailVerificationPage />}
-                />
-                <Route
-                  path="/auth/reset-password"
-                  element={<ResetPasswordPage />}
-                />
+                <Route element={<GuestRoute />}>
+                  <Route path="/auth/register" element={<RegisterPage />} />
+                  <Route path="/auth/login" element={<LoginPage />} />
+                  <Route
+                    path="/auth/forgot-password"
+                    element={<ForgotPasswordPage />}
+                  />
+                  <Route
+                    path="/auth/verify-email"
+                    element={<EmailVerificationPage />}
+                  />
+                  <Route
+                    path="/auth/reset-password"
+                    element={<ResetPasswordPage />}
+                  />
+                </Route>
 
                 <Route path="/dashboard" element={<DashboardLayout />}>
                   <Route index element={<DashboardHome />} />
