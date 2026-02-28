@@ -26,6 +26,19 @@ const LoginPage = () => {
 
   const navigate = useNavigate();
 
+  const { mutate: mutateResendLink } = useMutation({
+    mutationFn: () =>
+      AuthAPI.resendActivationEmail({
+        email,
+      }),
+    onSuccess(data) {
+      toast.success(data?.message || "Verification link sent!", {
+        description: "Check your inbox or spam for a new email.",
+      });
+      toast.dismiss();
+    },
+  });
+
   const { mutate: login, isPending } = useMutation({
     mutationFn: (payload: LoginPayload) => AuthAPI.login(payload),
     onSuccess(data) {
@@ -35,7 +48,19 @@ const LoginPage = () => {
       navigate(ROUTES.dashboard);
     },
     onError(error: any) {
-      toast.error(error?.response?.data?.message);
+      if (error?.response.data?.message === "Your account is unverified") {
+        toast.error(error?.response?.data?.message, {
+          duration: Infinity,
+          description: "Click below to resend a new link",
+          action: {
+            label: "Resend",
+            onClick: () => mutateResendLink(),
+          },
+        });
+
+        return;
+      }
+      toast.error(error?.response?.data?.message || error?.message);
     },
   });
 

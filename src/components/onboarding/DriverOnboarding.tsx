@@ -23,6 +23,7 @@ import {
   ChevronLeft,
   ChevronRight,
   FileText,
+  Loader2,
   LoaderCircle,
   Shield,
   Sparkles,
@@ -234,12 +235,9 @@ export function DriverOnboarding({ setShowOnboarding }: DriverOnboardingProps) {
   ];
 
   return (
-    <Card className="w-full max-w-full p-8">
+    <Card className="w-full max-w-full px-3 py-5 md:p-8">
       {/* Header */}
-      <div className="text-center mb-8">
-        <div className="w-16 h-16 gradient-driver rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <Car className="h-8 w-8 text-driver-foreground" />
-        </div>
+      <div className="text-center my-8">
         <h1 className="text-3xl font-bold mb-2">Become a Driver</h1>
         <p className="text-muted-foreground">
           Complete your profile to start earning
@@ -363,7 +361,7 @@ export function DriverOnboarding({ setShowOnboarding }: DriverOnboardingProps) {
             </div>
 
             <div className="grid gap-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="vehiclePlate">
                     Plate Number
@@ -561,18 +559,9 @@ export function DriverOnboarding({ setShowOnboarding }: DriverOnboardingProps) {
                 </div>
               ))}
             </div>
-
-            <div className="p-4 bg-muted rounded-xl">
-              <p className="text-sm text-muted-foreground">
-                You can skip this step and upload documents later from your
-                profile. However, your account will be pending approval until
-                all documents are verified.
-              </p>
-            </div>
           </div>
         )}
 
-        {/* Step 1: Personal Information */}
         {step === 4 && (
           <div className="space-y-6 animate-fade-in">
             <div className="flex items-center gap-3 p-4 bg-driver/10 rounded-xl border border-driver/20">
@@ -591,7 +580,7 @@ export function DriverOnboarding({ setShowOnboarding }: DriverOnboardingProps) {
                   <LoaderCircle className="size-5 animate-spin" />
                 ) : (
                   <>
-                    <Avatar className="size-56">
+                    <Avatar className="size-40 sm:size-56">
                       <AvatarImage src={formData?.profileImage || ""} />
                       <AvatarFallback className="bg-driver text-driver-foreground text-2xl">
                         {profile()?.fullname?.charAt(0) || "U"}
@@ -634,7 +623,7 @@ export function DriverOnboarding({ setShowOnboarding }: DriverOnboardingProps) {
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex justify-between mt-8 pt-6 border-t">
+      <div className="flex gap-4 justify-between mt-8 pt-6 border-t">
         {step > 1 ? (
           <Button variant="outline" onClick={handleBack}>
             <ChevronLeft className="h-4 w-4 mr-2" />
@@ -645,16 +634,16 @@ export function DriverOnboarding({ setShowOnboarding }: DriverOnboardingProps) {
         )}
         <Button
           onClick={handleNext}
-          disabled={!canProceed()}
+          disabled={!canProceed() || isCompletingOnboarding}
           className="min-w-[140px] gradient-driver text-driver-foreground"
         >
           {step === totalSteps ? (
             <div>
               {isCompletingOnboarding ? (
-                <p>Please wait...</p>
+                <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <div className="flex gap-2 items-center">
-                  Submit & Start Driving
+                  Start Driving
                   <Sparkles className="h-4 w-4" />
                 </div>
               )}
