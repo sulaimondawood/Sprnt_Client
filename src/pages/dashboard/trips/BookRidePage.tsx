@@ -93,14 +93,14 @@ const BookRidePage = () => {
     });
   };
 
-  const handleCancelNoDriverFound = () => {
-    setShowSearchingModal(false);
-    setDriverResponseType(null);
-    setBookingStep("location");
-    toast("Ride Cancelled", {
-      description: "Your ride has been cancelled.",
-    });
-  };
+  // const handleCancelNoDriverFound = () => {
+  //   setShowSearchingModal(false);
+  //   setDriverResponseType(null);
+  //   setBookingStep("location");
+  //   toast("Ride Cancelled", {
+  //     description: "Your ride has been cancelled.",
+  //   });
+  // };
 
   useSubscription(
     "/user/queue/no-driver-found",
@@ -480,7 +480,7 @@ const BookRidePage = () => {
       {/* === MODALS === */}
       <SearchingDriverModal
         open={showSearchingModal}
-        onCancel={handleCancelNoDriverFound}
+        // onCancel={handleCancelNoDriverFound}
       />
 
       <DriverResponseModal

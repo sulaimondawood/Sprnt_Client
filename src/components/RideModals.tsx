@@ -25,12 +25,12 @@ import { useEffect, useState } from "react";
 
 interface SearchingDriverModalProps {
   open: boolean;
-  onCancel: () => void;
+  // onCancel: () => void;
 }
 
 export const SearchingDriverModal = ({
   open,
-  onCancel,
+  // onCancel,
 }: SearchingDriverModalProps) => (
   <Dialog open={open}>
     <DialogContent
@@ -57,10 +57,10 @@ export const SearchingDriverModal = ({
             />
           ))}
         </div>
-        <Button variant="outline" onClick={onCancel} className="mt-4">
+        {/* <Button variant="outline" onClick={onCancel} className="mt-4">
           <X className="h-4 w-4 mr-2" />
           Cancel Search
-        </Button>
+        </Button> */}
       </div>
     </DialogContent>
   </Dialog>
