@@ -97,15 +97,13 @@ const RegisterPage = () => {
                 value="rider"
                 className="gap-2 data-[state=active]:gradient-rider data-[state=active]:text-rider-foreground"
               >
-                <User className="h-5 w-5" />
-                Rider
+                RIDER
               </TabsTrigger>
               <TabsTrigger
                 value="driver"
                 className="gap-2 data-[state=active]:gradient-driver data-[state=active]:text-driver-foreground"
               >
-                <Car className="h-5 w-5" />
-                Driver
+                DRIVER
               </TabsTrigger>
             </TabsList>
           </Tabs>

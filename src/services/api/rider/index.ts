@@ -1,4 +1,4 @@
-import { CreateRideRequest } from "@/types/riders";
+import { CreateRideRequest, RiderCompleteOnboarding } from "@/types/riders";
 import { api } from "../config";
 import { TripParams } from "../driver";
 
@@ -33,5 +33,10 @@ export const RiderAPI = {
   async riderOverviewData() {
     const res = await api.get(`/riders/overview`);
     return res.data.data;
+  },
+
+  async completeProfile(payload: RiderCompleteOnboarding) {
+    const res = await api.post("/riders/onboard", payload);
+    return res.data;
   },
 };

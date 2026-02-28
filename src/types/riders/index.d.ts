@@ -27,3 +27,8 @@ export interface DriverSummary {
   totalTrips: number;
   rating: number;
 }
+
+export interface RiderCompleteOnboarding {
+  imageUrl: string;
+  displayName: string;
+}
