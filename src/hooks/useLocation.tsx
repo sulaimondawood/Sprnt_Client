@@ -82,7 +82,7 @@ export const useLocationTracker = ({
       }
     };
 
-    if (!isOnline && role !== "DRIVER" && !activeRideId) {
+    if (!isOnline && role !== "DRIVER") {
       clearExisting();
       return;
     }
